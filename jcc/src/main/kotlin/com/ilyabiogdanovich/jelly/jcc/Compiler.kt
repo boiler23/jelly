@@ -2,6 +2,7 @@ package com.ilyabiogdanovich.jelly.jcc
 
 import com.ilyabiogdanovich.jelly.jcc.eval.EvalContext
 import com.ilyabiogdanovich.jelly.jcc.eval.ExpressionEvaluator
+import com.ilyabiogdanovich.jelly.jcc.print.VarPrinter
 import com.ilyabogdanovich.jelly.jcc.JccBaseListener
 import com.ilyabogdanovich.jelly.jcc.JccLexer
 import com.ilyabogdanovich.jelly.jcc.JccParser
@@ -29,35 +30,26 @@ class Compiler {
         val list = mutableListOf<String>()
         private val evalContext = EvalContext(mapOf())
         private val expressionEvaluator = ExpressionEvaluator()
+        private val varPrinter = VarPrinter()
 
         override fun enterExpression(ctx: JccParser.ExpressionContext?) {
-            if (ctx != null) {
-                when (val evaluated = expressionEvaluator.evaluateExpression(evalContext, ctx)) {
-                    is Either.Left -> errors.add(evaluated.value.formattedMessage)
-                    is Either.Right -> list.add("expr: ${ctx.text}")
-                }
+            ctx ?: return
+            when (val evaluated = expressionEvaluator.evaluateExpression(evalContext, ctx)) {
+                is Either.Left -> errors.add(evaluated.value.formattedMessage)
+                is Either.Right -> Unit
             }
-            super.enterExpression(ctx)
         }
 
-        override fun enterMap(ctx: JccParser.MapContext?) {
-            if (ctx != null) {
-                list.add("map: input=${ctx.expression().text}, lambda = { ${ctx.lambda1().text} }")
+        override fun enterOutput(ctx: JccParser.OutputContext?) {
+            ctx ?: return
+            when (val evaluated = expressionEvaluator.evaluateExpression(evalContext, ctx.expression())) {
+                is Either.Left -> errors.add(evaluated.value.formattedMessage)
+                is Either.Right -> list.add(varPrinter.print(evaluated.value))
             }
-            super.enterMap(ctx)
-        }
-
-        override fun enterReduce(ctx: JccParser.ReduceContext?) {
-            if (ctx != null) {
-                list.add("reduce: input=${ctx.expression(0).text}, neutral=${ctx.expression(1).text}, lambda = { ${ctx.lambda2().text} }")
-            }
-            super.enterReduce(ctx)
         }
 
         override fun visitErrorNode(node: ErrorNode?) {
             list.add(node?.text ?: "Unknown error")
-
-            super.visitErrorNode(node)
         }
     }
 
