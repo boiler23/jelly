@@ -29,41 +29,51 @@ import com.ilyabiogdanovich.jelly.jcc.Compiler
 @Composable
 @Preview
 fun App() {
-    val input = remember { mutableStateOf(TextFieldValue(text = "Hello Jelly;")) }
+    val input = remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = """
+                    var n = 500
+                    var seq = map({0, n}, i -> (-1)^i / (2 * i + 1))
+                    var pi = 4 * reduce(seq, 0, x y -> x + y)
+                    print "pi = "
+                    out pi
+                """.trimIndent()
+            )
+        )
+    }
     var resultOutput by remember { mutableStateOf("") }
     var errorOutput by remember { mutableStateOf("") }
 
+    fun handleInput(newInput: TextFieldValue) {
+        input.value = newInput
+        val compilation = Compiler().compile(newInput.text)
+        resultOutput = compilation.results.joinToString(separator = "\n")
+        errorOutput = compilation.errors.joinToString(separator = "\n")
+    }
+
+    handleInput(input.value)
+
     MaterialTheme {
         Column(modifier = Modifier.fillMaxHeight().padding(10.dp)) {
-            Row(modifier = Modifier.fillMaxWidth().height(0.dp).weight(1f)) {
+            Row(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text("Input", fontWeight = FontWeight.Bold)
                     BasicTextField(
                         value = input.value,
-                        onValueChange = { newInput ->
-                            input.value = newInput
-                            val compilation = Compiler().compile(newInput.text)
-                            resultOutput = compilation.result
-                            errorOutput = compilation.errors
-                        },
+                        onValueChange = ::handleInput,
                     )
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Output", fontWeight = FontWeight.Bold)
-                    Text(resultOutput)
-                    Text("Errors", fontWeight = FontWeight.Bold)
-                    Text(errorOutput, color = Color.Red)
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Output", fontWeight = FontWeight.Bold)
+                        Text(resultOutput)
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Errors", fontWeight = FontWeight.Bold)
+                        Text(errorOutput, color = Color.Red)
+                    }
                 }
-            }
-            Button(
-                modifier = Modifier.wrapContentHeight(),
-                onClick = {
-                    val compilation = Compiler().compile(input.value.text)
-                    resultOutput = compilation.result
-                    errorOutput = compilation.errors
-                }
-            ) {
-                Text("Compile")
             }
         }
     }

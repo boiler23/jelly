@@ -7,14 +7,12 @@ import org.antlr.v4.runtime.ANTLRErrorListener
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.Parser
-import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
 import org.antlr.v4.runtime.atn.ATNConfigSet
 import org.antlr.v4.runtime.dfa.DFA
 import org.antlr.v4.runtime.tree.ErrorNode
 import org.antlr.v4.runtime.tree.ParseTreeWalker
-import org.antlr.v4.runtime.tree.TerminalNode
 import java.util.BitSet
 
 /**
@@ -24,46 +22,31 @@ import java.util.BitSet
  */
 class Compiler {
     class ResultListener : JccBaseListener() {
-        val builder = StringBuilder()
+        val list = mutableListOf<String>()
 
-        override fun visitTerminal(node: TerminalNode?) {
-            if (node != null) {
-                when (node.symbol.type) {
-                    JccParser.GREET -> builder.appendLine(node.text)
-                    JccParser.NAME -> builder.appendLine(node.text)
-                }
+        override fun enterMap(ctx: JccParser.MapContext?) {
+            if (ctx != null) {
+                list.add("map: input=${ctx.expression().text}, lambda = { ${ctx.lambda1().text} }")
             }
+            super.enterMap(ctx)
+        }
 
-            super.visitTerminal(node)
+        override fun enterReduce(ctx: JccParser.ReduceContext?) {
+            if (ctx != null) {
+                list.add("reduce: input=${ctx.expression(0).text}, neutral=${ctx.expression(1).text}, lambda = { ${ctx.lambda2().text} }")
+            }
+            super.enterReduce(ctx)
         }
 
         override fun visitErrorNode(node: ErrorNode?) {
-            if (node != null) {
-                builder.appendLine(node.text)
-            }
+            list.add(node?.text ?: "Unknown error")
 
             super.visitErrorNode(node)
-        }
-
-        override fun enterEveryRule(ctx: ParserRuleContext?) {
-            super.enterEveryRule(ctx)
-        }
-
-        override fun exitEveryRule(ctx: ParserRuleContext?) {
-            super.exitEveryRule(ctx)
-        }
-
-        override fun enterParse(ctx: JccParser.ParseContext?) {
-            super.enterParse(ctx)
-        }
-
-        override fun exitParse(ctx: JccParser.ParseContext?) {
-            super.exitParse(ctx)
         }
     }
 
     class ErrorListener : ANTLRErrorListener {
-        val builder = StringBuilder()
+        val list = mutableListOf<String>()
 
         override fun syntaxError(
             recognizer: Recognizer<*, *>?,
@@ -73,7 +56,7 @@ class Compiler {
             message: String?,
             e: RecognitionException?
         ) {
-            builder.appendLine("line $line:$charPositionInLine $message")
+            list.add("line $line:$charPositionInLine $message")
         }
 
         override fun reportAmbiguity(
@@ -106,8 +89,8 @@ class Compiler {
     }
 
     data class Output(
-        val result: String,
-        val errors: String,
+        val results: List<String>,
+        val errors: List<String>,
     )
 
     fun compile(src: String): Output {
@@ -118,11 +101,11 @@ class Compiler {
         lexer.addErrorListener(errorListener)
         val parser = JccParser(CommonTokenStream(lexer))
         parser.addErrorListener(errorListener)
-        val tree = parser.parse()
+        val tree = parser.program()
         ParseTreeWalker.DEFAULT.walk(resultListener, tree)
         return Output(
-            result = resultListener.builder.toString(),
-            errors = errorListener.builder.toString(),
+            results = resultListener.list,
+            errors = errorListener.list,
         )
     }
 }
