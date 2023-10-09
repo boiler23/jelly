@@ -4,6 +4,7 @@ import com.ilyabiogdanovich.jelly.jcc.eval.Num
 import com.ilyabiogdanovich.jelly.jcc.eval.Seq
 import com.ilyabiogdanovich.jelly.jcc.eval.Var
 import io.kotest.matchers.shouldBe
+import org.junit.Before
 import org.junit.Test
 import java.util.Locale
 
@@ -14,6 +15,11 @@ import java.util.Locale
  */
 class VarPrinterTest {
     private val printer = VarPrinter()
+
+    @Before
+    fun setUp() {
+        Locale.setDefault(Locale.ROOT)
+    }
 
     @Test
     fun `print integer`() {
@@ -37,6 +43,18 @@ class VarPrinterTest {
 
         // Check
         result shouldBe "123.456"
+    }
+
+    @Test
+    fun `print double with long fraction`() {
+        // Prepare
+        val variable = Var.NumVar(Num.Real(3.1415926))
+
+        // Do
+        val result = printer.print(variable)
+
+        // Check
+        result shouldBe "3.1415926"
     }
 
     @Test

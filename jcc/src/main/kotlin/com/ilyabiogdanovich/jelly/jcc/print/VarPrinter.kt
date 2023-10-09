@@ -4,6 +4,7 @@ import com.ilyabiogdanovich.jelly.jcc.eval.Num
 import com.ilyabiogdanovich.jelly.jcc.eval.Seq
 import com.ilyabiogdanovich.jelly.jcc.eval.Var
 import java.text.DecimalFormat
+import java.text.NumberFormat
 import java.util.Locale
 
 
@@ -25,7 +26,7 @@ class VarPrinter {
 
     private fun Num.print(): String = when (this) {
         is Num.Integer -> v.toString()
-        is Num.Real -> DecimalFormat.getInstance(Locale.ROOT).format(r)
+        is Num.Real -> r.toString()
     }
 
     private fun Seq.print() = buildString {
