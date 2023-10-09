@@ -5,6 +5,7 @@ import com.ilyabiogdanovich.jelly.jcc.eval.ExpressionEvaluator
 import com.ilyabogdanovich.jelly.jcc.JccBaseListener
 import com.ilyabogdanovich.jelly.jcc.JccLexer
 import com.ilyabogdanovich.jelly.jcc.JccParser
+import com.ilyabogdanovich.jelly.utils.Either
 import org.antlr.v4.runtime.ANTLRErrorListener
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -24,15 +25,16 @@ import java.util.BitSet
  */
 class Compiler {
     class ResultListener : JccBaseListener() {
+        val errors = mutableListOf<String>()
         val list = mutableListOf<String>()
         private val evalContext = EvalContext(mapOf())
         private val expressionEvaluator = ExpressionEvaluator()
 
         override fun enterExpression(ctx: JccParser.ExpressionContext?) {
             if (ctx != null) {
-                val evaluated = expressionEvaluator.evaluateExpression(evalContext, ctx)
-                if (evaluated != null) {
-                    list.add("expr: ${ctx.text}")
+                when (val evaluated = expressionEvaluator.evaluateExpression(evalContext, ctx)) {
+                    is Either.Left -> errors.add(evaluated.value.formattedMessage)
+                    is Either.Right -> list.add("expr: ${ctx.text}")
                 }
             }
             super.enterExpression(ctx)
@@ -119,7 +121,7 @@ class Compiler {
         ParseTreeWalker.DEFAULT.walk(resultListener, tree)
         return Output(
             results = resultListener.list,
-            errors = errorListener.list,
+            errors = errorListener.list + resultListener.errors,
         )
     }
 }

@@ -4,6 +4,7 @@ version-plugin-kotlin = "1.9.10"
 
 version-test-junit = "4.13.2"
 version-test-kotest = "5.6.2"
+version-test-mockk = "1.13.5"
 
 [libraries]
 plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "version-plugin-kotlin" }
@@ -11,3 +12,4 @@ plugin-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", versi
 
 test-junit = { module = "junit:junit", version.ref = "version-test-junit" }
 test-kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "version-test-kotest" }
+test-mockk-jvm = { module = "io.mockk:mockk", version.ref = "version-test-mockk" }

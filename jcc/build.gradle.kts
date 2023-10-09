@@ -44,4 +44,10 @@ sourceSets {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to "*.jar")))
+
+    implementation(libs.test.junit)
+    implementation(libs.test.kotest.assertions)
+    implementation(libs.test.mockk.jvm)
+
+    implementation(project(":utils"))
 }
