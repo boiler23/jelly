@@ -2,6 +2,12 @@
 version-plugin-compose = "1.5.3"
 version-plugin-kotlin = "1.9.10"
 
+version-test-junit = "4.13.2"
+version-test-kotest = "5.6.2"
+
 [libraries]
 plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "version-plugin-kotlin" }
 plugin-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "version-plugin-compose" }
+
+test-junit = { module = "junit:junit", version.ref = "version-test-junit" }
+test-kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "version-test-kotest" }
