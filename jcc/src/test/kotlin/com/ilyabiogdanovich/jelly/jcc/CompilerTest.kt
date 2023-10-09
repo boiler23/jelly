@@ -50,16 +50,16 @@ class CompilerTest(
             arrayOf("out 0500", listOf("500"), empty()),
             arrayOf("out -500", listOf("-500"), empty()),
             arrayOf("out --500", listOf("-500"), listOf("line 1:4 extraneous input '-' expecting {'map', 'reduce', '(', '{', NUMBER, NAME}")),
-            arrayOf("out +500", listOf("500"), empty()),
-            arrayOf("out ++500", listOf("500"), listOf("line 1:4 extraneous input '+' expecting {'map', 'reduce', '(', '{', NUMBER, NAME}")),
+            arrayOf("out +500", listOf("500"), listOf("line 1:4 extraneous input '+' expecting {'map', 'reduce', '(', '{', NUMBER, NAME}")),
+            arrayOf("out ++500", empty(), listOf("line 1:4 mismatched input '+' expecting {'map', 'reduce', '(', '{', NUMBER, NAME}", "1:4: Unsupported expression encountered: `++500`.")),
             arrayOf("out +-500", listOf("-500"), listOf("line 1:4 extraneous input '+' expecting {'map', 'reduce', '(', '{', NUMBER, NAME}")),
-            arrayOf("out -+500", listOf("500"), listOf("line 1:4 extraneous input '-' expecting {'map', 'reduce', '(', '{', NUMBER, NAME}")),
+            arrayOf("out -+500", empty(), listOf("line 1:4 mismatched input '-' expecting {'map', 'reduce', '(', '{', NUMBER, NAME}", "1:4: Unsupported expression encountered: `-+500`.")),
             arrayOf("out 0.456", listOf("0.456"), empty()),
             arrayOf("out .5", listOf("0.5"), empty()),
             arrayOf("out 0.0", listOf("0.0"), empty()),
             arrayOf("out 123.456", listOf("123.456"), empty()),
             arrayOf("out -123.456", listOf("-123.456"), empty()),
-            arrayOf("out +123.456", listOf("123.456"), empty()),
+            arrayOf("out +123.456", listOf("123.456"), listOf("line 1:4 extraneous input '+' expecting {'map', 'reduce', '(', '{', NUMBER, NAME}")),
             arrayOf("out 500;", listOf("500"), listOf("line 1:7 token recognition error at: ';'")),
             arrayOf("print", empty(), listOf("line 1:5 missing STRING at '<EOF>'")),
             arrayOf("print \"text\"", listOf("text"), empty()),
@@ -120,6 +120,45 @@ class CompilerTest(
                     "line 2:7 mismatched input '<EOF>' expecting NAME", "1:0: Missing variable assignment: `var`.",
                     "2:4: Unsupported expression encountered: ``.", "2:4: Missing variable assignment: `var`."
                 ),
+            ),
+            arrayOf("out 2 + 3", listOf("5"), empty()),
+            arrayOf("out 15 - 2.5", listOf("12.5"), empty()),
+            arrayOf("out 15 / 5", listOf("3.0"), empty()),
+            arrayOf("out 3 * 5", listOf("15"), empty()),
+            arrayOf("out 2 ^ 5", listOf("32"), empty()),
+            arrayOf("out 2 + 3 * 4", listOf("14"), empty()),
+            arrayOf("out 2 ++ 3 * 4", listOf("14"), listOf("line 1:7 extraneous input '+' expecting {'map', 'reduce', '(', '{', NUMBER, NAME}")),
+            arrayOf("out (2 + 3) * 4", listOf("20"), empty()),
+            arrayOf("out (1 + 3 * 5) / 4", listOf("4.0"), empty()),
+            arrayOf("out 2 ^ (5 + 1)", listOf("64"), empty()),
+            arrayOf(
+                """
+                    var num1 = 12
+                    var num2 = 3
+                    var num3 = 2 + num1 / (10 - num2 * 2)
+                    print "result = "
+                    out num3
+                """.trimIndent(),
+                listOf("result = ", "5.0"),
+                empty()
+            ),
+            arrayOf(
+                """
+                    var i = 5
+                    var res = 2^(i + 1)
+                    out res
+                """.trimIndent(),
+                listOf("64"),
+                empty()
+            ),
+            arrayOf(
+                """
+                    var i = 5
+                    var res = 2^(i+1)
+                    out res
+                """.trimIndent(),
+                listOf("64"),
+                empty()
             ),
         )
     }

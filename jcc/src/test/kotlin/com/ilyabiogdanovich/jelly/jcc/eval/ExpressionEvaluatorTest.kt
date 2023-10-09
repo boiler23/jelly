@@ -1,6 +1,8 @@
 package com.ilyabiogdanovich.jelly.jcc.eval
 
-import com.ilyabogdanovich.jelly.jcc.JccParser
+import com.ilyabogdanovich.jelly.jcc.JccParser.ExpressionContext
+import com.ilyabogdanovich.jelly.jcc.JccParser.IdentifierContext
+import com.ilyabogdanovich.jelly.jcc.JccParser.NumberContext
 import com.ilyabogdanovich.jelly.utils.asLeft
 import com.ilyabogdanovich.jelly.utils.asRight
 import io.kotest.matchers.shouldBe
@@ -21,12 +23,12 @@ class ExpressionEvaluatorTest {
     @Test
     fun `evaluate integer`() {
         // Prepare
-        val numberContext = mockk<JccParser.NumberContext> {
+        val numberContext = mockk<NumberContext> {
             every { text } returns "123"
         }
-        val parserContext = mockk<JccParser.ExpressionContext> {
-            every { number() } returns numberContext
-            every { identifier() } returns null
+        val parserContext = mockk<ExpressionContext> {
+            every { getRuleContext(NumberContext::class.java, 0) } returns numberContext
+            every { getRuleContext(IdentifierContext::class.java, 0) } returns null
         }
 
         // Do
@@ -39,12 +41,12 @@ class ExpressionEvaluatorTest {
     @Test
     fun `evaluate double`() {
         // Prepare
-        val numberContext = mockk<JccParser.NumberContext> {
+        val numberContext = mockk<NumberContext> {
             every { text } returns "123.456"
         }
-        val parserContext = mockk<JccParser.ExpressionContext> {
-            every { number() } returns numberContext
-            every { identifier() } returns null
+        val parserContext = mockk<ExpressionContext> {
+            every { getRuleContext(NumberContext::class.java, 0) } returns numberContext
+            every { getRuleContext(IdentifierContext::class.java, 0) } returns null
         }
 
         // Do
@@ -61,13 +63,13 @@ class ExpressionEvaluatorTest {
             every { line } returns 5
             every { charPositionInLine } returns 11
         }
-        val numberContext = mockk<JccParser.NumberContext> {
+        val numberContext = mockk<NumberContext> {
             every { text } returns "12i+56"
             every { getStart() } returns startToken
         }
-        val parserContext = mockk<JccParser.ExpressionContext> {
-            every { number() } returns numberContext
-            every { identifier() } returns null
+        val parserContext = mockk<ExpressionContext> {
+            every { getRuleContext(NumberContext::class.java, 0) } returns numberContext
+            every { getRuleContext(IdentifierContext::class.java, 0) } returns null
         }
 
         // Do
@@ -85,12 +87,12 @@ class ExpressionEvaluatorTest {
     @Test
     fun `evaluate existing identifier`() {
         // Prepare
-        val identifier = mockk<JccParser.IdentifierContext> {
+        val identifier = mockk<IdentifierContext> {
             every { text } returns "id"
         }
-        val parserContext = mockk<JccParser.ExpressionContext> {
-            every { number() } returns null
-            every { identifier() } returns identifier
+        val parserContext = mockk<ExpressionContext> {
+            every { getRuleContext(NumberContext::class.java, 0) } returns null
+            every { getRuleContext(IdentifierContext::class.java, 0) } returns identifier
         }
         val variable = mockk<Var>()
         evalContext.push("id", variable)
@@ -109,13 +111,13 @@ class ExpressionEvaluatorTest {
             every { line } returns 3
             every { charPositionInLine } returns 14
         }
-        val identifier = mockk<JccParser.IdentifierContext> {
+        val identifier = mockk<IdentifierContext> {
             every { text } returns "id"
             every { getStart() } returns startToken
         }
-        val parserContext = mockk<JccParser.ExpressionContext> {
-            every { number() } returns null
-            every { identifier() } returns identifier
+        val parserContext = mockk<ExpressionContext> {
+            every { getRuleContext(NumberContext::class.java, 0) } returns null
+            every { getRuleContext(IdentifierContext::class.java, 0) } returns identifier
         }
 
         // Do
@@ -137,9 +139,9 @@ class ExpressionEvaluatorTest {
             every { line } returns 2
             every { charPositionInLine } returns 12
         }
-        val parserContext = mockk<JccParser.ExpressionContext> {
-            every { number() } returns null
-            every { identifier() } returns null
+        val parserContext = mockk<ExpressionContext> {
+            every { getRuleContext(NumberContext::class.java, 0) } returns null
+            every { getRuleContext(IdentifierContext::class.java, 0) } returns null
             every { text } returns "expr_text"
             every { getStart() } returns startToken
         }

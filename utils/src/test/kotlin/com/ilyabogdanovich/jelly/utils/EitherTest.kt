@@ -32,7 +32,7 @@ class EitherTest {
     }
 
     @Test
-    fun `map right - if right`() {
+    fun `map right - right`() {
         // Prepare
         val v = Either.Right<String, Int>(1)
 
@@ -44,12 +44,60 @@ class EitherTest {
     }
 
     @Test
-    fun `map right - if left`() {
+    fun `map right - left`() {
         // Prepare
         val v = Either.Left<String, Int>("1")
 
         // Do
         val result = v.mapRight { it + 1 }
+
+        // Check
+        result shouldBe Either.Left("1")
+    }
+
+    @Test
+    fun `map either right - right to right`() {
+        // Prepare
+        val v = Either.Right<String, Int>(1)
+
+        // Do
+        val result = v.mapEitherRight { Either.Right(it + 1) }
+
+        // Check
+        result shouldBe Either.Right(2)
+    }
+
+    @Test
+    fun `map either right - right to left`() {
+        // Prepare
+        val v = Either.Right<String, Int>(1)
+
+        // Do
+        val result = v.mapEitherRight { Either.Left<String, Int>("error") }
+
+        // Check
+        result shouldBe Either.Left("error")
+    }
+
+    @Test
+    fun `map either right - left to right`() {
+        // Prepare
+        val v = Either.Left<String, Int>("1")
+
+        // Do
+        val result = v.mapEitherRight { Either.Right<String, Int>(it + 1) }
+
+        // Check
+        result shouldBe Either.Left("1")
+    }
+
+    @Test
+    fun `map either right - left to left`() {
+        // Prepare
+        val v = Either.Left<String, Int>("1")
+
+        // Do
+        val result = v.mapEitherRight { Either.Left<String, Int>("error") }
 
         // Check
         result shouldBe Either.Left("1")

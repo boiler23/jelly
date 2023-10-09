@@ -15,14 +15,16 @@ output: OUT expression;
  */
 printing: PRINT STRING;
 
-expression:
-            identifier
-          | number
-          | expression OP expression
-          | LPAREN expression RPAREN
-          | sequence
-          | map
-          | reduce
+expression
+          : identifier                       # id
+          | number                           # value
+          | LPAREN expression RPAREN         # parenthesis
+          | expression POWER expression      # power
+          | expression MULDIV expression     # muldiv
+          | expression PLUSMINUS expression  # plusminus
+          | sequence                         # array
+          | map                              # mapping
+          | reduce                           # reducing
           ;
 
 identifier: NAME;
@@ -49,7 +51,9 @@ MAP: 'map';
 REDUCE: 'reduce';
 
 // Operators
-OP: ('+'|'-'|'*'|'/'|'^');
+PLUSMINUS: ('+'|'-');
+MULDIV: ('*'|'/');
+POWER: '^';
 ASSIGN: '=';
 ARROW: '->';
 

@@ -42,6 +42,16 @@ data class EvalError(
         MissingVariableAssignment,
 
         /**
+         *
+         */
+        InvalidArithmeticOperand,
+
+        /**
+         *
+         */
+        InvalidArithmeticOperator,
+
+        /**
          * Unsupported expression was encountered.
          */
         UnsupportedExpression,
@@ -63,6 +73,8 @@ data class EvalError(
             Type.VariableRedeclaration -> "Variable redeclaration: `$expression`."
             Type.UndeclaredVariable -> "Variable undeclared: `$expression`."
             Type.UnsupportedExpression -> "Unsupported expression encountered: `$expression`."
+            Type.InvalidArithmeticOperand -> "Invalid arithmetic operand: `$expression`."
+            Type.InvalidArithmeticOperator -> "Invalid arithmetic operator: `$expression`"
             Type.MissingVariableAssignment -> "Missing variable assignment: `$expression`."
         }
 }

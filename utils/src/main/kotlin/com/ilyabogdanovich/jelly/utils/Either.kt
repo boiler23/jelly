@@ -19,3 +19,11 @@ sealed class Either<L, R> {
 fun <L, R> L.asLeft(): Either<L, R> = Either.Left(this)
 
 fun <L, R> R.asRight(): Either<L, R> = Either.Right(this)
+
+inline fun <L, R, T> Either<L, R>.mapEitherRight(mapper: (R) -> Either<L, T>): Either<L, T> =
+    mapRight {
+        return when (val result = mapper(it)) {
+            is Either.Right -> result.value.asRight()
+            is Either.Left -> result.value.asLeft()
+        }
+    }
