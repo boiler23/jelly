@@ -17,4 +17,5 @@ rootProject.name = "Jelly"
 
 include(":ide:app")
 include(":jcc")
+include(":viewer")
 include(":utils")

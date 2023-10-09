@@ -11,6 +11,7 @@ import com.ilyabogdanovich.jelly.jcc.JccBaseListener
 import com.ilyabogdanovich.jelly.jcc.JccLexer
 import com.ilyabogdanovich.jelly.jcc.JccParser
 import com.ilyabogdanovich.jelly.utils.Either
+import org.antlr.v4.gui.TreeViewer
 import org.antlr.v4.runtime.ANTLRErrorListener
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -140,5 +141,16 @@ class Compiler {
             output = resultListener.list,
             errors = errorListener.list + resultListener.errors,
         )
+    }
+
+    fun view(src: String) {
+        val errorListener = ErrorListener()
+        val lexer = JccLexer(CharStreams.fromString(src))
+        lexer.addErrorListener(errorListener)
+        val parser = JccParser(CommonTokenStream(lexer))
+        parser.addErrorListener(errorListener)
+        val tree = parser.program()
+        val viewer = TreeViewer(listOf(*parser.ruleNames), tree)
+        viewer.open()
     }
 }
