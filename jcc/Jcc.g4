@@ -8,6 +8,11 @@ assignment: VAR NAME ASSIGN expression;
 
 output: OUT expression;
 
+/**
+ * Printing.
+ * We support only quoted strings. Quotes inside the string should be masked with the slash '\'.
+ * Non-quoted strings, empty or multiline strings are not supported.
+ */
 printing: PRINT STRING;
 
 expression:

@@ -2,6 +2,7 @@ package com.ilyabiogdanovich.jelly.jcc
 
 import com.ilyabiogdanovich.jelly.jcc.eval.EvalContext
 import com.ilyabiogdanovich.jelly.jcc.eval.ExpressionEvaluator
+import com.ilyabiogdanovich.jelly.jcc.eval.PrintEvaluator
 import com.ilyabiogdanovich.jelly.jcc.print.VarPrinter
 import com.ilyabogdanovich.jelly.jcc.JccBaseListener
 import com.ilyabogdanovich.jelly.jcc.JccLexer
@@ -15,7 +16,6 @@ import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
 import org.antlr.v4.runtime.atn.ATNConfigSet
 import org.antlr.v4.runtime.dfa.DFA
-import org.antlr.v4.runtime.tree.ErrorNode
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 import java.util.BitSet
 
@@ -31,6 +31,7 @@ class Compiler {
         private val evalContext = EvalContext(mapOf())
         private val expressionEvaluator = ExpressionEvaluator()
         private val varPrinter = VarPrinter()
+        private val printEvaluator = PrintEvaluator()
 
         override fun enterExpression(ctx: JccParser.ExpressionContext?) {
             ctx ?: return
@@ -48,8 +49,12 @@ class Compiler {
             }
         }
 
-        override fun visitErrorNode(node: ErrorNode?) {
-            list.add(node?.text ?: "Unknown error")
+        override fun enterPrinting(ctx: JccParser.PrintingContext?) {
+            ctx ?: return
+            val output = printEvaluator.evaluate(ctx)
+            if (output != null) {
+                list.add(output)
+            }
         }
     }
 
