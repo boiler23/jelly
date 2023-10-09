@@ -25,6 +25,7 @@ class ExpressionEvaluator {
     ): Either<EvalError, Var> {
         return parseContext.ruleContext<JccParser.NumberContext>()?.number()
             ?: parseContext.ruleContext<JccParser.IdentifierContext>()?.id(evalContext)
+            ?: parseContext.ruleContext<JccParser.SequenceContext>()?.seq(evalContext)
             ?: parseContext.cast<JccParser.PowerContext>()?.binary(evalContext)
             ?: parseContext.cast<JccParser.MuldivContext>()?.binary(evalContext)
             ?: parseContext.cast<JccParser.PlusminusContext>()?.binary(evalContext)
@@ -48,6 +49,14 @@ class ExpressionEvaluator {
                 Var.NumVar(Num.Real(text.toDouble())).asRight()
             } else {
                 toError(EvalError.Type.InvalidNumber).asLeft()
+            }
+        }
+    }
+
+    private fun JccParser.SequenceContext.seq(evalContext: EvalContext): Either<EvalError, Var> {
+        return evaluateToInt(evalContext, expression(0)).mapEitherRight { start ->
+            evaluateToInt(evalContext, expression(1)).mapRight { end ->
+                Var.SeqVar(Seq(from = start, to = end))
             }
         }
     }
@@ -92,6 +101,21 @@ class ExpressionEvaluator {
                 when (val variable = evaluated.value) {
                     is Var.NumVar -> variable.v.asRight()
                     is Var.SeqVar -> return expr.toError(EvalError.Type.InvalidArithmeticOperand).asLeft()
+                }
+            }
+            is Either.Left -> return evaluated.value.asLeft()
+        }
+    }
+
+    private fun evaluateToInt(
+        evalContext: EvalContext,
+        expr: JccParser.ExpressionContext
+    ): Either<EvalError, Int> {
+        return when (val evaluated = evaluateToNumber(evalContext, expr)) {
+            is Either.Right -> {
+                when (val variable = evaluated.value) {
+                    is Num.Integer -> variable.v.asRight()
+                    is Num.Real -> return expr.toError(EvalError.Type.IntegerExpected).asLeft()
                 }
             }
             is Either.Left -> return evaluated.value.asLeft()

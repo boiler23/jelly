@@ -3,6 +3,7 @@ package com.ilyabiogdanovich.jelly.jcc.eval
 import com.ilyabogdanovich.jelly.jcc.JccParser.ExpressionContext
 import com.ilyabogdanovich.jelly.jcc.JccParser.IdentifierContext
 import com.ilyabogdanovich.jelly.jcc.JccParser.NumberContext
+import com.ilyabogdanovich.jelly.jcc.JccParser.SequenceContext
 import com.ilyabogdanovich.jelly.utils.asLeft
 import com.ilyabogdanovich.jelly.utils.asRight
 import io.kotest.matchers.shouldBe
@@ -142,6 +143,7 @@ class ExpressionEvaluatorTest {
         val parserContext = mockk<ExpressionContext> {
             every { getRuleContext(NumberContext::class.java, 0) } returns null
             every { getRuleContext(IdentifierContext::class.java, 0) } returns null
+            every { getRuleContext(SequenceContext::class.java, 0) } returns null
             every { text } returns "expr_text"
             every { getStart() } returns startToken
         }

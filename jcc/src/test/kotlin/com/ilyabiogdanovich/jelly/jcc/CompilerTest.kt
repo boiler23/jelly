@@ -164,6 +164,19 @@ class CompilerTest(
                 listOf("64"),
                 empty()
             ),
+            arrayOf("out {1,5}", listOf("{ 1, 2, 3, 4, 5 }"), empty()),
+            arrayOf("out {1,5-2}", listOf("{ 1, 2, 3 }"), empty()),
+            arrayOf("out {1,5,7}", listOf("{ 1, 2, 3, 4, 5 }"), listOf("line 1:8 mismatched input ',' expecting {PLUSMINUS, MULDIV, '^', '}'}")),
+            arrayOf(
+                """
+                    var from = 2
+                    var to = 8
+                    var seq = {from,to-3}
+                    out seq
+                """.trimIndent(),
+                listOf("{ 2, 3, 4, 5 }"),
+                empty()
+            ),
         )
     }
 }
