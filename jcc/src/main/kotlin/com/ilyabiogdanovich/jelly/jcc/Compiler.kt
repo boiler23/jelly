@@ -1,5 +1,7 @@
 package com.ilyabiogdanovich.jelly.jcc
 
+import com.ilyabiogdanovich.jelly.jcc.eval.EvalContext
+import com.ilyabiogdanovich.jelly.jcc.eval.ExpressionEvaluator
 import com.ilyabogdanovich.jelly.jcc.JccBaseListener
 import com.ilyabogdanovich.jelly.jcc.JccLexer
 import com.ilyabogdanovich.jelly.jcc.JccParser
@@ -23,6 +25,18 @@ import java.util.BitSet
 class Compiler {
     class ResultListener : JccBaseListener() {
         val list = mutableListOf<String>()
+        private val evalContext = EvalContext(mapOf())
+        private val expressionEvaluator = ExpressionEvaluator()
+
+        override fun enterExpression(ctx: JccParser.ExpressionContext?) {
+            if (ctx != null) {
+                val evaluated = expressionEvaluator.evaluateExpression(evalContext, ctx)
+                if (evaluated != null) {
+                    list.add("expr: ${ctx.text}")
+                }
+            }
+            super.enterExpression(ctx)
+        }
 
         override fun enterMap(ctx: JccParser.MapContext?) {
             if (ctx != null) {
