@@ -25,9 +25,10 @@ class ExpressionEvaluator {
     ): Either<EvalError, Var> {
         return parseContext.ruleContext<JccParser.NumberContext>()?.number()
             ?: parseContext.ruleContext<JccParser.IdentifierContext>()?.id(evalContext)
-            ?: parseContext.cast<JccParser.PowerContext>()?.operation(evalContext)
-            ?: parseContext.cast<JccParser.MuldivContext>()?.operation(evalContext)
-            ?: parseContext.cast<JccParser.PlusminusContext>()?.operation(evalContext)
+            ?: parseContext.cast<JccParser.PowerContext>()?.binary(evalContext)
+            ?: parseContext.cast<JccParser.MuldivContext>()?.binary(evalContext)
+            ?: parseContext.cast<JccParser.PlusminusContext>()?.binary(evalContext)
+            ?: parseContext.cast<JccParser.UnaryContext>()?.unary(evalContext)
             ?: parseContext.cast<JccParser.ParenthesisContext>()?.parenthesis(evalContext)
             ?: parseContext.unsupported()
     }
@@ -60,16 +61,16 @@ class ExpressionEvaluator {
     private fun JccParser.ExpressionContext.unsupported(): Either<EvalError, Var> =
         toError(EvalError.Type.UnsupportedExpression).asLeft()
 
-    private fun JccParser.PowerContext.operation(evalContext: EvalContext) =
-        operation(evalContext, POWER().text, expression(0), expression(1))
+    private fun JccParser.PowerContext.binary(evalContext: EvalContext) =
+        binary(evalContext, POWER().text, expression(0), expression(1))
 
-    private fun JccParser.MuldivContext.operation(evalContext: EvalContext) =
-        operation(evalContext, MULDIV().text, expression(0), expression(1))
+    private fun JccParser.MuldivContext.binary(evalContext: EvalContext) =
+        binary(evalContext, MULDIV().text, expression(0), expression(1))
 
-    private fun JccParser.PlusminusContext.operation(evalContext: EvalContext) =
-        operation(evalContext, PLUSMINUS().text, expression(0), expression(1))
+    private fun JccParser.PlusminusContext.binary(evalContext: EvalContext) =
+        binary(evalContext, PLUSMINUS().text, expression(0), expression(1))
 
-    private fun JccParser.ExpressionContext.operation(
+    private fun JccParser.ExpressionContext.binary(
         evalContext: EvalContext,
         operation: String,
         leftExpr: JccParser.ExpressionContext,
@@ -107,4 +108,25 @@ class ExpressionEvaluator {
             else -> toError(EvalError.Type.InvalidArithmeticOperator).asLeft()
         }
     }
+
+    private fun JccParser.UnaryContext.unary(evalContext: EvalContext) =
+        unary(evalContext, PLUSMINUS().text, expression())
+
+    private fun JccParser.ExpressionContext.unary(
+        evalContext: EvalContext,
+        operation: String,
+        expr: JccParser.ExpressionContext
+    ): Either<EvalError, Var> {
+        return evaluateToNumber(evalContext, expr).mapEitherRight { value ->
+            unaryOperate(operation, value)
+        }.mapRight { num -> Var.NumVar(num) }
+    }
+
+private fun JccParser.ExpressionContext.unaryOperate(operation: String, num: Num): Either<EvalError, Num> {
+    return when (operation) {
+        "+" -> num.asRight()
+        "-" -> (-num).asRight()
+        else -> toError(EvalError.Type.InvalidArithmeticOperator).asLeft()
+    }
+}
 }

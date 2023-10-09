@@ -68,4 +68,11 @@ sealed interface Num {
             is Real -> Real(r.pow(n.doubleValue))
         }
     }
+
+    operator fun unaryMinus(): Num {
+        return when (this) {
+            is Integer -> Integer(-v)
+            is Real -> Real(-r)
+        }
+    }
 }
