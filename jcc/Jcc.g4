@@ -66,7 +66,7 @@ DOT: '.';
 
 // Integers
 fragment DIGIT: [0-9];
-NUMBER: [+|-]*(DIGIT+[.]*DIGIT*|DIGIT*[.]*DIGIT+);
+NUMBER: [+|-]?(DIGIT+[.]*DIGIT*|DIGIT*[.]*DIGIT+);
 
 // Variable names
 NAME: [a-zA-Z|_][a-zA-Z0-9|_]*;
