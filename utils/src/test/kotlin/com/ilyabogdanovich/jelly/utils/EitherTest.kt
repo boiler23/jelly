@@ -30,4 +30,28 @@ class EitherTest {
         // Check
         result shouldBe Either.Right("test")
     }
+
+    @Test
+    fun `map right - if right`() {
+        // Prepare
+        val v = Either.Right<String, Int>(1)
+
+        // Do
+        val result = v.mapRight { it + 1 }
+
+        // Check
+        result shouldBe Either.Right(2)
+    }
+
+    @Test
+    fun `map right - if left`() {
+        // Prepare
+        val v = Either.Left<String, Int>("1")
+
+        // Do
+        val result = v.mapRight { it + 1 }
+
+        // Check
+        result shouldBe Either.Left("1")
+    }
 }

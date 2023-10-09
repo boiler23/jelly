@@ -8,7 +8,7 @@ import org.junit.runners.Parameterized
 import java.util.Locale
 
 /**
- * Test for [Compiler]
+ * Integration test for [Compiler] components all together.
  *
  * @author Ilya Bogdanovich on 09.10.2023
  */
@@ -66,6 +66,48 @@ class CompilerTest(
                 """.trimIndent(),
                 listOf("pi = ", "3.1415926"),
                 empty(),
+            ),
+            arrayOf(
+                """
+                    var n = 1.5
+                    out n
+                """.trimIndent(),
+                listOf("1.5"),
+                empty(),
+            ),
+            arrayOf(
+                """
+                    var n = 1
+                    var n1 = n
+                    print "n1="
+                    out n1
+                    print "n="
+                    out n
+                """.trimIndent(),
+                listOf("n1=", "1", "n=", "1"),
+                empty(),
+            ),
+            arrayOf(
+                """
+                    var n = 1
+                    var n = 2
+                    out n
+                """.trimIndent(),
+                listOf("1"),
+                listOf("2:0: Variable redeclaration: `varn=2`."),
+            ),
+            arrayOf(
+                """
+                    var var = 1
+                    out var
+                """.trimIndent(),
+                empty(),
+                listOf(
+                    "line 1:4 mismatched input 'var' expecting NAME", "line 1:8 missing NAME at '='",
+                    "line 2:4 mismatched input 'var' expecting {'map', 'reduce', '(', '{', NUMBER, NAME}",
+                    "line 2:7 mismatched input '<EOF>' expecting NAME", "1:0: Missing variable assignment: `var`.",
+                    "2:4: Unsupported expression encountered: ``.", "2:4: Missing variable assignment: `var`."
+                ),
             ),
         )
     }

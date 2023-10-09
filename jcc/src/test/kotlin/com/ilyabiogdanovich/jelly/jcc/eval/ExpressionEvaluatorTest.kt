@@ -15,8 +15,7 @@ import org.junit.Test
  * @author Ilya Bogdanovich on 09.10.2023
  */
 class ExpressionEvaluatorTest {
-    private val evalContext = EvalContext(mapOf()) // not used yet.
-
+    private val evalContext = EvalContext()
     private val evaluator = ExpressionEvaluator()
 
     @Test
@@ -27,6 +26,7 @@ class ExpressionEvaluatorTest {
         }
         val parserContext = mockk<JccParser.ExpressionContext> {
             every { number() } returns numberContext
+            every { identifier() } returns null
         }
 
         // Do
@@ -44,6 +44,7 @@ class ExpressionEvaluatorTest {
         }
         val parserContext = mockk<JccParser.ExpressionContext> {
             every { number() } returns numberContext
+            every { identifier() } returns null
         }
 
         // Do
@@ -66,6 +67,7 @@ class ExpressionEvaluatorTest {
         }
         val parserContext = mockk<JccParser.ExpressionContext> {
             every { number() } returns numberContext
+            every { identifier() } returns null
         }
 
         // Do
@@ -81,6 +83,54 @@ class ExpressionEvaluatorTest {
     }
 
     @Test
+    fun `evaluate existing identifier`() {
+        // Prepare
+        val identifier = mockk<JccParser.IdentifierContext> {
+            every { text } returns "id"
+        }
+        val parserContext = mockk<JccParser.ExpressionContext> {
+            every { number() } returns null
+            every { identifier() } returns identifier
+        }
+        val variable = mockk<Var>()
+        evalContext.push("id", variable)
+
+        // Do
+        val result = evaluator.evaluateExpression(evalContext, parserContext)
+
+        // Check
+        result shouldBe variable.asRight()
+    }
+
+    @Test
+    fun `evaluate non-existing identifier`() {
+        // Prepare
+        val startToken = mockk<Token> {
+            every { line } returns 3
+            every { charPositionInLine } returns 14
+        }
+        val identifier = mockk<JccParser.IdentifierContext> {
+            every { text } returns "id"
+            every { getStart() } returns startToken
+        }
+        val parserContext = mockk<JccParser.ExpressionContext> {
+            every { number() } returns null
+            every { identifier() } returns identifier
+        }
+
+        // Do
+        val result = evaluator.evaluateExpression(evalContext, parserContext)
+
+        // Check
+        result shouldBe EvalError(
+            line = 3,
+            positionInLine = 14,
+            expression = "id",
+            type = EvalError.Type.UndeclaredVariable
+        ).asLeft()
+    }
+
+    @Test
     fun `evaluate unsupported expression`() {
         // Prepare
         val startToken = mockk<Token> {
@@ -89,6 +139,7 @@ class ExpressionEvaluatorTest {
         }
         val parserContext = mockk<JccParser.ExpressionContext> {
             every { number() } returns null
+            every { identifier() } returns null
             every { text } returns "expr_text"
             every { getStart() } returns startToken
         }

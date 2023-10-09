@@ -1,8 +1,11 @@
 package com.ilyabiogdanovich.jelly.jcc
 
+import com.ilyabiogdanovich.jelly.jcc.eval.AssignmentEvaluator
 import com.ilyabiogdanovich.jelly.jcc.eval.EvalContext
+import com.ilyabiogdanovich.jelly.jcc.eval.EvalError
 import com.ilyabiogdanovich.jelly.jcc.eval.ExpressionEvaluator
 import com.ilyabiogdanovich.jelly.jcc.eval.PrintEvaluator
+import com.ilyabiogdanovich.jelly.jcc.eval.toError
 import com.ilyabiogdanovich.jelly.jcc.print.VarPrinter
 import com.ilyabogdanovich.jelly.jcc.JccBaseListener
 import com.ilyabogdanovich.jelly.jcc.JccLexer
@@ -20,7 +23,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker
 import java.util.BitSet
 
 /**
- * Sample compiler, based on ANTLR output.
+ * Compiler for our language.
  *
  * @author Ilya Bogdanovich on 08.10.2023
  */
@@ -28,16 +31,25 @@ class Compiler {
     class ResultListener : JccBaseListener() {
         val errors = mutableListOf<String>()
         val list = mutableListOf<String>()
-        private val evalContext = EvalContext(mapOf())
+        private val evalContext = EvalContext()
         private val expressionEvaluator = ExpressionEvaluator()
+        private val assignmentEvaluator = AssignmentEvaluator(expressionEvaluator)
         private val varPrinter = VarPrinter()
         private val printEvaluator = PrintEvaluator()
 
-        override fun enterExpression(ctx: JccParser.ExpressionContext?) {
+        override fun enterAssignment(ctx: JccParser.AssignmentContext?) {
             ctx ?: return
-            when (val evaluated = expressionEvaluator.evaluateExpression(evalContext, ctx)) {
-                is Either.Left -> errors.add(evaluated.value.formattedMessage)
-                is Either.Right -> Unit
+            when (val evaluated = assignmentEvaluator.evaluate(evalContext, ctx)) {
+                is Either.Left -> {
+                    errors.add(evaluated.value.formattedMessage)
+                }
+                is Either.Right -> {
+                    val (id, variable) = evaluated.value
+                    val pushed = evalContext.push(id, variable)
+                    if (!pushed) {
+                        errors.add(ctx.toError(EvalError.Type.VariableRedeclaration).formattedMessage)
+                    }
+                }
             }
         }
 
@@ -55,6 +67,14 @@ class Compiler {
             if (output != null) {
                 list.add(output)
             }
+        }
+
+        override fun enterProgram(ctx: JccParser.ProgramContext?) {
+            evalContext.clear()
+        }
+
+        override fun exitProgram(ctx: JccParser.ProgramContext?) {
+            evalContext.clear()
         }
     }
 

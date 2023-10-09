@@ -23,6 +23,7 @@ class ExpressionEvaluator {
         parseContext: JccParser.ExpressionContext
     ): Either<EvalError, Var> {
         val number = parseContext.number()
+        val id = parseContext.identifier()
         return if (number != null) {
             val intNum = number.text.toIntOrNull()
             if (intNum != null) {
@@ -35,18 +36,10 @@ class ExpressionEvaluator {
                     number.toError(EvalError.Type.InvalidNumber).asLeft()
                 }
             }
+        } else if (id != null) {
+            evalContext[id.text]?.asRight() ?: id.toError(EvalError.Type.UndeclaredVariable).asLeft()
         } else {
             parseContext.toError(EvalError.Type.UnsupportedExpression).asLeft()
         }
-    }
-
-    private fun ParserRuleContext.toError(type: EvalError.Type): EvalError {
-        val startToken = getStart()
-        return EvalError(
-            line = startToken.line,
-            positionInLine = startToken.charPositionInLine,
-            expression = text,
-            type = type,
-        )
     }
 }

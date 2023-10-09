@@ -1,5 +1,7 @@
 package com.ilyabiogdanovich.jelly.jcc.eval
 
+import org.antlr.v4.runtime.ParserRuleContext
+
 /**
  * Holds inofrmation of an error, that can happen during the expression evaluation.
  * @property line line of code where the error occured.
@@ -25,6 +27,21 @@ data class EvalError(
         InvalidNumber,
 
         /**
+         * Attempt to re-declare already existing variable.
+         */
+        VariableRedeclaration,
+
+        /**
+         * Attempt to use variable, that wasn't declared before.
+         */
+        UndeclaredVariable,
+
+        /**
+         * Variable assignment is missing.
+         */
+        MissingVariableAssignment,
+
+        /**
          * Unsupported expression was encountered.
          */
         UnsupportedExpression,
@@ -43,6 +60,19 @@ data class EvalError(
     private val message: String
         get() = when (type) {
             Type.InvalidNumber -> "Invalid number encountered in `$expression`. It is neither integer or double."
+            Type.VariableRedeclaration -> "Variable redeclaration: `$expression`."
+            Type.UndeclaredVariable -> "Variable undeclared: `$expression`."
             Type.UnsupportedExpression -> "Unsupported expression encountered: `$expression`."
+            Type.MissingVariableAssignment -> "Missing variable assignment: `$expression`."
         }
+}
+
+fun ParserRuleContext.toError(type: EvalError.Type): EvalError {
+    val startToken = getStart()
+    return EvalError(
+        line = startToken.line,
+        positionInLine = startToken.charPositionInLine,
+        expression = text,
+        type = type,
+    )
 }
