@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,14 +45,16 @@ fun App() {
             )
         )
     }
-    var resultOutput by remember { mutableStateOf("") }
-    var errorOutput by remember { mutableStateOf("") }
+    val resultOutput = mutableStateListOf<String>()
+    val errorOutput = mutableStateListOf<String>()
 
     fun handleInput(newInput: TextFieldValue) {
         input.value = newInput
         val compilation = Compiler().compile(newInput.text)
-        resultOutput = compilation.results.joinToString(separator = "\n")
-        errorOutput = compilation.errors.joinToString(separator = "\n")
+        resultOutput.clear()
+        resultOutput.addAll(compilation.results)
+        errorOutput.clear()
+        errorOutput.addAll(compilation.errors)
     }
 
     handleInput(input.value)
@@ -67,11 +72,19 @@ fun App() {
                 Column(modifier = Modifier.weight(1f)) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text("Output", fontWeight = FontWeight.Bold)
-                        Text(resultOutput)
+                        LazyColumn {
+                            items(resultOutput) {
+                                Text(it)
+                            }
+                        }
                     }
                     Column(modifier = Modifier.weight(1f)) {
                         Text("Errors", fontWeight = FontWeight.Bold)
-                        Text(errorOutput, color = Color.Red)
+                        LazyColumn {
+                            items(errorOutput) {
+                                Text(it, color = Color.Red)
+                            }
+                        }
                     }
                 }
             }
