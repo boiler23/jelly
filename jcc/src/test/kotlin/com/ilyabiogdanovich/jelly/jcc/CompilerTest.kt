@@ -12,6 +12,20 @@ class CompilerTest {
     private val compiler = Compiler()
 
     @Test
+    fun `compile empty`() {
+        // Prepare
+
+        // Do
+        val result = compiler.compile("")
+
+        // Check
+        result shouldBe Compiler.Output(
+            results = listOf(),
+            errors = listOf(),
+        )
+    }
+    
+    @Test
     fun `compile out number`() {
         // Prepare
 
