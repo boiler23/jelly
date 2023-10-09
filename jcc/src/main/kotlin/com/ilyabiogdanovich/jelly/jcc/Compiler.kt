@@ -101,12 +101,12 @@ class Compiler {
         ) = Unit
     }
 
-    data class Output(
-        val results: List<String>,
+    data class Result(
+        val output: List<String>,
         val errors: List<String>,
     )
 
-    fun compile(src: String): Output {
+    fun compile(src: String): Result {
         val resultListener = ResultListener()
         val errorListener = ErrorListener()
 
@@ -116,8 +116,8 @@ class Compiler {
         parser.addErrorListener(errorListener)
         val tree = parser.program()
         ParseTreeWalker.DEFAULT.walk(resultListener, tree)
-        return Output(
-            results = resultListener.list,
+        return Result(
+            output = resultListener.list,
             errors = errorListener.list + resultListener.errors,
         )
     }

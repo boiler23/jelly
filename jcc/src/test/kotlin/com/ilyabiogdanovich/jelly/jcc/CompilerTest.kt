@@ -33,8 +33,8 @@ class CompilerTest(
         val result = compiler.compile(src)
 
         // Check
-        result shouldBe Compiler.Output(
-            results = output,
+        result shouldBe Compiler.Result(
+            output = output,
             errors = errors,
         )
     }
