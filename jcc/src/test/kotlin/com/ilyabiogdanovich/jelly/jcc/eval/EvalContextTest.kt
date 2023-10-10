@@ -62,6 +62,19 @@ class EvalContextTest {
     }
 
     @Test
+    fun pop() {
+        // Prepare
+        val variable = mockk<Var>()
+        evalContext.push("id", variable)
+
+        // Do
+        evalContext.pop("id")
+
+        // Check
+        evalContext["id"] shouldBe null
+    }
+
+    @Test
     fun clear() {
         // Prepare
         evalContext.push("id1", mockk())

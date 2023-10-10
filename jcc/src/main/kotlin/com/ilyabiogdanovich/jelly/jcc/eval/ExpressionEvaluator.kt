@@ -26,6 +26,8 @@ class ExpressionEvaluator {
         return parseContext.ruleContext<JccParser.NumberContext>()?.number()
             ?: parseContext.ruleContext<JccParser.IdentifierContext>()?.id(evalContext)
             ?: parseContext.ruleContext<JccParser.SequenceContext>()?.seq(evalContext)
+            ?: parseContext.ruleContext<JccParser.MapContext>()?.map(evalContext)
+            ?: parseContext.ruleContext<JccParser.ReduceContext>()?.reduce(evalContext)
             ?: parseContext.cast<JccParser.PowerContext>()?.binary(evalContext)
             ?: parseContext.cast<JccParser.MuldivContext>()?.binary(evalContext)
             ?: parseContext.cast<JccParser.PlusminusContext>()?.binary(evalContext)
@@ -54,9 +56,12 @@ class ExpressionEvaluator {
     }
 
     private fun JccParser.SequenceContext.seq(evalContext: EvalContext): Either<EvalError, Var> {
-        return evaluateToInt(evalContext, expression(0)).mapEitherRight { start ->
-            evaluateToInt(evalContext, expression(1)).mapRight { end ->
-                Var.SeqVar(Seq(from = start, to = end))
+        val lower = expression(0) ?: return toError(EvalError.Type.MissingSequenceLowerBound).asLeft()
+        val upper = expression(1) ?: return toError(EvalError.Type.MissingSequenceLowerBound).asLeft()
+
+        return evaluateToInt(evalContext, lower).mapEitherRight { start ->
+            evaluateToInt(evalContext, upper).mapRight { end ->
+                Var.SeqVar(Seq.Bounds(from = start, to = end))
             }
         }
     }
@@ -82,9 +87,12 @@ class ExpressionEvaluator {
     private fun JccParser.ExpressionContext.binary(
         evalContext: EvalContext,
         operation: String,
-        leftExpr: JccParser.ExpressionContext,
-        rightExpr: JccParser.ExpressionContext
+        leftExpr: JccParser.ExpressionContext?,
+        rightExpr: JccParser.ExpressionContext?
     ): Either<EvalError, Var> {
+        leftExpr ?: return toError(EvalError.Type.MissingLeftOperand).asLeft()
+        rightExpr ?: return toError(EvalError.Type.MissingRightOperand).asLeft()
+
         return evaluateToNumber(evalContext, leftExpr).mapEitherRight { left ->
             evaluateToNumber(evalContext, rightExpr).mapEitherRight { right ->
                 operate(operation, left, right)
@@ -96,14 +104,11 @@ class ExpressionEvaluator {
         evalContext: EvalContext,
         expr: JccParser.ExpressionContext
     ): Either<EvalError, Num> {
-        return when (val evaluated = evaluateExpression(evalContext, expr)) {
-            is Either.Right -> {
-                when (val variable = evaluated.value) {
-                    is Var.NumVar -> variable.v.asRight()
-                    is Var.SeqVar -> return expr.toError(EvalError.Type.InvalidArithmeticOperand).asLeft()
-                }
+        return evaluateExpression(evalContext, expr).mapEitherRight { variable ->
+            when (variable) {
+                is Var.NumVar -> variable.v.asRight()
+                is Var.SeqVar -> return expr.toError(EvalError.Type.InvalidArithmeticOperand).asLeft()
             }
-            is Either.Left -> return evaluated.value.asLeft()
         }
     }
 
@@ -111,14 +116,23 @@ class ExpressionEvaluator {
         evalContext: EvalContext,
         expr: JccParser.ExpressionContext
     ): Either<EvalError, Int> {
-        return when (val evaluated = evaluateToNumber(evalContext, expr)) {
-            is Either.Right -> {
-                when (val variable = evaluated.value) {
-                    is Num.Integer -> variable.v.asRight()
-                    is Num.Real -> return expr.toError(EvalError.Type.IntegerExpected).asLeft()
-                }
+        return evaluateToNumber(evalContext, expr).mapEitherRight { num ->
+            when (num) {
+                is Num.Integer -> num.v.asRight()
+                is Num.Real -> return expr.toError(EvalError.Type.IntegerExpected).asLeft()
             }
-            is Either.Left -> return evaluated.value.asLeft()
+        }
+    }
+
+    private fun evaluateToSeq(
+        evalContext: EvalContext,
+        expr: JccParser.ExpressionContext
+    ): Either<EvalError, Seq> {
+        return evaluateExpression(evalContext, expr).mapEitherRight { variable ->
+            when (variable) {
+                is Var.NumVar -> return expr.toError(EvalError.Type.SequenceExpected).asLeft()
+                is Var.SeqVar -> variable.v.asRight()
+            }
         }
     }
 
@@ -139,18 +153,61 @@ class ExpressionEvaluator {
     private fun JccParser.ExpressionContext.unary(
         evalContext: EvalContext,
         operation: String,
-        expr: JccParser.ExpressionContext
+        expr: JccParser.ExpressionContext?
     ): Either<EvalError, Var> {
+        expr ?: return toError(EvalError.Type.MissingUnaryOperand).asLeft()
         return evaluateToNumber(evalContext, expr).mapEitherRight { value ->
             unaryOperate(operation, value)
         }.mapRight { num -> Var.NumVar(num) }
     }
 
-private fun JccParser.ExpressionContext.unaryOperate(operation: String, num: Num): Either<EvalError, Num> {
-    return when (operation) {
-        "+" -> num.asRight()
-        "-" -> (-num).asRight()
-        else -> toError(EvalError.Type.InvalidArithmeticOperator).asLeft()
+    private fun JccParser.ExpressionContext.unaryOperate(operation: String, num: Num): Either<EvalError, Num> {
+        return when (operation) {
+            "+" -> num.asRight()
+            "-" -> (-num).asRight()
+            else -> toError(EvalError.Type.InvalidArithmeticOperator).asLeft()
+        }
     }
-}
+
+    private fun JccParser.MapContext.map(evalContext: EvalContext): Either<EvalError, Var> {
+        val seqExpr = expression() ?: return toError(EvalError.Type.MapMissingSequence).asLeft()
+        val lambda = lambda1() ?: return toError(EvalError.Type.MapMissingLambda).asLeft()
+        val id = lambda.identifier()?.NAME()?.text ?: return toError(EvalError.Type.MapMissingLambdaId).asLeft()
+        val lambdaExpr = lambda.expression() ?: return toError(EvalError.Type.MapMissingLambdaExpression).asLeft()
+
+        return evaluateToSeq(evalContext, seqExpr).mapEitherRight { seq ->
+            val result = seq.map { e ->
+                evalContext.push(id, e)
+                val result = evaluateExpression(evalContext, lambdaExpr)
+                evalContext.pop(id)
+                result
+            }
+            result.mapRight { Var.SeqVar(it) }
+        }
+    }
+
+    private fun JccParser.ReduceContext.reduce(evalContext: EvalContext): Either<EvalError, Var> {
+        val seqExpr = expression(0) ?: return toError(EvalError.Type.ReduceMissingSequence).asLeft()
+        val neutralExpr = expression(1) ?: return toError(EvalError.Type.ReduceMissingNeutral).asLeft()
+        val lambda = lambda2() ?: return toError(EvalError.Type.ReduceMissingLambda).asLeft()
+        val accumulatorId = lambda.identifier(0)?.NAME()?.text
+            ?: return toError(EvalError.Type.ReduceMissingLambdaAccumulator).asLeft()
+        val nextId = lambda.identifier(1)?.NAME()?.text
+            ?: return toError(EvalError.Type.ReduceMissingLambdaNext).asLeft()
+        val lambdaExpr = lambda.expression() ?: return toError(EvalError.Type.ReduceMissingLambdaExpression).asLeft()
+
+        return evaluateToSeq(evalContext, seqExpr).mapEitherRight { seq ->
+            evaluateExpression(evalContext, neutralExpr).mapEitherRight { neutral ->
+                val result = seq.reduce(neutral) { accumulatorValue, nextValue ->
+                    evalContext.push(accumulatorId, accumulatorValue)
+                    evalContext.push(nextId, nextValue)
+                    val result = evaluateExpression(evalContext, lambdaExpr)
+                    evalContext.pop(nextId)
+                    evalContext.pop(accumulatorId)
+                    result
+                }
+                result
+            }
+        }
+    }
 }

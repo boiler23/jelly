@@ -29,6 +29,10 @@ class EvalContext {
         }
     }
 
+    fun pop(id: String) {
+        vars.remove(id)
+    }
+
     operator fun get(id: String): Var? = vars[id]
 
     fun clear() {

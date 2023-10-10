@@ -6,6 +6,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import java.util.Locale
+import kotlin.math.pow
 
 /**
  * Integration test for [Compiler] components all together.
@@ -177,6 +178,61 @@ class CompilerTest(
                 listOf("{ 2, 3, 4, 5 }"),
                 empty()
             ),
+            arrayOf("out map({1,5},i->i^2)", listOf("{ 1, 4, 9, 16, 25 }"), empty()),
+            arrayOf("out map({1,5},i->{i,i+2})", listOf("{ { 1, 2, 3 }, { 2, 3, 4 }, { 3, 4, 5 }, { 4, 5, 6 }, { 5, 6, 7 } }"), empty()),
+            arrayOf("out reduce(map({1,5},i->i^2), 1, x y -> x*y)", listOf("14400"), empty()),
+            arrayOf("out reduce({1,5},0,i j->i+j)", listOf("15"), empty()),
+            arrayOf(
+                """
+                    var r = reduce(
+                        map(
+                            map(
+                                { 1, 5 },
+                                i -> map({i, i + 2}, j -> j)
+                            ),
+                            e -> reduce(e, 0, x y -> x + y)
+                        ),
+                        0,
+                        x y -> x + y
+                    )
+                    out r
+                """.trimIndent(),
+                listOf("60"),
+                empty()
+            ),
+            arrayOf(
+                """
+                    var n = 500
+                    var seq = map({0, n}, i -> (-1)^i / (2 * i + 1))
+                    var pi = 4 * reduce(seq, 0, x y -> x + y)
+                    print "pi = "
+                    out pi
+                """.trimIndent(),
+                listOf("pi = ", "${calculatePi()}"),
+                empty()
+            ),
+            arrayOf(
+                "out 4 * reduce(map({0, 500}, i -> (-1)^i / (2 * i + 1)), 0, x y -> x + y)",
+                listOf("${calculatePi()}"),
+                empty()
+            ),
+            arrayOf(
+                """
+                    var n = map({0, 5}, i -> i^2)
+                    out i
+                """.trimIndent(),
+                empty(),
+                listOf("2:4: Variable undeclared: `i`."),
+            ),
         )
+
+        /**
+         * This one is used to verify the reference example.
+         * @return pi value approximation
+         */
+        private fun calculatePi() =
+            4.0 * (0..500)
+                .map { i -> (if (i % 2 == 0) 1.0 else -1.0) / (2 * i + 1) }
+                .fold(0.0) { x, y -> x + y }
     }
 }
