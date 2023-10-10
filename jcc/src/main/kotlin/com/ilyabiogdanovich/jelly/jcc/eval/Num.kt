@@ -8,71 +8,102 @@ import kotlin.math.pow
  * @author Ilya Bogdanovich on 09.10.2023
  */
 sealed interface Num {
+    /**
+     * Binary plus operator.
+     * @param n right operand.
+     * @return [Real] if one of the operands is [Real], otherwise - [Integer].
+     */
+    operator fun plus(n: Num): Num
+
+    /**
+     * Binary minus operator.
+     * @param n right operand.
+     * @return [Real] if one of the operands is [Real], otherwise - [Integer].
+     */
+    operator fun minus(n: Num): Num
+
+    /**
+     * Binary multiply operator.
+     * @param n right operand.
+     * @return [Real] if one of the operands is [Real], otherwise - [Integer].
+     */
+    operator fun times(n: Num): Num
+
+    /**
+     * Binary divide operator.
+     * @param n right operand (denominator).
+     * @return [Real] if one of the operands is [Real], otherwise - [Integer].
+     */
+    operator fun div(n: Num): Num
+
+    /**
+     * Exponentiation operation.
+     * @param n power to exponentiate into this number.
+     * @return [Real] if one of the operands is [Real], otherwise - [Integer].
+     */
+    fun pow(n: Num): Num
+
+    /**
+     * Unary minus operator.
+     * @return negated value, not changing its type.
+     */
+    operator fun unaryMinus(): Num
+
     @JvmInline
-    value class Integer(val v: Int) : Num
+    value class Integer(val v: Int) : Num {
+        override operator fun plus(n: Num) = when (n) {
+            is Integer -> Integer(v + n.v)
+            is Real -> Real(v + n.r)
+        }
+
+        override operator fun minus(n: Num) = when (n) {
+            is Integer -> Integer(v - n.v)
+            is Real -> Real(v - n.r)
+        }
+
+        override operator fun times(n: Num) = when (n) {
+            is Integer -> Integer(v * n.v)
+            is Real -> Real(v * n.r)
+        }
+
+        override operator fun div(n: Num): Num = when (n) {
+            is Integer -> Real(v.toDouble() / n.v)
+            is Real -> Real(v / n.r)
+        }
+
+        override operator fun unaryMinus() = Integer(-v)
+
+        override fun pow(n: Num) = when (n) {
+            is Integer -> Integer(v.toDouble().pow(n.doubleValue).toInt())
+            is Real -> Real(v.toDouble().pow(n.r))
+        }
+    }
+
     @JvmInline
-    value class Real(val r: Double): Num
+    value class Real(val r: Double): Num {
+        override operator fun plus(n: Num) = Real(r + n.doubleValue)
+        override operator fun minus(n: Num) = Real(r - n.doubleValue)
+        override operator fun times(n: Num) = Real(r * n.doubleValue)
+        override operator fun div(n: Num) = Real(r / n.doubleValue)
+        override operator fun unaryMinus() = Real(-r)
+        override fun pow(n: Num) = Real(r.pow(n.doubleValue))
+    }
 
     private val doubleValue: Double
         get() = when(this) {
             is Integer -> v.toDouble()
             is Real -> r
         }
-
-    operator fun plus(n: Num): Num {
-        return when (this) {
-            is Integer -> when (n) {
-                is Integer -> Integer(v + n.v)
-                is Real -> Real(v + n.r)
-            }
-            is Real -> Real(r + n.doubleValue)
-        }
-    }
-
-    operator fun minus(n: Num): Num {
-        return when (this) {
-            is Integer -> when (n) {
-                is Integer -> Integer(v - n.v)
-                is Real -> Real(v - n.r)
-            }
-            is Real -> Real(r - n.doubleValue)
-        }
-    }
-
-    operator fun times(n: Num): Num {
-        return when (this) {
-            is Integer -> when (n) {
-                is Integer -> Integer(v * n.v)
-                is Real -> Real(v * n.r)
-            }
-            is Real -> Real(r * n.doubleValue)
-        }
-    }
-
-    operator fun div(n: Num): Num {
-        return when (this) {
-            is Integer -> when (n) {
-                is Integer -> Real(v.toDouble() / n.v)
-                is Real -> Real(v / n.r)
-            }
-            is Real -> Real(r / n.doubleValue)
-        }
-    }
-
-    fun pow(n: Num): Num {
-        return when (this) {
-            is Integer -> when (n) {
-                is Integer -> Integer(doubleValue.pow(n.doubleValue).toInt())
-                is Real -> Real(doubleValue.pow(n.r))
-            }
-            is Real -> Real(r.pow(n.doubleValue))
-        }
-    }
-
-    operator fun unaryMinus(): Num {
-        return when (this) {
-            is Integer -> Integer(-v)
-            is Real -> Real(-r)
-        }
-    }
 }
+
+/**
+ * Helper property to create [Num.Integer] from [Int].
+ */
+val Int.num
+    get() = Num.Integer(this)
+
+/**
+ * Helper property to create [Num.Real] from [Double].
+ */
+val Double.num
+    get() = Num.Real(this)

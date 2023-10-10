@@ -244,4 +244,54 @@ class NumTest {
         // Check
         result shouldBe Num.Real(32.0)
     }
+
+    //
+    // Unary
+    //
+    @Test
+    fun `negate int`() {
+        // Prepare
+
+        // Do
+        val result = -Num.Integer(123)
+
+        // Check
+        result shouldBe Num.Integer(-123)
+    }
+
+    @Test
+    fun `negate real`() {
+        // Prepare
+
+        // Do
+        val result = -Num.Real(123.456)
+
+        // Check
+        result shouldBe Num.Real(-123.456)
+    }
+
+    //
+    // Helpers
+    //
+    @Test
+    fun `Int as Num`() {
+        // Prepare
+
+        // Do
+        val result = 123.num
+
+        // Check
+        result shouldBe Num.Integer(123)
+    }
+
+    @Test
+    fun `Double as Num`() {
+        // Prepare
+
+        // Do
+        val result = 123.456.num
+
+        // Check
+        result shouldBe Num.Real(123.456)
+    }
 }
