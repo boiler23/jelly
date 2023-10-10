@@ -88,6 +88,7 @@ class CompilerTest(
                 listOf("1.5"),
                 empty(),
             ),
+            arrayOf("out n", empty(), listOf("1:4: Variable undeclared: `n`.")),
             arrayOf(
                 """
                     var n = 1
@@ -168,6 +169,7 @@ class CompilerTest(
             arrayOf("out {1,5}", listOf("{ 1, 2, 3, 4, 5 }"), empty()),
             arrayOf("out {1,5-2}", listOf("{ 1, 2, 3 }"), empty()),
             arrayOf("out {1,5,7}", listOf("{ 1, 2, 3, 4, 5 }"), listOf("line 1:8 mismatched input ',' expecting {PLUSMINUS, MULDIV, '^', '}'}")),
+            arrayOf("out {-2,3}", listOf("{ -2, -1, 0, 1, 2, 3 }"), empty()),
             arrayOf(
                 """
                     var from = 2

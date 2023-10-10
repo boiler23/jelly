@@ -11,6 +11,7 @@ import com.ilyabogdanovich.jelly.utils.asRight
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verifySequence
 import org.antlr.v4.runtime.Token
 import org.junit.Test
 
@@ -31,7 +32,6 @@ class ExpressionEvaluatorTest {
         }
         val parserContext = mockk<ExpressionContext> {
             every { getRuleContext(NumberContext::class.java, 0) } returns numberContext
-            every { getRuleContext(IdentifierContext::class.java, 0) } returns null
         }
 
         // Do
@@ -49,7 +49,6 @@ class ExpressionEvaluatorTest {
         }
         val parserContext = mockk<ExpressionContext> {
             every { getRuleContext(NumberContext::class.java, 0) } returns numberContext
-            every { getRuleContext(IdentifierContext::class.java, 0) } returns null
         }
 
         // Do
@@ -72,7 +71,6 @@ class ExpressionEvaluatorTest {
         }
         val parserContext = mockk<ExpressionContext> {
             every { getRuleContext(NumberContext::class.java, 0) } returns numberContext
-            every { getRuleContext(IdentifierContext::class.java, 0) } returns null
         }
 
         // Do
@@ -133,6 +131,161 @@ class ExpressionEvaluatorTest {
             expression = "id",
             type = EvalError.Type.UndeclaredVariable
         ).asLeft()
+    }
+
+    @Test
+    fun `evaluate sequence`() {
+        // Prepare
+        val sequence = mockk<SequenceContext> {
+            every { expression(0) } returns mockk {
+                every { getRuleContext(NumberContext::class.java, 0) } returns mockk {
+                    every { text } returns "1"
+                }
+            }
+            every { expression(1) } returns mockk {
+                every { getRuleContext(NumberContext::class.java, 0) } returns mockk {
+                    every { text } returns "2"
+                }
+            }
+        }
+        val parserContext = mockk<ExpressionContext> {
+            every { getRuleContext(NumberContext::class.java, 0) } returns null
+            every { getRuleContext(IdentifierContext::class.java, 0) } returns null
+            every { getRuleContext(SequenceContext::class.java, 0) } returns sequence
+        }
+
+        // Do
+        val result = evaluator.evaluateExpression(evalContext, parserContext)
+
+        // Check
+        result shouldBe Var.SeqVar(Seq.Bounds(1, 2)).asRight()
+    }
+
+    @Test
+    fun `evaluate map`() {
+        // Prepare
+        val map = mockk<MapContext> {
+            every { expression() } returns mockk {
+                every { getRuleContext(NumberContext::class.java, 0) } returns null
+                every { getRuleContext(IdentifierContext::class.java, 0) } returns null
+                every { getRuleContext(SequenceContext::class.java, 0) } returns mockk {
+                    every { expression(0) } returns mockk {
+                        every { getRuleContext(NumberContext::class.java, 0) } returns mockk {
+                            every { text } returns "1"
+                        }
+                    }
+                    every { expression(1) } returns mockk {
+                        every { getRuleContext(NumberContext::class.java, 0) } returns mockk {
+                            every { text } returns "2"
+                        }
+                    }
+                }
+            }
+            every { lambda1() } returns mockk {
+                every { identifier() } returns mockk {
+                    every { NAME() } returns mockk {
+                        every { text } returns "id"
+                    }
+                }
+                every { expression() } returns mockk {
+                    every { getRuleContext(NumberContext::class.java, 0) } returns mockk {
+                        every { text } returns "1"
+                    }
+                }
+            }
+        }
+        val parserContext = mockk<ExpressionContext> {
+            every { getRuleContext(NumberContext::class.java, 0) } returns null
+            every { getRuleContext(IdentifierContext::class.java, 0) } returns null
+            every { getRuleContext(SequenceContext::class.java, 0) } returns null
+            every { getRuleContext(MapContext::class.java, 0) } returns map
+        }
+        val evalContext = mockk<EvalContext>()
+        every { evalContext.push("id", 1.toVar()) } returns true
+        every { evalContext.push("id", 2.toVar()) } returns true
+        every { evalContext.pop("id") } returns Unit
+
+        // Do
+        val result = evaluator.evaluateExpression(evalContext, parserContext)
+
+        // Check
+        verifySequence {
+            evalContext.push("id", 1.toVar())
+            evalContext.pop("id")
+            evalContext.push("id", 2.toVar())
+            evalContext.pop("id")
+        }
+        result shouldBe listOf(1.toVar(), 1.toVar()).toVar().asRight()
+    }
+
+    @Test
+    fun `evaluate reduce`() {
+        // Prepare
+        val reduce = mockk<ReduceContext> {
+            every { expression(0) } returns mockk {
+                every { getRuleContext(NumberContext::class.java, 0) } returns null
+                every { getRuleContext(IdentifierContext::class.java, 0) } returns null
+                every { getRuleContext(SequenceContext::class.java, 0) } returns mockk {
+                    every { expression(0) } returns mockk {
+                        every { getRuleContext(NumberContext::class.java, 0) } returns mockk {
+                            every { text } returns "1"
+                        }
+                    }
+                    every { expression(1) } returns mockk {
+                        every { getRuleContext(NumberContext::class.java, 0) } returns mockk {
+                            every { text } returns "2"
+                        }
+                    }
+                }
+            }
+            every { expression(1) } returns mockk {
+                every { getRuleContext(NumberContext::class.java, 0) } returns mockk {
+                    every { text } returns "0"
+                }
+            }
+            every { lambda2() } returns mockk {
+                every { identifier(0) } returns mockk {
+                    every { NAME() } returns mockk {
+                        every { text } returns "acc"
+                    }
+                }
+                every { identifier(1) } returns mockk {
+                    every { NAME() } returns mockk {
+                        every { text } returns "n"
+                    }
+                }
+                every { expression() } returns mockk {
+                    every { getRuleContext(NumberContext::class.java, 0) } returns mockk {
+                        every { text } returns "1"
+                    }
+                }
+            }
+        }
+        val parserContext = mockk<ExpressionContext> {
+            every { getRuleContext(NumberContext::class.java, 0) } returns null
+            every { getRuleContext(IdentifierContext::class.java, 0) } returns null
+            every { getRuleContext(SequenceContext::class.java, 0) } returns null
+            every { getRuleContext(MapContext::class.java, 0) } returns null
+            every { getRuleContext(ReduceContext::class.java, 0) } returns reduce
+        }
+        every { evalContext.push(any(), any()) } returns true
+        every { evalContext.pop(any()) } returns Unit
+
+        // Do
+        val result = evaluator.evaluateExpression(evalContext, parserContext)
+
+        // Check
+        verifySequence {
+            evalContext.push("acc", 0.toVar())
+            evalContext.push("n", 1.toVar())
+            evalContext.pop("n")
+            evalContext.pop("acc")
+            evalContext.push("acc", 1.toVar())
+            evalContext.push("n", 2.toVar())
+            evalContext.pop("n")
+            evalContext.pop("acc")
+        }
+        result shouldBe 1.toVar().asRight()
     }
 
     @Test

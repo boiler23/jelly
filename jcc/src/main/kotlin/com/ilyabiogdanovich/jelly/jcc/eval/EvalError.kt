@@ -62,6 +62,11 @@ data class EvalError(
         MissingUnaryOperand,
 
         /**
+         * Operator is missing in arithmetic operation.
+         */
+        MissingOperator,
+
+        /**
          * Sequence declaration is missing in map().
          */
         MapMissingSequence,
@@ -168,6 +173,7 @@ data class EvalError(
             Type.MissingLeftOperand -> "Missing left operand: `$expression`."
             Type.MissingRightOperand -> "Missing right operand: `$expression`."
             Type.MissingUnaryOperand -> "Missing unary operand: `$expression`."
+            Type.MissingOperator -> "Operator is missing in arithmetic operation: `$expression`."
             Type.MapMissingSequence -> "Missing sequence declaration in map(): `$expression`."
             Type.MapMissingLambda -> "Missing lambda declaration in map(): `$expression`."
             Type.MapMissingLambdaId -> "Missing iterator declaration in map's lambda: `$expression`."
