@@ -268,6 +268,7 @@ class ExpressionEvaluatorTest {
             every { getRuleContext(MapContext::class.java, 0) } returns null
             every { getRuleContext(ReduceContext::class.java, 0) } returns reduce
         }
+        val evalContext = mockk<EvalContext>()
         every { evalContext.push(any(), any()) } returns true
         every { evalContext.pop(any()) } returns Unit
 
