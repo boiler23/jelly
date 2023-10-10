@@ -3,10 +3,6 @@ package com.ilyabiogdanovich.jelly.jcc.print
 import com.ilyabiogdanovich.jelly.jcc.eval.Num
 import com.ilyabiogdanovich.jelly.jcc.eval.Seq
 import com.ilyabiogdanovich.jelly.jcc.eval.Var
-import java.text.DecimalFormat
-import java.text.NumberFormat
-import java.util.Locale
-
 
 /**
  * Printer for variables. This printer is used in "out" command of our language.
@@ -29,13 +25,31 @@ class VarPrinter {
         is Num.Real -> r.toString()
     }
 
-    private fun Seq.print() = buildString {
+    private fun Seq.print() = when (this) {
+        is Seq.Bounds -> printBounds()
+        is Seq.Array -> printArray()
+    }
+
+    private fun Seq.Bounds.printBounds() = buildString {
         append("{ ")
         if (from <= to) {
             for (n in from until to) {
                 append("$n, ")
             }
             append(to)
+        }
+        append(" }")
+    }
+
+    private fun Seq.Array.printArray() = buildString {
+        append("{ ")
+        for (n in 0 until elements.lastIndex) {
+            append(print(elements[n]))
+            append(", ")
+        }
+        if (elements.isNotEmpty()) {
+            val v = elements.last()
+            append(print(v))
         }
         append(" }")
     }

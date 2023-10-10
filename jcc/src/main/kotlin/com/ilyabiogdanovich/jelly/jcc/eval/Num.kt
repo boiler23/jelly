@@ -49,6 +49,9 @@ sealed interface Num {
      */
     operator fun unaryMinus(): Num
 
+    /**
+     * Represents the integer number.
+     */
     @JvmInline
     value class Integer(val v: Int) : Num {
         override operator fun plus(n: Num) = when (n) {
@@ -79,6 +82,9 @@ sealed interface Num {
         }
     }
 
+    /**
+     * Represents the decimal number.
+     */
     @JvmInline
     value class Real(val r: Double): Num {
         override operator fun plus(n: Num) = Real(r + n.doubleValue)
