@@ -4,6 +4,8 @@ import androidx.compose.runtime.mutableStateOf
 import com.ilyabiogdanovich.jelly.jcc.Compiler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlin.system.measureTimeMillis
+import kotlin.time.measureTimedValue
 
 /**
  * Main view model for the IDE application.
@@ -14,14 +16,19 @@ class AppViewModel(private val compiler: Compiler) {
     private val textInput = MutableStateFlow("")
     val resultOutput = mutableStateOf("")
     val errorOutput = mutableStateOf("")
+    val compilationTimeOutput = mutableStateOf("")
+    val compilationStatus = mutableStateOf(false)
 
     fun notifyNewTextInput(text: String) {
         textInput.value = text
     }
 
     suspend fun subscribeForTextInput() = textInput.collectLatest {
-        val results = compiler.compile(it)
+        compilationStatus.value = true
+        val (results, duration) = measureTimedValue { compiler.compile(it) }
+        compilationStatus.value = false
         resultOutput.value = results.output.joinToString("")
         errorOutput.value = results.errors.joinToString("\n")
+        compilationTimeOutput.value = (duration.inWholeMilliseconds / 1000.0).toString()
     }
 }

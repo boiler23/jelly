@@ -22,6 +22,8 @@ fun main() {
             App(
                 resultOutput = viewModel.resultOutput,
                 errorOutput = viewModel.errorOutput,
+                compilationTimeOutput = viewModel.compilationTimeOutput,
+                compilationStatus = viewModel.compilationStatus,
                 onInputTextChanged = viewModel::notifyNewTextInput,
             )
         }
