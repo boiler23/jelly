@@ -4,8 +4,8 @@ package com.ilyabogdanovich.jelly.ide.app
 
 import com.ilyabiogdanovich.jelly.jcc.Compiler
 import io.kotest.matchers.shouldBe
+import io.mockk.coEvery
 import io.mockk.coVerifySequence
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -29,8 +29,8 @@ class AppViewModelTest {
     @Test
     fun `compile on subscribe`() = runTest(dispatcher) {
         // Prepare
-        every { compiler.compile("") } returns Compiler.Result(output = listOf(), errors = listOf())
-        every { compiler.compile("text") } returns Compiler.Result(
+        coEvery { compiler.compile("") } returns Compiler.Result(output = listOf(), errors = listOf())
+        coEvery { compiler.compile("text") } returns Compiler.Result(
             output = listOf("out", "put"),
             errors = listOf("err 1", "err 2")
         )

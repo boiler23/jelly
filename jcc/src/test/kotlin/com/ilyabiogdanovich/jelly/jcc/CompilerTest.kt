@@ -3,6 +3,7 @@ package com.ilyabiogdanovich.jelly.jcc
 import com.ilyabiogdanovich.jelly.jcc.eval.toVar
 import com.ilyabiogdanovich.jelly.jcc.print.VarPrinter
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,7 +29,7 @@ class CompilerTest(
     }
 
     @Test
-    fun test() {
+    fun test() = runTest {
         // Prepare
 
         // Do

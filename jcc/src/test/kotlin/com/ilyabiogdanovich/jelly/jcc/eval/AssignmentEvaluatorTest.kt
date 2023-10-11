@@ -4,8 +4,10 @@ import com.ilyabogdanovich.jelly.jcc.JccParser
 import com.ilyabogdanovich.jelly.utils.asLeft
 import com.ilyabogdanovich.jelly.utils.asRight
 import io.kotest.matchers.shouldBe
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.junit.Test
@@ -21,7 +23,7 @@ class AssignmentEvaluatorTest {
     private val assignmentEvaluator = AssignmentEvaluator(expressionEvaluator)
 
     @Test
-    fun `evaluate - no expression`() {
+    fun `evaluate - no expression`() = runTest {
         // Prepare
         val startToken = mockk<Token> {
             every { line } returns 3
@@ -46,7 +48,7 @@ class AssignmentEvaluatorTest {
     }
 
     @Test
-    fun `evaluate - expression evaluated`() {
+    fun `evaluate - expression evaluated`() = runTest {
         // Prepare
         val name = mockk<TerminalNode> {
             every { text } returns "id"
@@ -57,7 +59,7 @@ class AssignmentEvaluatorTest {
             every { NAME() } returns name
         }
         val variable = mockk<Var>()
-        every { expressionEvaluator.evaluateExpression(evalContext, expression) } returns variable.asRight()
+        coEvery { expressionEvaluator.evaluateExpression(evalContext, expression) } returns variable.asRight()
 
         // Do
         val result = assignmentEvaluator.evaluate(evalContext, parseContext)
@@ -67,14 +69,14 @@ class AssignmentEvaluatorTest {
     }
 
     @Test
-    fun `evaluate - expression not evaluated`() {
+    fun `evaluate - expression not evaluated`() = runTest {
         // Prepare
         val expression = mockk<JccParser.ExpressionContext>()
         val parseContext = mockk<JccParser.AssignmentContext> {
             every { expression() } returns expression
         }
         val error = mockk<EvalError>()
-        every { expressionEvaluator.evaluateExpression(evalContext, expression) } returns error.asLeft()
+        coEvery { expressionEvaluator.evaluateExpression(evalContext, expression) } returns error.asLeft()
 
         // Do
         val result = assignmentEvaluator.evaluate(evalContext, parseContext)

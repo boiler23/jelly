@@ -9,21 +9,21 @@ package com.ilyabogdanovich.jelly.utils
 sealed class Either<L, R> {
     data class Left<L, R>(val value: L) : Either<L, R>()
     data class Right<L, R>(val value: R) : Either<L, R>()
-
-    inline fun <T> mapRight(mapper: (R) -> T): Either<L, T> = when (this) {
-        is Left -> Left(value)
-        is Right -> Right(mapper(value))
-    }
 }
 
 fun <L, R> L.asLeft(): Either<L, R> = Either.Left(this)
 
 fun <L, R> R.asRight(): Either<L, R> = Either.Right(this)
 
-inline fun <L, R, T> Either<L, R>.mapEitherRight(mapper: (R) -> Either<L, T>): Either<L, T> =
-    mapRight {
-        return when (val result = mapper(it)) {
-            is Either.Right -> result.value.asRight()
-            is Either.Left -> result.value.asLeft()
-        }
+inline fun <L, R, T> Either<L, R>.mapRight(mapper: (R) -> T): Either<L, T> = when (this) {
+    is Either.Left -> Either.Left(value)
+    is Either.Right -> Either.Right(mapper(value))
+}
+
+inline fun <L, R, T> Either<L, R>.mapEitherRight(mapper: (R) -> Either<L, T>): Either<L, T> = when (this) {
+    is Either.Right -> when (val mapped = mapper(value)) {
+        is Either.Right -> Either.Right(mapped.value)
+        is Either.Left -> Either.Left(mapped.value)
     }
+    is Either.Left -> Either.Left(value)
+}

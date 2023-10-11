@@ -1,6 +1,7 @@
 package com.ilyabiogdanovich.jelly.jcc
 
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,7 +17,7 @@ class CompilerCleanupTest {
     private val compiler = Compiler()
 
     @Test
-    fun cleanup() {
+    fun cleanup() = runTest {
         // Prepare
 
         // Do

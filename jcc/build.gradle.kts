@@ -47,7 +47,10 @@ dependencies {
 
     implementation(project(":utils"))
 
+    implementation(libs.kotlin.coroutines.core)
+
     testImplementation(libs.test.junit)
     testImplementation(libs.test.kotest.assertions)
+    testImplementation(libs.test.kotlin.coroutines)
     testImplementation(libs.test.mockk.jvm)
 }

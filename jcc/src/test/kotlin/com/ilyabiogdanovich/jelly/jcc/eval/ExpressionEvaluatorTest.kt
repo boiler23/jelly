@@ -12,6 +12,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verifySequence
+import kotlinx.coroutines.test.runTest
 import org.antlr.v4.runtime.Token
 import org.junit.Test
 
@@ -21,11 +22,10 @@ import org.junit.Test
  * @author Ilya Bogdanovich on 09.10.2023
  */
 class ExpressionEvaluatorTest {
-    private val evalContext = EvalContext()
     private val evaluator = ExpressionEvaluator()
 
     @Test
-    fun `evaluate integer`() {
+    fun `evaluate integer`() = runTest {
         // Prepare
         val numberContext = mockk<NumberContext> {
             every { text } returns "123"
@@ -35,14 +35,14 @@ class ExpressionEvaluatorTest {
         }
 
         // Do
-        val result = evaluator.evaluateExpression(evalContext, parserContext)
+        val result = evaluator.evaluateExpression(EvalContext(), parserContext)
 
         // Check
         result shouldBe Var.NumVar(Num.Integer(123)).asRight()
     }
 
     @Test
-    fun `evaluate double`() {
+    fun `evaluate double`() = runTest {
         // Prepare
         val numberContext = mockk<NumberContext> {
             every { text } returns "123.456"
@@ -52,14 +52,14 @@ class ExpressionEvaluatorTest {
         }
 
         // Do
-        val result = evaluator.evaluateExpression(evalContext, parserContext)
+        val result = evaluator.evaluateExpression(EvalContext(), parserContext)
 
         // Check
         result shouldBe Var.NumVar(Num.Real(123.456)).asRight()
     }
 
     @Test
-    fun `evaluate wrong number`() {
+    fun `evaluate wrong number`() = runTest {
         // Prepare
         val startToken = mockk<Token> {
             every { line } returns 5
@@ -74,7 +74,7 @@ class ExpressionEvaluatorTest {
         }
 
         // Do
-        val result = evaluator.evaluateExpression(evalContext, parserContext)
+        val result = evaluator.evaluateExpression(EvalContext(), parserContext)
 
         // Check
         result shouldBe EvalError(
@@ -86,7 +86,7 @@ class ExpressionEvaluatorTest {
     }
 
     @Test
-    fun `evaluate existing identifier`() {
+    fun `evaluate existing identifier`() = runTest {
         // Prepare
         val identifier = mockk<IdentifierContext> {
             every { text } returns "id"
@@ -96,17 +96,16 @@ class ExpressionEvaluatorTest {
             every { getRuleContext(IdentifierContext::class.java, 0) } returns identifier
         }
         val variable = mockk<Var>()
-        evalContext.push("id", variable)
 
         // Do
-        val result = evaluator.evaluateExpression(evalContext, parserContext)
+        val result = evaluator.evaluateExpression(EvalContext(mapOf("id" to variable)), parserContext)
 
         // Check
         result shouldBe variable.asRight()
     }
 
     @Test
-    fun `evaluate non-existing identifier`() {
+    fun `evaluate non-existing identifier`() = runTest {
         // Prepare
         val startToken = mockk<Token> {
             every { line } returns 3
@@ -122,7 +121,7 @@ class ExpressionEvaluatorTest {
         }
 
         // Do
-        val result = evaluator.evaluateExpression(evalContext, parserContext)
+        val result = evaluator.evaluateExpression(EvalContext(), parserContext)
 
         // Check
         result shouldBe EvalError(
@@ -134,7 +133,7 @@ class ExpressionEvaluatorTest {
     }
 
     @Test
-    fun `evaluate sequence`() {
+    fun `evaluate sequence`() = runTest {
         // Prepare
         val sequence = mockk<SequenceContext> {
             every { expression(0) } returns mockk {
@@ -155,14 +154,14 @@ class ExpressionEvaluatorTest {
         }
 
         // Do
-        val result = evaluator.evaluateExpression(evalContext, parserContext)
+        val result = evaluator.evaluateExpression(EvalContext(), parserContext)
 
         // Check
         result shouldBe Var.SeqVar(Seq.Bounds(1, 2)).asRight()
     }
 
     @Test
-    fun `evaluate map`() {
+    fun `evaluate map`() = runTest {
         // Prepare
         val map = mockk<MapContext> {
             every { expression() } returns mockk {
@@ -200,26 +199,16 @@ class ExpressionEvaluatorTest {
             every { getRuleContext(SequenceContext::class.java, 0) } returns null
             every { getRuleContext(MapContext::class.java, 0) } returns map
         }
-        val evalContext = mockk<EvalContext>()
-        every { evalContext.push("id", 1.toVar()) } returns true
-        every { evalContext.push("id", 2.toVar()) } returns true
-        every { evalContext.pop("id") } returns Unit
 
         // Do
-        val result = evaluator.evaluateExpression(evalContext, parserContext)
+        val result = evaluator.evaluateExpression(EvalContext(), parserContext)
 
         // Check
-        verifySequence {
-            evalContext.push("id", 1.toVar())
-            evalContext.pop("id")
-            evalContext.push("id", 2.toVar())
-            evalContext.pop("id")
-        }
         result shouldBe listOf(1.toVar(), 1.toVar()).toVar().asRight()
     }
 
     @Test
-    fun `evaluate reduce`() {
+    fun `evaluate reduce`() = runTest {
         // Prepare
         val reduce = mockk<ReduceContext> {
             every { expression(0) } returns mockk {
@@ -268,29 +257,16 @@ class ExpressionEvaluatorTest {
             every { getRuleContext(MapContext::class.java, 0) } returns null
             every { getRuleContext(ReduceContext::class.java, 0) } returns reduce
         }
-        val evalContext = mockk<EvalContext>()
-        every { evalContext.push(any(), any()) } returns true
-        every { evalContext.pop(any()) } returns Unit
 
         // Do
-        val result = evaluator.evaluateExpression(evalContext, parserContext)
+        val result = evaluator.evaluateExpression(EvalContext(), parserContext)
 
         // Check
-        verifySequence {
-            evalContext.push("acc", 0.toVar())
-            evalContext.push("n", 1.toVar())
-            evalContext.pop("n")
-            evalContext.pop("acc")
-            evalContext.push("acc", 1.toVar())
-            evalContext.push("n", 2.toVar())
-            evalContext.pop("n")
-            evalContext.pop("acc")
-        }
         result shouldBe 1.toVar().asRight()
     }
 
     @Test
-    fun `evaluate unsupported expression`() {
+    fun `evaluate unsupported expression`() = runTest {
         // Prepare
         val startToken = mockk<Token> {
             every { line } returns 2
@@ -307,7 +283,7 @@ class ExpressionEvaluatorTest {
         }
 
         // Do
-        val result = evaluator.evaluateExpression(evalContext, parserContext)
+        val result = evaluator.evaluateExpression(EvalContext(), parserContext)
 
         // Check
         result shouldBe EvalError(

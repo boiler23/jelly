@@ -3,6 +3,7 @@ package com.ilyabiogdanovich.jelly.jcc.eval
 import com.ilyabogdanovich.jelly.jcc.JccParser
 import com.ilyabogdanovich.jelly.utils.Either
 import com.ilyabogdanovich.jelly.utils.asLeft
+import com.ilyabogdanovich.jelly.utils.mapRight
 
 /**
  * Evaluator for the assignment statments.
@@ -16,7 +17,7 @@ class AssignmentEvaluator(private val expressionEvaluator: ExpressionEvaluator) 
      * @param assignmentContext assignment context of the parser.
      * @return either error or evaluated pair.
      */
-    fun evaluate(
+    suspend fun evaluate(
         evalContext: EvalContext,
         assignmentContext: JccParser.AssignmentContext
     ): Either<EvalError, Pair<String, Var>> {

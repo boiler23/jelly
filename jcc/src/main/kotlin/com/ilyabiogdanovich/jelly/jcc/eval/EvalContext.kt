@@ -1,6 +1,8 @@
 package com.ilyabiogdanovich.jelly.jcc.eval
 
-import java.util.concurrent.ConcurrentHashMap
+import com.ilyabogdanovich.jelly.utils.Either
+import com.ilyabogdanovich.jelly.utils.asLeft
+import com.ilyabogdanovich.jelly.utils.asRight
 
 /**
  * Holds the information about the current evaluation context.
@@ -8,34 +10,14 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * @author Ilya Bogdanovich on 09.10.2023
  */
-class EvalContext {
-    /**
-     * Holds the map of all variable currently being visible.
-     */
-    private val vars: ConcurrentHashMap<String, Var> = ConcurrentHashMap()
-
-    /**
-     * Pushes a new variable into the context, if it doesn't exist yet.
-     * @param id variable name
-     * @param variable variable value
-     * @return true if the variable was successfully pushed. Otherwise, returns false.
-     */
-    fun push(id: String, variable: Var): Boolean {
-        return if (!vars.containsKey(id)) {
-            vars[id] = variable
-            true
-        } else {
-            false
-        }
-    }
-
-    fun pop(id: String) {
-        vars.remove(id)
-    }
-
+class EvalContext(private val vars: Map<String, Var> = mapOf()) {
     operator fun get(id: String): Var? = vars[id]
 
-    fun clear() {
-        vars.clear()
+    operator fun plus(vars: Map<String, Var>): Either<EvalError.Type, EvalContext> {
+        return if (vars.keys.any { it in this.vars.keys }) {
+            EvalError.Type.VariableRedeclaration.asLeft()
+        } else {
+            EvalContext(this.vars + vars).asRight()
+        }
     }
 }
