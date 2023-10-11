@@ -1,12 +1,13 @@
 package com.ilyabiogdanovich.jelly.jcc
 
+import com.ilyabiogdanovich.jelly.jcc.eval.toVar
+import com.ilyabiogdanovich.jelly.jcc.print.VarPrinter
 import io.kotest.matchers.shouldBe
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import java.util.Locale
-import kotlin.math.pow
 
 /**
  * Integration test for [Compiler] components all together.
@@ -57,7 +58,7 @@ class CompilerTest(
             arrayOf("out -+500", listOf("-500"), empty()),
             arrayOf("out 0.456", listOf("0.456"), empty()),
             arrayOf("out .5", listOf("0.5"), empty()),
-            arrayOf("out 0.0", listOf("0.0"), empty()),
+            arrayOf("out 0.0", listOf("0"), empty()),
             arrayOf("out 123.456", listOf("123.456"), empty()),
             arrayOf("out -123.456", listOf("-123.456"), empty()),
             arrayOf("out +123.456", listOf("123.456"), empty()),
@@ -128,13 +129,13 @@ class CompilerTest(
             ),
             arrayOf("out 2 + 3", listOf("5"), empty()),
             arrayOf("out 15 - 2.5", listOf("12.5"), empty()),
-            arrayOf("out 15 / 5", listOf("3.0"), empty()),
+            arrayOf("out 15 / 5", listOf("3"), empty()),
             arrayOf("out 3 * 5", listOf("15"), empty()),
             arrayOf("out 2 ^ 5", listOf("32"), empty()),
             arrayOf("out 2 + 3 * 4", listOf("14"), empty()),
             arrayOf("out 2 ++ 3 * 4", listOf("14"), empty()),
             arrayOf("out (2 + 3) * 4", listOf("20"), empty()),
-            arrayOf("out (1 + 3 * 5) / 4", listOf("4.0"), empty()),
+            arrayOf("out (1 + 3 * 5) / 4", listOf("4"), empty()),
             arrayOf("out 2 ^ (5 + 1)", listOf("64"), empty()),
             arrayOf("out 2^(5-1)", listOf("16"), empty()),
             arrayOf(
@@ -145,7 +146,7 @@ class CompilerTest(
                     print "result = "
                     out num3
                 """.trimIndent(),
-                listOf("result = ", "5.0"),
+                listOf("result = ", "5"),
                 empty()
             ),
             arrayOf(
@@ -210,12 +211,12 @@ class CompilerTest(
                     print "pi = "
                     out pi
                 """.trimIndent(),
-                listOf("pi = ", "${calculatePi()}"),
+                listOf("pi = ", calculatePi()),
                 empty()
             ),
             arrayOf(
                 "out 4 * reduce(map({0, 500}, i -> (-1)^i / (2 * i + 1)), 0, x y -> x + y)",
-                listOf("${calculatePi()}"),
+                listOf(calculatePi()),
                 empty()
             ),
             arrayOf(
@@ -233,8 +234,10 @@ class CompilerTest(
          * @return pi value approximation
          */
         private fun calculatePi() =
-            4.0 * (0..500)
-                .map { i -> (if (i % 2 == 0) 1.0 else -1.0) / (2 * i + 1) }
-                .fold(0.0) { x, y -> x + y }
+            VarPrinter().print((
+                4.0 * (0..500)
+                    .map { i -> (if (i % 2 == 0) 1.0 else -1.0) / (2 * i + 1) }
+                    .fold(0.0) { x, y -> x + y }
+                ).toVar())
     }
 }

@@ -3,6 +3,8 @@ package com.ilyabiogdanovich.jelly.jcc.print
 import com.ilyabiogdanovich.jelly.jcc.eval.Num
 import com.ilyabiogdanovich.jelly.jcc.eval.Seq
 import com.ilyabiogdanovich.jelly.jcc.eval.Var
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 /**
  * Printer for variables. This printer is used in "out" command of our language.
@@ -22,7 +24,10 @@ class VarPrinter {
 
     private fun Num.print(): String = when (this) {
         is Num.Integer -> v.toString()
-        is Num.Real -> r.toString()
+        is Num.Real -> {
+            val bd = BigDecimal(r)
+            bd.setScale(9, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
+        }
     }
 
     private fun Seq.print() = when (this) {
@@ -43,13 +48,12 @@ class VarPrinter {
 
     private fun Seq.Array.printArray() = buildString {
         append("{ ")
-        for (n in 0 until elements.lastIndex) {
-            append(print(elements[n]))
-            append(", ")
-        }
-        if (elements.isNotEmpty()) {
-            val v = elements.last()
-            append(print(v))
+        val i = elements.iterator()
+        while (i.hasNext()) {
+            append(print(i.next()))
+            if (i.hasNext()) {
+                append(", ")
+            }
         }
         append(" }")
     }

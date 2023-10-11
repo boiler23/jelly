@@ -102,7 +102,7 @@ class VarPrinterTest {
         val result = printer.print(variable)
 
         // Check
-        result shouldBe "{ 1, 2.0, 3, 4.0, 5.0 }"
+        result shouldBe "{ 1, 2, 3, 4, 5 }"
     }
 
     @Test
@@ -140,7 +140,7 @@ class VarPrinterTest {
         val result = printer.print(variable)
 
         // Check
-        result shouldBe "{ 1, { 2.0, { 3 } }, 4.0, 5.0 }"
+        result shouldBe "{ 1, { 2, { 3 } }, 4, 5 }"
     }
 
     @Test
