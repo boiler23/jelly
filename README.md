@@ -12,7 +12,7 @@ Just navigate to the project folder and execute in the Terminal:
 ./gradlew :ide:app:run
 ```
 
-# Frameworks/Libraries used
+## Frameworks/Libraries used
 - ANTLR for generating the lexer/parser/parse tree
 - Compose Desktop for the editor UI
 - Kotlin Coroutines to organise concurrency
