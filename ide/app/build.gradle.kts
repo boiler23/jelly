@@ -14,7 +14,14 @@ dependencies {
     // (in a separate module for demo project and in testMain).
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.currentOs)
+    implementation(libs.kotlin.coroutines.core)
+    implementation(libs.kotlin.coroutines.swing)
     implementation(project(":jcc"))
+
+    testImplementation(libs.test.junit)
+    testImplementation(libs.test.kotest.assertions)
+    testImplementation(libs.test.kotlin.coroutines)
+    testImplementation(libs.test.mockk.jvm)
 }
 
 compose.desktop {
