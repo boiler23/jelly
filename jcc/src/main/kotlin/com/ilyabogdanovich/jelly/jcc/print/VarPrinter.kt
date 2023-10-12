@@ -1,8 +1,8 @@
 package com.ilyabogdanovich.jelly.jcc.print
 
-import com.ilyabiogdanovich.jelly.jcc.eval.Num
-import com.ilyabiogdanovich.jelly.jcc.eval.Seq
-import com.ilyabiogdanovich.jelly.jcc.eval.Var
+import com.ilyabogdanovich.jelly.jcc.eval.Num
+import com.ilyabogdanovich.jelly.jcc.eval.Seq
+import com.ilyabogdanovich.jelly.jcc.eval.Var
 import java.math.BigDecimal
 import java.math.RoundingMode
 

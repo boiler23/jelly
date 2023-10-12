@@ -1,8 +1,8 @@
 package com.ilyabogdanovich.jelly.jcc.print
 
-import com.ilyabiogdanovich.jelly.jcc.eval.Seq
-import com.ilyabiogdanovich.jelly.jcc.eval.Var
-import com.ilyabiogdanovich.jelly.jcc.eval.toVar
+import com.ilyabogdanovich.jelly.jcc.eval.Seq
+import com.ilyabogdanovich.jelly.jcc.eval.Var
+import com.ilyabogdanovich.jelly.jcc.eval.toVar
 import io.kotest.matchers.shouldBe
 import org.junit.Before
 import org.junit.Test
