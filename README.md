@@ -3,6 +3,7 @@
 ## Module structure
 - `ide:app` - editor UI
 - `jcc` - compiler core
+- `perf-check` - runs a simple performance measure on map/reduce
 - `utils` - common helpers
 - `viewer` - simple tool to render parse trees
 
@@ -15,5 +16,5 @@ Just navigate to the project folder and execute in the Terminal:
 ## Frameworks/Libraries used
 - ANTLR for generating the lexer/parser/parse tree
 - Compose Desktop for the editor UI
-- Kotlin Coroutines to organise concurrency
+- Kotlin Coroutines to organize concurrency
 - JUnit, kotest & mmock for unit testing
