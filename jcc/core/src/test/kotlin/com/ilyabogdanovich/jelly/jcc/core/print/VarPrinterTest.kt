@@ -1,6 +1,5 @@
 package com.ilyabogdanovich.jelly.jcc.core.print
 
-import com.ilyabogdanovich.jelly.jcc.core.print.VarPrinter
 import com.ilyabogdanovich.jelly.jcc.core.eval.Seq
 import com.ilyabogdanovich.jelly.jcc.core.eval.Var
 import com.ilyabogdanovich.jelly.jcc.core.eval.toVar
@@ -56,6 +55,42 @@ class VarPrinterTest {
 
         // Check
         result shouldBe "3.1415926"
+    }
+
+    @Test
+    fun `print positive infinity`() {
+        // Prepare
+        val variable = Double.POSITIVE_INFINITY.toVar()
+
+        // Do
+        val result = printer.print(variable)
+
+        // Check
+        result shouldBe "Infinity"
+    }
+
+    @Test
+    fun `print negative infinity`() {
+        // Prepare
+        val variable = Double.NEGATIVE_INFINITY.toVar()
+
+        // Do
+        val result = printer.print(variable)
+
+        // Check
+        result shouldBe "-Infinity"
+    }
+
+    @Test
+    fun `print NaN`() {
+        // Prepare
+        val variable = Double.NaN.toVar()
+
+        // Do
+        val result = printer.print(variable)
+
+        // Check
+        result shouldBe "NaN"
     }
 
     @Test

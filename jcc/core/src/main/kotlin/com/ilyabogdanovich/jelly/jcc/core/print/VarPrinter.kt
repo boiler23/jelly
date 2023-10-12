@@ -25,8 +25,15 @@ class VarPrinter {
     private fun Num.print(): String = when (this) {
         is Num.Integer -> v.toString()
         is Num.Real -> {
-            val bd = BigDecimal(r)
-            bd.setScale(9, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
+            when {
+                r == Double.POSITIVE_INFINITY -> "Infinity"
+                r == Double.NEGATIVE_INFINITY -> "-Infinity"
+                r.isNaN() -> "NaN"
+                else -> {
+                    val bd = BigDecimal(r)
+                    bd.setScale(9, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
+                }
+            }
         }
     }
 

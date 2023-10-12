@@ -139,6 +139,9 @@ class CompilerTest(
             arrayOf("out (1 + 3 * 5) / 4", listOf("4"), empty()),
             arrayOf("out 2 ^ (5 + 1)", listOf("64"), empty()),
             arrayOf("out 2^(5-1)", listOf("16"), empty()),
+            arrayOf("out 1 / 0", listOf("Infinity"), empty()),
+            arrayOf("out -1/0", listOf("-Infinity"), empty()),
+            arrayOf("out 0/0", listOf("NaN"), empty()),
             arrayOf(
                 """
                     var num1 = 12
