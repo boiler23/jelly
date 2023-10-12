@@ -1,6 +1,6 @@
 grammar Jcc;
 
-program: statement* | EOF;
+program: statement* EOF;
 
 statement: assignment | output | printing | expression;
 

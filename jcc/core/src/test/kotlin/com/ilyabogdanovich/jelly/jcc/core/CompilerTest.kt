@@ -65,14 +65,15 @@ class CompilerTest(
             arrayOf("out +123.456", listOf("123.456"), empty()),
             arrayOf("out 500;", listOf("500"), listOf("line 1:7 token recognition error at: ';'")),
             arrayOf("out 1abc", listOf("1"), empty()),
+            arrayOf("out 1) out 2", listOf("1", "2"), listOf("line 1:5 extraneous input ')' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}")),
             arrayOf("print", empty(), listOf("line 1:5 missing STRING at '<EOF>'")),
             arrayOf("print \"text\"", listOf("text"), empty()),
             arrayOf("print \"text\";", listOf("text"), listOf("line 1:12 token recognition error at: ';'")),
-            arrayOf("print \"line 1\nline 2\"", empty(), listOf("line 1:6 mismatched input '\"line 1' expecting STRING")),
+            arrayOf("print \"line 1\nline 2\"", empty(), listOf("line 1:6 mismatched input '\"line 1' expecting STRING", "line 2:6 extraneous input '\"' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}")),
             arrayOf("print text", empty(), listOf("line 1:6 missing STRING at 'text'")),
             arrayOf("print \"'text'\"", listOf("'text'"), empty()),
             arrayOf("print \"text", empty(), listOf("line 1:6 mismatched input '\"text' expecting STRING")),
-            arrayOf("print text\"", empty(), listOf("line 1:6 missing STRING at 'text'")),
+            arrayOf("print text\"", empty(), listOf("line 1:6 missing STRING at 'text'", "line 1:10 extraneous input '\"' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}")),
             arrayOf("print \"te\\\"xt\"", listOf("te\"xt"), empty()),
             arrayOf("print \"te\\xt\"", listOf("te\\xt"), empty()),
             arrayOf(
@@ -174,7 +175,7 @@ class CompilerTest(
             ),
             arrayOf("out {1,5}", listOf("{ 1, 2, 3, 4, 5 }"), empty()),
             arrayOf("out {1,5-2}", listOf("{ 1, 2, 3 }"), empty()),
-            arrayOf("out {1,5,7}", listOf("{ 1, 2, 3, 4, 5 }"), listOf("line 1:8 mismatched input ',' expecting {PLUSMINUS, MULDIV, '^', '}'}")),
+            arrayOf("out {1,5,7}", listOf("{ 1, 2, 3, 4, 5 }"), listOf("line 1:8 mismatched input ',' expecting {PLUSMINUS, MULDIV, '^', '}'}", "line 1:10 extraneous input '}' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}")),
             arrayOf("out {-2,3}", listOf("{ -2, -1, 0, 1, 2, 3 }"), empty()),
             arrayOf(
                 """
@@ -239,6 +240,16 @@ class CompilerTest(
                 """.trimIndent(),
                 listOf("1"),
                 empty(),
+            ),
+            arrayOf(
+                """
+                    var i = 5
+                    var seq = 2^i / 2 * i + 1)
+                    print "seq = "
+                    out seq
+                """.trimIndent(),
+                listOf("seq = ", "81"),
+                listOf("line 2:25 extraneous input ')' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}"),
             )
         )
 
