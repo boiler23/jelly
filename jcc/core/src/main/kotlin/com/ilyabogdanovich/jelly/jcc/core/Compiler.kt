@@ -44,7 +44,7 @@ class Compiler {
                     val (id, variable) = evaluated.value
                     when (val result = evalContext + mapOf(id to variable)) {
                         is Either.Left -> {
-                            errors.add(ctx.toError(result.value).formattedMessage)
+                            errors.add(ctx.toError(result.value, expression = ctx.NAME()?.text).formattedMessage)
                             evalContext
                         }
                         is Either.Right -> {

@@ -187,12 +187,12 @@ data class EvalError(
         }
 }
 
-fun ParserRuleContext.toError(type: EvalError.Type): EvalError {
+fun ParserRuleContext.toError(type: EvalError.Type, expression: String? = null): EvalError {
     val startToken = getStart()
     return EvalError(
         line = startToken.line,
         positionInLine = startToken.charPositionInLine,
-        expression = text,
+        expression = expression ?: text,
         type = type,
     )
 }

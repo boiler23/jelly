@@ -112,7 +112,7 @@ class CompilerTest(
                     out n
                 """.trimIndent(),
                 listOf("1"),
-                listOf("line 2:0 Variable redeclaration: 'varn=2'."),
+                listOf("line 2:0 Variable redeclaration: 'n'."),
             ),
             arrayOf(
                 """
