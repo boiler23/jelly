@@ -1,6 +1,6 @@
 package com.ilyabogdanovich.jelly.jcc.core.eval
 
-import kotlin.math.pow
+import org.apache.commons.math3.util.FastMath
 
 /**
  * Represents the evaluated number, either integer or double.
@@ -77,8 +77,16 @@ sealed interface Num {
         override operator fun unaryMinus() = Integer(-v)
 
         override fun pow(n: Num) = when (n) {
-            is Integer -> Integer(v.toDouble().pow(n.doubleValue).toInt())
-            is Real -> Real(v.toDouble().pow(n.r))
+            is Integer -> {
+                when (v) {
+                    1 -> Integer(1)
+                    -1 -> Integer(if (n.v % 2 == 0) 1 else -1)
+                    else -> Integer(FastMath.pow(v.toDouble(), n.v).toInt())
+                }
+            }
+            is Real -> {
+                Real(FastMath.pow(v.toDouble(), n.r))
+            }
         }
     }
 
@@ -92,7 +100,10 @@ sealed interface Num {
         override operator fun times(n: Num) = Real(r * n.doubleValue)
         override operator fun div(n: Num) = Real(r / n.doubleValue)
         override operator fun unaryMinus() = Real(-r)
-        override fun pow(n: Num) = Real(r.pow(n.doubleValue))
+        override fun pow(n: Num) = when (n) {
+            is Integer -> Real(FastMath.pow(r, n.v))
+            is Real -> Real(FastMath.pow(r, n.r))
+        }
     }
 
     private val doubleValue: Double

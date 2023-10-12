@@ -4,6 +4,8 @@ version-plugin-kotlin = "1.9.10"
 
 version-kotlin-coroutines = "1.7.3"
 
+version-apache-fastmath = "3.6.1"
+
 version-test-junit = "4.13.2"
 version-test-kotest = "5.6.2"
 version-test-mockk = "1.13.5"
@@ -14,6 +16,8 @@ plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.
 
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "version-kotlin-coroutines" }
 kotlin-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "version-kotlin-coroutines" }
+
+apache-fastmath = { module = "org.apache.commons:commons-math3", version.ref = "version-apache-fastmath" }
 
 test-junit = { module = "junit:junit", version.ref = "version-test-junit" }
 test-kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "version-test-kotest" }

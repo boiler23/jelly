@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":utils"))
 
     implementation(libs.kotlin.coroutines.core)
+    implementation(libs.apache.fastmath)
 
     testImplementation(libs.test.junit)
     testImplementation(libs.test.kotest.assertions)
