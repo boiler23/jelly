@@ -1,3 +1,4 @@
+import com.ilyabogdanovich.jelly.jcc.core.Compiler
 import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
 import com.ilyabogdanovich.jelly.jcc.core.eval.Seq
 import com.ilyabogdanovich.jelly.jcc.core.eval.Var
@@ -56,7 +57,23 @@ private suspend fun reduce() {
     println("Improvement: ${improvement(from = timeSequntial, to = timeParallel)}%")
 }
 
+private suspend fun powerPerformance() {
+    val compiler = Compiler()
+    print("Measuring calculate power performance...")
+    val time = measureAvgTime {
+        compiler.compile(
+            """
+                var seq = map({1, 1000000}, x -> x^(1000000 - x/2))
+                out seq
+            """.trimIndent()
+        )
+    }
+    println("Done!")
+    println("Average time spent: ${time/1000.0}s")
+}
+
 fun main() = runBlocking(Dispatchers.Default) {
     map()
     reduce()
+    powerPerformance()
 }
