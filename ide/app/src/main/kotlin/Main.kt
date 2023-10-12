@@ -1,6 +1,6 @@
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import com.ilyabiogdanovich.jelly.jcc.Compiler
+import com.ilyabogdanovich.jelly.jcc.Compiler
 import com.ilyabogdanovich.jelly.ide.app.App
 import com.ilyabogdanovich.jelly.ide.app.AppViewModel
 import kotlinx.coroutines.CoroutineScope

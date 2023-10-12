@@ -1,7 +1,7 @@
 package com.ilyabogdanovich.jelly.ide.app
 
 import androidx.compose.runtime.mutableStateOf
-import com.ilyabiogdanovich.jelly.jcc.Compiler
+import com.ilyabogdanovich.jelly.jcc.Compiler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlin.time.measureTimedValue

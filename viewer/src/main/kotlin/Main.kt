@@ -1,4 +1,4 @@
-import com.ilyabiogdanovich.jelly.jcc.Compiler
+import com.ilyabogdanovich.jelly.jcc.Compiler
 
 fun main() {
     Compiler().view("""
