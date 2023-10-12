@@ -90,7 +90,7 @@ class CompilerTest(
                 listOf("1.5"),
                 empty(),
             ),
-            arrayOf("out n", empty(), listOf("1:4: Variable undeclared: `n`.")),
+            arrayOf("out n", empty(), listOf("line 1:4 Variable undeclared: 'n'.")),
             arrayOf(
                 """
                     var n = 1
@@ -110,7 +110,7 @@ class CompilerTest(
                     out n
                 """.trimIndent(),
                 listOf("1"),
-                listOf("2:0: Variable redeclaration: `varn=2`."),
+                listOf("line 2:0 Variable redeclaration: 'varn=2'."),
             ),
             arrayOf(
                 """
@@ -123,9 +123,9 @@ class CompilerTest(
                     "line 1:8 missing NAME at '='",
                     "line 2:4 mismatched input 'var' expecting {'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}",
                     "line 2:7 mismatched input '<EOF>' expecting NAME",
-                    "1:0: Missing variable assignment: `var`.",
-                    "2:4: Unsupported expression encountered: ``.",
-                    "2:4: Missing variable assignment: `var`."
+                    "line 1:0 Missing variable assignment: 'var'.",
+                    "line 2:4 Unsupported expression encountered: ''.",
+                    "line 2:4 Missing variable assignment: 'var'."
                 ),
             ),
             arrayOf("out 2 + 3", listOf("5"), empty()),
@@ -226,7 +226,7 @@ class CompilerTest(
                     out i
                 """.trimIndent(),
                 empty(),
-                listOf("2:4: Variable undeclared: `i`."),
+                listOf("line 2:4 Variable undeclared: 'i'."),
             ),
         )
 

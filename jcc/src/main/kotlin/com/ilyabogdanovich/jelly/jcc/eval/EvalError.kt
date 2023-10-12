@@ -151,7 +151,7 @@ data class EvalError(
      * Formatted error message, that has all the required information.
      */
     val formattedMessage: String
-        get() = "$line:$positionInLine: $message"
+        get() = "line $line:$positionInLine $message"
 
     /**
      * Helper to build a user-readable error message.
@@ -159,31 +159,31 @@ data class EvalError(
      */
     private val message: String
         get() = when (type) {
-            Type.InvalidNumber -> "Invalid number encountered in `$expression`. It is neither integer or double."
-            Type.VariableRedeclaration -> "Variable redeclaration: `$expression`."
-            Type.UndeclaredVariable -> "Variable undeclared: `$expression`."
-            Type.UnsupportedExpression -> "Unsupported expression encountered: `$expression`."
-            Type.InvalidArithmeticOperand -> "Invalid arithmetic operand: `$expression`."
-            Type.InvalidArithmeticOperator -> "Invalid arithmetic operator: `$expression`."
-            Type.IntegerExpected -> "Expected integer: `$expression`."
-            Type.SequenceExpected -> "Expected sequence: `$expression`."
-            Type.MissingVariableAssignment -> "Missing variable assignment: `$expression`."
-            Type.MissingSequenceLowerBound -> "Missing sequence's lower bound: `$expression`."
-            Type.MissingSequenceUpperBound -> "Missing sequence's upper bound: `$expression`."
-            Type.MissingLeftOperand -> "Missing left operand: `$expression`."
-            Type.MissingRightOperand -> "Missing right operand: `$expression`."
-            Type.MissingUnaryOperand -> "Missing unary operand: `$expression`."
-            Type.MissingOperator -> "Operator is missing in arithmetic operation: `$expression`."
-            Type.MapMissingSequence -> "Missing sequence declaration in map(): `$expression`."
-            Type.MapMissingLambda -> "Missing lambda declaration in map(): `$expression`."
-            Type.MapMissingLambdaId -> "Missing iterator declaration in map's lambda: `$expression`."
-            Type.MapMissingLambdaExpression -> "Missing return expression in map's lambda: `$expression`."
-            Type.ReduceMissingSequence -> "Missing sequence declaration in reduce(): `$expression`."
-            Type.ReduceMissingNeutral -> "Missing neutral element declaration in reduce(): `$expression`."
-            Type.ReduceMissingLambda -> "Missing lambda declaration in reduce(): `$expression`."
-            Type.ReduceMissingLambdaAccumulator -> "Missing accumulator declaration in reduce's lambda: `$expression`."
-            Type.ReduceMissingLambdaNext -> "Missing next element declaration in reduce's lambda: `$expression`."
-            Type.ReduceMissingLambdaExpression -> "Missing return expression declaration in reduce's lambda: `$expression`."
+            Type.InvalidNumber -> "Invalid number encountered in '$expression'. It is neither integer or double."
+            Type.VariableRedeclaration -> "Variable redeclaration: '$expression'."
+            Type.UndeclaredVariable -> "Variable undeclared: '$expression'."
+            Type.UnsupportedExpression -> "Unsupported expression encountered: '$expression'."
+            Type.InvalidArithmeticOperand -> "Invalid arithmetic operand: '$expression'."
+            Type.InvalidArithmeticOperator -> "Invalid arithmetic operator: '$expression'."
+            Type.IntegerExpected -> "Expected integer: '$expression'."
+            Type.SequenceExpected -> "Expected sequence: '$expression'."
+            Type.MissingVariableAssignment -> "Missing variable assignment: '$expression'."
+            Type.MissingSequenceLowerBound -> "Missing sequence's lower bound: '$expression'."
+            Type.MissingSequenceUpperBound -> "Missing sequence's upper bound: '$expression'."
+            Type.MissingLeftOperand -> "Missing left operand: '$expression'."
+            Type.MissingRightOperand -> "Missing right operand: '$expression'."
+            Type.MissingUnaryOperand -> "Missing unary operand: '$expression'."
+            Type.MissingOperator -> "Operator is missing in arithmetic operation: '$expression'."
+            Type.MapMissingSequence -> "Missing sequence declaration in map(): '$expression'."
+            Type.MapMissingLambda -> "Missing lambda declaration in map(): '$expression'."
+            Type.MapMissingLambdaId -> "Missing iterator declaration in map's lambda: '$expression'."
+            Type.MapMissingLambdaExpression -> "Missing return expression in map's lambda: '$expression'."
+            Type.ReduceMissingSequence -> "Missing sequence declaration in reduce(): '$expression'."
+            Type.ReduceMissingNeutral -> "Missing neutral element declaration in reduce(): '$expression'."
+            Type.ReduceMissingLambda -> "Missing lambda declaration in reduce(): '$expression'."
+            Type.ReduceMissingLambdaAccumulator -> "Missing accumulator declaration in reduce's lambda: '$expression'."
+            Type.ReduceMissingLambdaNext -> "Missing next element declaration in reduce's lambda: '$expression'."
+            Type.ReduceMissingLambdaExpression -> "Missing return expression declaration in reduce's lambda: '$expression'."
         }
 }
 

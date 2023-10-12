@@ -31,7 +31,7 @@ class CompilerCleanupTest {
         // Check
         result shouldBe Compiler.Result(
             output = listOf(),
-            errors = listOf("1:4: Variable undeclared: `n`."),
+            errors = listOf("line 1:4 Variable undeclared: 'n'."),
         )
     }
 }
