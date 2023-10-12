@@ -2,7 +2,7 @@
 
 package com.ilyabogdanovich.jelly.ide.app
 
-import com.ilyabogdanovich.jelly.jcc.Compiler
+import com.ilyabogdanovich.jelly.jcc.core.Compiler
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerifySequence

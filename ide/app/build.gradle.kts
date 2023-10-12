@@ -17,7 +17,7 @@ dependencies {
     implementation(compose.materialIconsExtended)
     implementation(libs.kotlin.coroutines.core)
     implementation(libs.kotlin.coroutines.swing)
-    implementation(project(":jcc"))
+    implementation(project(":jcc:core"))
 
     testImplementation(libs.test.junit)
     testImplementation(libs.test.kotest.assertions)
