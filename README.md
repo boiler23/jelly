@@ -18,3 +18,5 @@ Just navigate to the project folder and execute in the Terminal:
 - Compose Desktop for the editor UI
 - Kotlin Coroutines to organize concurrency
 - JUnit, kotest & mmock for unit testing
+
+Full list of dependencies can be found in `gradle/libs.versions.toml`
