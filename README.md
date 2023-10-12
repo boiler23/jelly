@@ -2,10 +2,10 @@
 
 ## Module structure
 - `ide:app` - editor UI
-- `jcc` - compiler core
-- `perf-check` - runs a simple performance measure on map/reduce
+- `jcc:core` - compiler core
+- `jcc:perf-check` - runs a simple performance measure on map/reduce
+- `jcc:viewer` - simple tool to render parse trees
 - `utils` - common helpers
-- `viewer` - simple tool to render parse trees
 
 ## Running the app
 Just navigate to the project folder and execute in the Terminal:
