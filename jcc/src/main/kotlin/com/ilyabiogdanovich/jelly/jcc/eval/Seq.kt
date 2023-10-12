@@ -5,6 +5,7 @@ import com.ilyabogdanovich.jelly.utils.asLeft
 import com.ilyabogdanovich.jelly.utils.asRight
 import com.ilyabogdanovich.jelly.utils.mapEitherRight
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlin.math.ceil
 
@@ -22,7 +23,8 @@ sealed interface Seq {
     /**
      * Sequence defined by a list of values.
      */
-    data class Array(val elements: List<Var>) : Seq
+    @JvmInline
+    value class Array(val elements: List<Var>) : Seq
 }
 
 /**
@@ -30,30 +32,64 @@ sealed interface Seq {
  * It maps every element of the sequence with the given [mapper],
  * which can return either new [Var] or [EvalError].
  * In the latter case, whole mapping operation returns error.
- * The sequence is split into a number of chunks, according to the maximum parallelism allowed in the system,
+ * The sequence is split into a number of chunks, according to the [maxParallelism] parameter,
  * each of those chunks is transformed in parallel.
  *
+ * @param maxParallelism defines the maximum possible parallel mappings running, effectively defining the chunk size.
  * @param mapper mapper used for this operation.
  * @return wither [Seq] or [EvalError].
  */
-internal suspend inline fun Seq.parallelMap(
+suspend inline fun Seq.parallelMap(
+    maxParallelism: Int = Runtime.getRuntime().availableProcessors(),
     crossinline mapper: suspend (Var) -> Either<EvalError, Var>
 ): Either<EvalError, Seq> = with(asArray()) {
     coroutineScope {
         val out = elements
-            .chunked(getParallelChunkSize())
+            .chunked(getParallelChunkSize(maxParallelism))
             .map { chunk ->
-                async { chunk.map { mapper(it) } }
+                async {
+                    val output = ArrayList<Var>(elements.size)
+                    for (e in chunk) {
+                        when (val mapResult = mapper(e)) {
+                            is Either.Left -> return@async mapResult.value.asLeft()
+                            is Either.Right -> output.add(mapResult.value)
+                        }
+                    }
+                    output.asRight<EvalError, List<Var>>()
+                }
             }
-            .flatMap { it.await() }
+            .awaitAll()
         val error = out.find { it is Either.Left }
         if (error != null) {
             error as Either.Left
             error.value.asLeft()
         } else {
-            Seq.Array(out.filterIsInstance<Either.Right<EvalError, Var>>().map { it.value }).asRight()
+            out.map { it as Either.Right; it.value }.flatten().toSeq().asRight()
         }
     }
+}
+
+/**
+ * Sequential mapping operation for the sequence.
+ * It maps every element of the sequence with the given [mapper],
+ * which can return either new [Var] or [EvalError].
+ * In the latter case, whole mapping operation returns error.
+ * The sequence elements are processed one by one, without any parallelism.
+ *
+ * @param mapper mapper used for this operation.
+ * @return wither [Seq] or [EvalError].
+ */
+inline fun Seq.map(
+    crossinline mapper: (Var) -> Either<EvalError, Var>
+): Either<EvalError, Seq> = with(asArray()) {
+    val output = ArrayList<Var>(elements.size)
+    for (e in elements) {
+        when (val mapResult = mapper(e)) {
+            is Either.Left -> return@with mapResult.value.asLeft()
+            is Either.Right -> output.add(mapResult.value)
+        }
+    }
+    output.toSeq().asRight()
 }
 
 /**
@@ -61,37 +97,42 @@ internal suspend inline fun Seq.parallelMap(
  * It reduces this sequence to a [Var] using the given [neutral] value and reduce [operation],
  * which can return either new [Var] or [EvalError].
  * In the latter case, whole reducing operation returns error.
- * The sequence is split into a number of chunks, according to the maximum parallelism allowed in the system,
+ * The sequence is split into a number of chunks, according to the [maxParallelism] parameter,
  * each of those chunks is transformed in parallel.
- * In order for this parallel computing run correctly, [operation] has to be associative.
+ * In order for this parallel computing to run correctly, [operation] has to be associative.
  * Otherwise, correctness of the final result is not guaranteed!
  *
  * @param neutral neutral element, which is used as an initial accumulation value.
+ * @param maxParallelism defines the maximum possible parallel reductions running, effectively defining the chunk size.
  * @param operation associative reducer used for this operation.
  *                  It takes to parameters as an input: first one is the accumulated value,
  *                  second one is the next element picked.
  *                  Returned result is used to update the accumulated value.
- * @return wither [Seq] or [EvalError].
+ * @return either [Seq] or [EvalError].
  */
-internal suspend inline fun Seq.parallelReduce(
+suspend inline fun Seq.parallelReduce(
     neutral: Var,
+    maxParallelism: Int = Runtime.getRuntime().availableProcessors(),
     crossinline operation: suspend (Var, Var) -> Either<EvalError, Var>
 ): Either<EvalError, Var> = with(asArray()) {
     coroutineScope {
         elements
-            .chunked(getParallelChunkSize())
+            .asSequence()
+            .chunked(getParallelChunkSize(maxParallelism))
             .map { chunk ->
                 async {
-                    chunk.fold<Var, Either<EvalError, Var>>(neutral.asRight()) { acc, p ->
-                        when (acc) {
-                            is Either.Left -> acc
-                            is Either.Right -> operation(acc.value, p)
+                    var accumulator = neutral
+                    for (element in chunk) {
+                        when (val operationResult = operation(accumulator, element)) {
+                            is Either.Left -> return@async operationResult.value.asLeft()
+                            is Either.Right -> accumulator = operationResult.value
                         }
                     }
+                    accumulator.asRight<EvalError, Var>()
                 }
             }
-            .map { it.await() }
             .toList()
+            .awaitAll()
             .reduce { acc, p ->
                 acc.mapEitherRight { accVal -> p.mapEitherRight { pVal -> operation(accVal, pVal) } }
             }
@@ -99,17 +140,46 @@ internal suspend inline fun Seq.parallelReduce(
 }
 
 /**
+ * Sequential reduce operation for the sequence.
+ * It reduces this sequence to a [Var] using the given [neutral] value and reduce [operation],
+ * which can return either new [Var] or [EvalError].
+ * In the latter case, whole reducing operation returns error.
+ * The sequence elements are processed one by one, without any parallelism.
+ *
+ * @param neutral neutral element, which is used as an initial accumulation value.
+ * @param operation reducer used for this operation.
+ *                  It takes to parameters as an input: first one is the accumulated value,
+ *                  second one is the next element picked.
+ *                  Returned result is used to update the accumulated value.
+ * @return either [Seq] or [EvalError].
+ */
+inline fun Seq.reduce(
+    neutral: Var,
+    crossinline operation: (Var, Var) -> Either<EvalError, Var>
+): Either<EvalError, Var> = with(asArray()) {
+    var accumulator = neutral
+    for (element in elements) {
+        when (val operationResult = operation(accumulator, element)) {
+            is Either.Left -> return operationResult.value.asLeft()
+            is Either.Right -> accumulator = operationResult.value
+        }
+    }
+    return accumulator.asRight()
+}
+
+/**
  * Helper to decide on the chunk size for the parallel computing.
  */
-private fun Seq.Array.getParallelChunkSize(): Int {
-    val chunkCount = Runtime.getRuntime().availableProcessors()
-    return ceil(elements.size / chunkCount.toDouble()).toInt()
+@PublishedApi
+internal fun Seq.Array.getParallelChunkSize(maxParallelism: Int): Int {
+    return ceil(elements.size / maxParallelism.toDouble()).toInt()
 }
 
 /**
  * Helper, used in map/reduce operations, to always represent this sequence as an [Array].
  */
-private fun Seq.asArray() = when (this) {
+@PublishedApi
+internal fun Seq.asArray() = when (this) {
     is Seq.Bounds -> Seq.Array((from..to).map { Var.NumVar(Num.Integer(it)) })
     is Seq.Array -> this
 }
