@@ -44,6 +44,10 @@ suspend inline fun Seq.parallelMap(
     crossinline mapper: suspend (Var) -> Either<EvalError, Var>
 ): Either<EvalError, Seq> = with(asArray()) {
     coroutineScope {
+        if (elements.isEmpty()) {
+            return@coroutineScope this@parallelMap.asRight()
+        }
+
         val out = elements
             .chunked(getParallelChunkSize(maxParallelism))
             .map { chunk ->
@@ -116,6 +120,10 @@ suspend inline fun Seq.parallelReduce(
     crossinline operation: suspend (Var, Var) -> Either<EvalError, Var>
 ): Either<EvalError, Var> = with(asArray()) {
     coroutineScope {
+        if (elements.isEmpty()) {
+            return@coroutineScope neutral.asRight()
+        }
+        
         elements
             .asSequence()
             .chunked(getParallelChunkSize(maxParallelism))

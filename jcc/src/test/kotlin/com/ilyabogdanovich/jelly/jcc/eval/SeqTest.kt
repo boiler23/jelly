@@ -26,6 +26,72 @@ class SeqTest {
     }
 
     @Test
+    fun `map array without errors`() = runTest {
+        // Prepare
+
+        // Do
+        val result = listOf(1.toVar(), 2.toVar(), 3.toVar()).toSeq().map {
+            it as Var.NumVar
+            Var.NumVar(it.v + 1.num).asRight()
+        }
+
+        // Check
+        result shouldBe listOf(2.toVar(), 3.toVar(), 4.toVar()).toSeq().asRight()
+    }
+
+    @Test
+    fun `map array with errors`() = runTest {
+        // Prepare
+        val error = mockk<EvalError>()
+
+        // Do
+        val result = listOf(1.toVar(), 2.toVar(), 3.toVar()).toSeq().map { error.asLeft() }
+
+        // Check
+        result shouldBe error.asLeft()
+    }
+
+    @Test
+    fun `map empty array`() = runTest {
+        // Prepare
+
+        // Do
+        val result = listOf<Var>().toSeq().map {
+            it as Var.NumVar
+            Var.NumVar(it.v + 1.num).asRight()
+        }
+
+        // Check
+        result shouldBe listOf<Var>().toSeq().asRight()
+    }
+
+    @Test
+    fun `map bounds without errors`() = runTest {
+        // Prepare
+
+        // Do
+        val result = Seq.Bounds(1, 3).map {
+            it as Var.NumVar
+            Var.NumVar(it.v + 1.num).asRight()
+        }
+
+        // Check
+        result shouldBe listOf(2.toVar(), 3.toVar(), 4.toVar()).toSeq().asRight()
+    }
+
+    @Test
+    fun `map bounds with errors`() = runTest {
+        // Prepare
+        val error = mockk<EvalError>()
+
+        // Do
+        val result = Seq.Bounds(1, 3).map { error.asLeft() }
+
+        // Check
+        result shouldBe error.asLeft()
+    }
+
+    @Test
     fun `parallel map array without errors`() = runTest {
         // Prepare
 
@@ -52,6 +118,20 @@ class SeqTest {
     }
 
     @Test
+    fun `parallel map empty array`() = runTest {
+        // Prepare
+
+        // Do
+        val result = listOf<Var>().toSeq().parallelMap {
+            it as Var.NumVar
+            Var.NumVar(it.v + 1.num).asRight()
+        }
+
+        // Check
+        result shouldBe listOf<Var>().toSeq().asRight()
+    }
+
+    @Test
     fun `parallel map bounds without errors`() = runTest {
         // Prepare
 
@@ -75,6 +155,91 @@ class SeqTest {
 
         // Check
         result shouldBe error.asLeft()
+    }
+
+    @Test
+    fun `reduce empty array`() = runTest {
+        // Prepare
+
+        // Do
+        val result = listOf<Var>().toSeq().reduce(0.toVar()) { acc, n ->
+            acc as Var.NumVar
+            n as Var.NumVar
+            Var.NumVar(acc.v + n.v).asRight()
+        }
+
+        // Check
+        result shouldBe 0.toVar().asRight()
+    }
+
+    @Test
+    fun `reduce array without errors`() = runTest {
+        // Prepare
+
+        // Do
+        val result = listOf(1.toVar(), 2.toVar(), 3.toVar()).toSeq().reduce(0.toVar()) { acc, n ->
+            acc as Var.NumVar
+            n as Var.NumVar
+            Var.NumVar(acc.v + n.v).asRight()
+        }
+
+        // Check
+        result shouldBe 6.toVar().asRight()
+    }
+
+    @Test
+    fun `reduce array with errors`() = runTest {
+        // Prepare
+        val error = mockk<EvalError>()
+
+        // Do
+        val result = listOf(1.toVar(), 2.toVar(), 3.toVar()).toSeq()
+            .reduce(0.toVar()) { _, _ -> error.asLeft() }
+
+        // Check
+        result shouldBe error.asLeft()
+    }
+
+    @Test
+    fun `reduce bounds without errors`() = runTest {
+        // Prepare
+
+        // Do
+        val result = Seq.Bounds(1, 3).reduce(0.toVar()) { acc, n ->
+            acc as Var.NumVar
+            n as Var.NumVar
+            Var.NumVar(acc.v + n.v).asRight()
+        }
+
+        // Check
+        result shouldBe 6.toVar().asRight()
+    }
+
+    @Test
+    fun `reduce bounds with errors`() = runTest {
+        // Prepare
+        val error = mockk<EvalError>()
+
+        // Do
+        val result = Seq.Bounds(1, 3).reduce(0.toVar()) { _, _ -> error.asLeft() }
+
+        // Check
+        result shouldBe error.asLeft()
+    }
+
+    @Test
+    fun `parallel reduce empty array`() = runTest {
+        // Prepare
+
+        // Do
+        val result = listOf<Var>().toSeq().parallelReduce(0.toVar()) { acc, n ->
+            acc as Var.NumVar
+            n as Var.NumVar
+            Var.NumVar(acc.v + n.v).asRight()
+        }
+
+        // Check
+        result shouldBe 0.toVar().asRight()
     }
 
     @Test
