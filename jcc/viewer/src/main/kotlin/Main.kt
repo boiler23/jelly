@@ -2,6 +2,7 @@ import com.ilyabogdanovich.jelly.jcc.core.Compiler
 
 fun main() {
     Compiler().view("""
-        out (2 + 3) * 4
+        map({0, 5}, i -> i^2)
+        out 1
     """.trimIndent())
 }

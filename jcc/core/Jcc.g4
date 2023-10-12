@@ -2,7 +2,7 @@ grammar Jcc;
 
 program: statement* | EOF;
 
-statement: assignment | output | printing;
+statement: assignment | output | printing | expression;
 
 assignment: VAR NAME ASSIGN expression;
 

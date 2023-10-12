@@ -64,14 +64,15 @@ class CompilerTest(
             arrayOf("out -123.456", listOf("-123.456"), empty()),
             arrayOf("out +123.456", listOf("123.456"), empty()),
             arrayOf("out 500;", listOf("500"), listOf("line 1:7 token recognition error at: ';'")),
+            arrayOf("out 1abc", listOf("1"), empty()),
             arrayOf("print", empty(), listOf("line 1:5 missing STRING at '<EOF>'")),
             arrayOf("print \"text\"", listOf("text"), empty()),
             arrayOf("print \"text\";", listOf("text"), listOf("line 1:12 token recognition error at: ';'")),
             arrayOf("print \"line 1\nline 2\"", empty(), listOf("line 1:6 mismatched input '\"line 1' expecting STRING")),
-            arrayOf("print text", empty(), listOf("line 1:6 mismatched input 'text' expecting STRING")),
+            arrayOf("print text", empty(), listOf("line 1:6 missing STRING at 'text'")),
             arrayOf("print \"'text'\"", listOf("'text'"), empty()),
             arrayOf("print \"text", empty(), listOf("line 1:6 mismatched input '\"text' expecting STRING")),
-            arrayOf("print text\"", empty(), listOf("line 1:6 mismatched input 'text' expecting STRING")),
+            arrayOf("print text\"", empty(), listOf("line 1:6 missing STRING at 'text'")),
             arrayOf("print \"te\\\"xt\"", listOf("te\"xt"), empty()),
             arrayOf("print \"te\\xt\"", listOf("te\\xt"), empty()),
             arrayOf(
@@ -231,6 +232,14 @@ class CompilerTest(
                 empty(),
                 listOf("line 2:4 Variable undeclared: 'i'."),
             ),
+            arrayOf(
+                """
+                    map({0, 5}, i -> i^2)
+                    out 1
+                """.trimIndent(),
+                listOf("1"),
+                empty(),
+            )
         )
 
         /**
