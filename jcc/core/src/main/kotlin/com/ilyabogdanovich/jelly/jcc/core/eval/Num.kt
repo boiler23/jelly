@@ -53,7 +53,7 @@ sealed interface Num {
      * Represents the integer number.
      */
     @JvmInline
-    value class Integer(val v: Int) : Num {
+    value class Integer(val v: Long) : Num {
         override operator fun plus(n: Num) = when (n) {
             is Integer -> Integer(v + n.v)
             is Real -> Real(v + n.r)
@@ -79,9 +79,9 @@ sealed interface Num {
         override fun pow(n: Num) = when (n) {
             is Integer -> {
                 when (v) {
-                    1 -> Integer(1)
-                    -1 -> Integer(if (n.v % 2 == 0) 1 else -1)
-                    else -> Integer(FastMath.pow(v.toDouble(), n.v).toInt())
+                    1L -> Integer(1L)
+                    -1L -> Integer(if (n.v % 2 == 0L) 1L else -1L)
+                    else -> Integer(FastMath.pow(v.toDouble(), n.v).toLong())
                 }
             }
             is Real -> {
@@ -117,6 +117,12 @@ sealed interface Num {
  * Helper property to create [Num.Integer] from [Int].
  */
 val Int.num
+    get() = Num.Integer(this.toLong())
+
+/**
+ * Helper property to create [Num.Integer] from [Long].
+ */
+val Long.num
     get() = Num.Integer(this)
 
 /**

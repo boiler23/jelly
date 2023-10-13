@@ -25,6 +25,11 @@ sealed interface Var {
 fun Int.toVar() = Var.NumVar(this.num)
 
 /**
+ * Helper to create [Var] from [Long].
+ */
+fun Long.toVar() = Var.NumVar(this.num)
+
+/**
  * Helper to create [Var] from [Double].
  */
 fun Double.toVar() = Var.NumVar(this.num)

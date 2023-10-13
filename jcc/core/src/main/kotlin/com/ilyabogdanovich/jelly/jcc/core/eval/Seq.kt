@@ -36,16 +36,16 @@ class Seq(val elements: Sequence<Var>, val size: Int) {
 
     override fun hashCode(): Int {
         var result = elements.toList().hashCode()
-        result = 31 * result + size
+        result = 31 * result + size.hashCode()
         return result
     }
 
     companion object {
-        fun fromBounds(from: Int, to: Int): Seq {
+        fun fromBounds(from: Long, to: Long): Seq {
             if (from > to) {
                 throw IllegalArgumentException("Sequence from > to: $from > $to")
             }
-            return Seq((from..to).asSequence().map { it.toVar() }, to - from + 1)
+            return Seq((from..to).asSequence().map { it.toVar() }, (to - from + 1).toInt())
         }
     }
 }

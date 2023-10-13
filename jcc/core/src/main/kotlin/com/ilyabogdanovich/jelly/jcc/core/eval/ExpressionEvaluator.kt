@@ -43,7 +43,7 @@ class ExpressionEvaluator {
     private inline fun <reified T : ParserRuleContext> JccParser.ExpressionContext.cast() = this as? T
 
     private fun JccParser.NumberContext.number(): Either<EvalError, Var> {
-        val intNum = text.toIntOrNull()
+        val intNum = text.toLongOrNull()
         return if (intNum != null) {
             Var.NumVar(Num.Integer(intNum)).asRight()
         } else {
@@ -126,7 +126,7 @@ class ExpressionEvaluator {
     private suspend fun evaluateToInt(
         evalContext: EvalContext,
         expr: JccParser.ExpressionContext
-    ): Either<EvalError, Int> {
+    ): Either<EvalError, Long> {
         return evaluateToNumber(evalContext, expr).mapEitherRight { num ->
             when (num) {
                 is Num.Integer -> num.v.asRight()
