@@ -28,7 +28,7 @@ private suspend fun map() {
     val seq = Seq.Bounds(1, 10_000_000)
     val mapper: (Var) -> Either<EvalError, Var> = {
         it as Var.NumVar
-        Var.NumVar(it.v.pow(2.num)).asRight()
+        Var.NumVar(it.v.pow(3.num) + it.v.pow(2.num) + 1.num).asRight()
     }
 
     print("Measuring map performance... ")
@@ -45,7 +45,7 @@ private suspend fun reduce() {
     val reduction: (Var, Var) -> Either<EvalError, Var> = { acc, p ->
         acc as Var.NumVar
         p as Var.NumVar
-        Var.NumVar(acc.v.pow(p.v)).asRight()
+        Var.NumVar(acc.v.pow(p.v) * p.v.pow(acc.v)).asRight()
     }
 
     print("Measuring reduce performance... ")
