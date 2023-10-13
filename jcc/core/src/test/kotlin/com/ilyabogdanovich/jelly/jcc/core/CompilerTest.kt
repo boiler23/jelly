@@ -253,6 +253,36 @@ class CompilerTest(
                 """.trimIndent(),
                 listOf("seq = ", "81"),
                 listOf("line 2:25 extraneous input ')' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}"),
+            ),
+            arrayOf(
+                """
+                    var n = 50000
+                    var seq = map({0, n}, i -> (-1)^i / (2 * i + 1))
+                    var pi = 4 * reduce(seq, 0, x y -> x + y)
+                    print "pi="
+                    out pi
+                    
+                    print "; "
+                    
+                    var x = pi/2
+                    var n2 = 10
+                    var seq2 = map({1, n2}, i -> (-1)^i * x^(2*i + 1) / reduce({1,2*i + 1}, 1, j k -> j*k))
+                    var sinx = x + reduce(seq2, 0, j k -> j+k)
+                    print "sin(x)="
+                    out sinx
+                    
+                    print "; "
+                    
+                    var seq3 = map({1, n2}, i -> (-1)^i * x^(2*i) / reduce({1,2*i}, 1, j k -> j*k))
+                    var cosx = 1 + reduce(seq3, 0, j k -> j+k)
+                    print "cos(x)="
+                    out cosx
+                    
+                    print "; sin^2(x)+cos^2(x)="
+                    out sinx^2+cosx^2
+                """.trimIndent(),
+                listOf("pi=", "3.141612653", "; ", "sin(x)=", "1", "; ", "cos(x)=", "-0.00001", "; sin^2(x)+cos^2(x)=", "1"),
+                empty(),
             )
         )
 
