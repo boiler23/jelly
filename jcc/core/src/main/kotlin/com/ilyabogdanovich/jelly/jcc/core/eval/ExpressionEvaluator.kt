@@ -61,8 +61,12 @@ class ExpressionEvaluator {
         val upper = expression(1) ?: return toError(EvalError.Type.MissingSequenceUpperBound).asLeft()
 
         return evaluateToInt(evalContext, lower).mapEitherRight { start ->
-            evaluateToInt(evalContext, upper).mapRight { end ->
-                Var.SeqVar(Seq.Bounds(from = start, to = end))
+            evaluateToInt(evalContext, upper).mapEitherRight { end ->
+                if (start <= end) {
+                    Var.SeqVar(Seq.Bounds(from = start, to = end)).asRight()
+                } else {
+                    toError(EvalError.Type.SequenceInvalidBounds, expression = "$start > $end").asLeft()
+                }
             }
         }
     }

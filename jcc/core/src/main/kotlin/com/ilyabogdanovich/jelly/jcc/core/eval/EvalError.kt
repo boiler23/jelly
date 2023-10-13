@@ -47,6 +47,16 @@ data class EvalError(
         MissingSequenceLowerBound,
 
         /**
+         * Sequence's upper bound is missing.
+         */
+        MissingSequenceUpperBound,
+
+        /**
+         * Sequence's upper bound is lower than lower bound.
+         */
+        SequenceInvalidBounds,
+
+        /**
          * Left operand is missing in an arithmetic operation.
          */
         MissingLeftOperand,
@@ -117,11 +127,6 @@ data class EvalError(
         ReduceMissingLambdaExpression,
 
         /**
-         * Sequence's upper bound is missing.
-         */
-        MissingSequenceUpperBound,
-
-        /**
          * Invalid operand detected in arithmetic operation.
          */
         InvalidArithmeticOperand,
@@ -159,7 +164,7 @@ data class EvalError(
      */
     private val message: String
         get() = when (type) {
-            Type.InvalidNumber -> "Invalid number encountered in '$expression'. It is neither integer or double."
+            Type.InvalidNumber -> "Invalid number encountered in '$expression'. it is neither integer or double."
             Type.VariableRedeclaration -> "Variable redeclaration: '$expression'."
             Type.UndeclaredVariable -> "Variable undeclared: '$expression'."
             Type.UnsupportedExpression -> "Unsupported expression encountered: '$expression'."
@@ -170,6 +175,7 @@ data class EvalError(
             Type.MissingVariableAssignment -> "Missing variable assignment: '$expression'."
             Type.MissingSequenceLowerBound -> "Missing sequence's lower bound: '$expression'."
             Type.MissingSequenceUpperBound -> "Missing sequence's upper bound: '$expression'."
+            Type.SequenceInvalidBounds -> "Sequence's upper bound is less than lower bound: $expression."
             Type.MissingLeftOperand -> "Missing left operand: '$expression'."
             Type.MissingRightOperand -> "Missing right operand: '$expression'."
             Type.MissingUnaryOperand -> "Missing unary operand: '$expression'."

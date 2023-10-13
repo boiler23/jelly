@@ -177,6 +177,9 @@ class CompilerTest(
             arrayOf("out {1,5-2}", listOf("{ 1, 2, 3 }"), empty()),
             arrayOf("out {1,5,7}", listOf("{ 1, 2, 3, 4, 5 }"), listOf("line 1:8 mismatched input ',' expecting {PLUSMINUS, MULDIV, '^', '}'}", "line 1:10 extraneous input '}' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}")),
             arrayOf("out {-2,3}", listOf("{ -2, -1, 0, 1, 2, 3 }"), empty()),
+            arrayOf("out {5,1}", empty(), listOf("line 1:4 Sequence's upper bound is less than lower bound: 5 > 1.")),
+            arrayOf("out {1}", empty(), listOf("line 1:6 mismatched input '}' expecting {PLUSMINUS, MULDIV, '^', ','}", "line 1:4 Missing sequence's upper bound: '{1}'.")),
+            arrayOf("out {}", empty(), listOf("line 1:5 mismatched input '}' expecting {'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}", "line 1:4 Missing sequence's upper bound: '{}'.")),
             arrayOf(
                 """
                     var from = 2
