@@ -63,7 +63,7 @@ class ExpressionEvaluator {
         return evaluateToInt(evalContext, lower).mapEitherRight { start ->
             evaluateToInt(evalContext, upper).mapEitherRight { end ->
                 if (start <= end) {
-                    Var.SeqVar(Seq.Bounds(from = start, to = end)).asRight()
+                    Var.SeqVar(Seq.fromBounds(from = start, to = end)).asRight()
                 } else {
                     toError(EvalError.Type.SequenceInvalidBounds, expression = "$start > $end").asLeft()
                 }

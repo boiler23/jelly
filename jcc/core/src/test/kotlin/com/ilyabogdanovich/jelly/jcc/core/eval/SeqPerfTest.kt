@@ -25,7 +25,7 @@ class SeqPerfTest {
     @Test
     fun map(): Unit = runBlocking(Dispatchers.Default) {
         // Prepare
-        val seq = Seq.Bounds(1, 1_000_000)
+        val seq = Seq.fromBounds(1, 1_000_000)
         val mapper: (Var) -> Either<EvalError, Var> = {
             it as Var.NumVar
             Var.NumVar(it.v.pow(2.num)).asRight()
@@ -47,7 +47,7 @@ class SeqPerfTest {
     @Test
     fun reduce(): Unit = runBlocking(Dispatchers.Default) {
         // Prepare
-        val seq = Seq.Bounds(1, 1_000_000)
+        val seq = Seq.fromBounds(1, 1_000_000)
         val reduction: (Var, Var) -> Either<EvalError, Var> = { acc, p ->
             acc as Var.NumVar
             p as Var.NumVar

@@ -96,7 +96,7 @@ class VarPrinterTest {
     @Test
     fun `print bounds sequence - many elements`() {
         // Prepare
-        val variable = Var.SeqVar(Seq.Bounds(1, 5))
+        val variable = Var.SeqVar(Seq.fromBounds(1, 5))
 
         // Do
         val result = printer.print(variable)
@@ -108,25 +108,13 @@ class VarPrinterTest {
     @Test
     fun `print bounds sequence - 1 element`() {
         // Prepare
-        val variable = Var.SeqVar(Seq.Bounds(1, 1))
+        val variable = Var.SeqVar(Seq.fromBounds(1, 1))
 
         // Do
         val result = printer.print(variable)
 
         // Check
         result shouldBe "{ 1 }"
-    }
-
-    @Test
-    fun `print bounds sequence - wrong`() {
-        // Prepare
-        val variable = Var.SeqVar(Seq.Bounds(5, 1))
-
-        // Do
-        val result = printer.print(variable)
-
-        // Check
-        result shouldBe "{  }"
     }
 
     @Test
@@ -156,7 +144,7 @@ class VarPrinterTest {
     @Test
     fun `print array sequence - empty`() {
         // Prepare
-        val variable = Var.SeqVar(Seq.Array(listOf()))
+        val variable = Var.SeqVar(Seq(sequenceOf(), 0))
 
         // Do
         val result = printer.print(variable)

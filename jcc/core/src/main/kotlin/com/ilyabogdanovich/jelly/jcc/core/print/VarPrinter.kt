@@ -37,23 +37,7 @@ class VarPrinter {
         }
     }
 
-    private fun Seq.print() = when (this) {
-        is Seq.Bounds -> printBounds()
-        is Seq.Array -> printArray()
-    }
-
-    private fun Seq.Bounds.printBounds() = buildString {
-        append("{ ")
-        if (from <= to) {
-            for (n in from until to) {
-                append("$n, ")
-            }
-            append(to)
-        }
-        append(" }")
-    }
-
-    private fun Seq.Array.printArray() = buildString {
+    private fun Seq.print() = buildString {
         append("{ ")
         val i = elements.iterator()
         while (i.hasNext()) {

@@ -1,15 +1,5 @@
 package com.ilyabogdanovich.jelly.jcc.core.eval
 
-import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
-import com.ilyabogdanovich.jelly.jcc.core.eval.Seq
-import com.ilyabogdanovich.jelly.jcc.core.eval.Var
-import com.ilyabogdanovich.jelly.jcc.core.eval.map
-import com.ilyabogdanovich.jelly.jcc.core.eval.num
-import com.ilyabogdanovich.jelly.jcc.core.eval.parallelMap
-import com.ilyabogdanovich.jelly.jcc.core.eval.parallelReduce
-import com.ilyabogdanovich.jelly.jcc.core.eval.reduce
-import com.ilyabogdanovich.jelly.jcc.core.eval.toSeq
-import com.ilyabogdanovich.jelly.jcc.core.eval.toVar
 import com.ilyabogdanovich.jelly.utils.asLeft
 import com.ilyabogdanovich.jelly.utils.asRight
 import io.kotest.matchers.shouldBe
@@ -26,13 +16,13 @@ class SeqTest {
     @Test
     fun `list to seq`() {
         // Prepare
-        val list = listOf(Var.NumVar(1.num), Var.NumVar(2.5.num))
+        val list = listOf(1.toVar(), 2.5.toVar())
 
         // Do
         val result = list.toSeq()
 
         // Check
-        result shouldBe Seq.Array(list)
+        result shouldBe Seq(sequenceOf(1.toVar(), 2.5.toVar()), 2)
     }
 
     @Test
@@ -80,7 +70,7 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = Seq.Bounds(1, 3).map {
+        val result = Seq.fromBounds(1, 3).map {
             it as Var.NumVar
             Var.NumVar(it.v + 1.num).asRight()
         }
@@ -95,7 +85,7 @@ class SeqTest {
         val error = mockk<EvalError>()
 
         // Do
-        val result = Seq.Bounds(1, 3).map { error.asLeft() }
+        val result = Seq.fromBounds(1, 3).map { error.asLeft() }
 
         // Check
         result shouldBe error.asLeft()
@@ -146,7 +136,7 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = Seq.Bounds(1, 3).parallelMap {
+        val result = Seq.fromBounds(1, 3).parallelMap {
             it as Var.NumVar
             Var.NumVar(it.v + 1.num).asRight()
         }
@@ -161,7 +151,7 @@ class SeqTest {
         val error = mockk<EvalError>()
 
         // Do
-        val result = Seq.Bounds(1, 3).parallelMap { error.asLeft() }
+        val result = Seq.fromBounds(1, 3).parallelMap { error.asLeft() }
 
         // Check
         result shouldBe error.asLeft()
@@ -215,7 +205,7 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = Seq.Bounds(1, 3).reduce(0.toVar()) { acc, n ->
+        val result = Seq.fromBounds(1, 3).reduce(0.toVar()) { acc, n ->
             acc as Var.NumVar
             n as Var.NumVar
             Var.NumVar(acc.v + n.v).asRight()
@@ -231,7 +221,7 @@ class SeqTest {
         val error = mockk<EvalError>()
 
         // Do
-        val result = Seq.Bounds(1, 3).reduce(0.toVar()) { _, _ -> error.asLeft() }
+        val result = Seq.fromBounds(1, 3).reduce(0.toVar()) { _, _ -> error.asLeft() }
 
         // Check
         result shouldBe error.asLeft()
@@ -285,7 +275,7 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = Seq.Bounds(1, 3).parallelReduce(0.toVar()) { acc, n ->
+        val result = Seq.fromBounds(1, 3).parallelReduce(0.toVar()) { acc, n ->
             acc as Var.NumVar
             n as Var.NumVar
             Var.NumVar(acc.v + n.v).asRight()
@@ -301,7 +291,7 @@ class SeqTest {
         val error = mockk<EvalError>()
 
         // Do
-        val result = Seq.Bounds(1, 3).parallelReduce(0.toVar()) { _, _ -> error.asLeft() }
+        val result = Seq.fromBounds(1, 3).parallelReduce(0.toVar()) { _, _ -> error.asLeft() }
 
         // Check
         result shouldBe error.asLeft()

@@ -156,7 +156,7 @@ class ExpressionEvaluatorTest {
         val result = evaluator.evaluateExpression(EvalContext(), parserContext)
 
         // Check
-        result shouldBe Var.SeqVar(Seq.Bounds(1, 2)).asRight()
+        result shouldBe Var.SeqVar(Seq.fromBounds(1, 2)).asRight()
     }
 
     @Test

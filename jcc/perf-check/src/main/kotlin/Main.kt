@@ -25,7 +25,7 @@ private fun improvement(from: Double, to: Double): Int {
 }
 
 private suspend fun map() {
-    val seq = Seq.Bounds(1, 10_000_000)
+    val seq = Seq.fromBounds(1, 10_000_000)
     val mapper: (Var) -> Either<EvalError, Var> = {
         it as Var.NumVar
         Var.NumVar(it.v.pow(3.num) + it.v.pow(2.num) + 1.num).asRight()
@@ -41,7 +41,7 @@ private suspend fun map() {
 }
 
 private suspend fun reduce() {
-    val seq = Seq.Bounds(1, 10_000_000)
+    val seq = Seq.fromBounds(1, 10_000_000)
     val reduction: (Var, Var) -> Either<EvalError, Var> = { acc, p ->
         acc as Var.NumVar
         p as Var.NumVar

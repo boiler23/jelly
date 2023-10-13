@@ -44,6 +44,6 @@ class VarTest {
         val result = list.toVar()
 
         // Check
-        result shouldBe Var.SeqVar(Seq.Array(list))
+        result shouldBe Var.SeqVar(Seq(sequenceOf(1.toVar(), 2.toVar()), 2))
     }
 }
