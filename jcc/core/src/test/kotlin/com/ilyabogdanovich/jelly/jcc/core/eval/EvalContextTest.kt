@@ -1,6 +1,5 @@
 package com.ilyabogdanovich.jelly.jcc.core.eval
 
-import com.ilyabogdanovich.jelly.jcc.core.eval.EvalContext
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 

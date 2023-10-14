@@ -36,8 +36,8 @@ class SeqPerfTest {
         val timeSequntial = measureAvgTime { seq.map(mapper) }
         val timeParallel = measureAvgTime { seq.parallelMap(mapper = mapper) }
         println("Done!")
-        println("Time sequential: ${timeSequntial/1000.0}s")
-        println("Time parallel: ${timeParallel/1000.0}s")
+        println("Time sequential: ${timeSequntial / 1000.0}s")
+        println("Time parallel: ${timeParallel / 1000.0}s")
 
         // Check
         // >15% improvement is expected
@@ -59,8 +59,8 @@ class SeqPerfTest {
         val timeSequntial = measureAvgTime { seq.reduce(1.toVar(), reduction) }
         val timeParallel = measureAvgTime { seq.parallelReduce(1.toVar(), operation = reduction) }
         println("Done!")
-        println("Time sequential: ${timeSequntial/1000.0}s")
-        println("Time parallel: ${timeParallel/1000.0}s")
+        println("Time sequential: ${timeSequntial / 1000.0}s")
+        println("Time parallel: ${timeParallel / 1000.0}s")
 
         // Check
         // >15% improvement is expected

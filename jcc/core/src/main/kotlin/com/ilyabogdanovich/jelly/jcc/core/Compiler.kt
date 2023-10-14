@@ -154,6 +154,7 @@ class Compiler {
         val parser = JccParser(CommonTokenStream(lexer))
         parser.addErrorListener(errorListener)
         val tree = parser.program()
+        @Suppress("SpreadOperator")
         val viewer = TreeViewer(listOf(*parser.ruleNames), tree)
         viewer.open()
     }

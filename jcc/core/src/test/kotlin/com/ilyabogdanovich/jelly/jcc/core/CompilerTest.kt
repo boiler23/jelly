@@ -65,15 +65,35 @@ class CompilerTest(
             arrayOf("out +123.456", listOf("123.456"), empty()),
             arrayOf("out 500;", listOf("500"), listOf("line 1:7 token recognition error at: ';'")),
             arrayOf("out 1abc", listOf("1"), empty()),
-            arrayOf("out 1) out 2", listOf("1", "2"), listOf("line 1:5 extraneous input ')' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}")),
+            arrayOf(
+                "out 1) out 2",
+                listOf("1", "2"),
+                listOf(
+                    "line 1:5 extraneous input ')' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}"
+                )
+            ),
             arrayOf("print", empty(), listOf("line 1:5 missing STRING at '<EOF>'")),
             arrayOf("print \"text\"", listOf("text"), empty()),
             arrayOf("print \"text\";", listOf("text"), listOf("line 1:12 token recognition error at: ';'")),
-            arrayOf("print \"line 1\nline 2\"", empty(), listOf("line 1:6 mismatched input '\"line 1' expecting STRING", "line 2:6 extraneous input '\"' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}")),
+            arrayOf(
+                "print \"line 1\nline 2\"",
+                empty(),
+                listOf(
+                    "line 1:6 mismatched input '\"line 1' expecting STRING",
+                    "line 2:6 extraneous input '\"' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}"
+                )
+            ),
             arrayOf("print text", empty(), listOf("line 1:6 missing STRING at 'text'")),
             arrayOf("print \"'text'\"", listOf("'text'"), empty()),
             arrayOf("print \"text", empty(), listOf("line 1:6 mismatched input '\"text' expecting STRING")),
-            arrayOf("print text\"", empty(), listOf("line 1:6 missing STRING at 'text'", "line 1:10 extraneous input '\"' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}")),
+            arrayOf(
+                "print text\"",
+                empty(),
+                listOf(
+                    "line 1:6 missing STRING at 'text'",
+                    "line 1:10 extraneous input '\"' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}"
+                )
+            ),
             arrayOf("print \"te\\\"xt\"", listOf("te\"xt"), empty()),
             arrayOf("print \"te\\xt\"", listOf("te\\xt"), empty()),
             arrayOf(
@@ -175,11 +195,32 @@ class CompilerTest(
             ),
             arrayOf("out {1,5}", listOf("{ 1, 2, 3, 4, 5 }"), empty()),
             arrayOf("out {1,5-2}", listOf("{ 1, 2, 3 }"), empty()),
-            arrayOf("out {1,5,7}", listOf("{ 1, 2, 3, 4, 5 }"), listOf("line 1:8 mismatched input ',' expecting {PLUSMINUS, MULDIV, '^', '}'}", "line 1:10 extraneous input '}' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}")),
+            arrayOf(
+                "out {1,5,7}",
+                listOf("{ 1, 2, 3, 4, 5 }"),
+                listOf(
+                    "line 1:8 mismatched input ',' expecting {PLUSMINUS, MULDIV, '^', '}'}",
+                    "line 1:10 extraneous input '}' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}"
+                )
+            ),
             arrayOf("out {-2,3}", listOf("{ -2, -1, 0, 1, 2, 3 }"), empty()),
             arrayOf("out {5,1}", empty(), listOf("line 1:4 Sequence's upper bound is less than lower bound: 5 > 1.")),
-            arrayOf("out {1}", empty(), listOf("line 1:6 mismatched input '}' expecting {PLUSMINUS, MULDIV, '^', ','}", "line 1:4 Missing sequence's upper bound: '{1}'.")),
-            arrayOf("out {}", empty(), listOf("line 1:5 mismatched input '}' expecting {'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}", "line 1:4 Missing sequence's upper bound: '{}'.")),
+            arrayOf(
+                "out {1}",
+                empty(),
+                listOf(
+                    "line 1:6 mismatched input '}' expecting {PLUSMINUS, MULDIV, '^', ','}",
+                    "line 1:4 Missing sequence's upper bound: '{1}'."
+                )
+            ),
+            arrayOf(
+                "out {}",
+                empty(),
+                listOf(
+                    "line 1:5 mismatched input '}' expecting {'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}",
+                    "line 1:4 Missing sequence's upper bound: '{}'."
+                )
+            ),
             arrayOf(
                 """
                     var from = 2
@@ -191,7 +232,11 @@ class CompilerTest(
                 empty()
             ),
             arrayOf("out map({1,5},i->i^2)", listOf("{ 1, 4, 9, 16, 25 }"), empty()),
-            arrayOf("out map({1,5},i->{i,i+2})", listOf("{ { 1, 2, 3 }, { 2, 3, 4 }, { 3, 4, 5 }, { 4, 5, 6 }, { 5, 6, 7 } }"), empty()),
+            arrayOf(
+                "out map({1,5},i->{i,i+2})",
+                listOf("{ { 1, 2, 3 }, { 2, 3, 4 }, { 3, 4, 5 }, { 4, 5, 6 }, { 5, 6, 7 } }"),
+                empty()
+            ),
             arrayOf("out reduce(map({1,5},i->i^2), 1, x y -> x*y)", listOf("14400"), empty()),
             arrayOf("out reduce({1,5},0,i j->i+j)", listOf("15"), empty()),
             arrayOf(
@@ -252,7 +297,9 @@ class CompilerTest(
                     out seq
                 """.trimIndent(),
                 listOf("seq = ", "81"),
-                listOf("line 2:25 extraneous input ')' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}"),
+                listOf(
+                    "line 2:25 extraneous input ')' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}"
+                ),
             ),
             arrayOf(
                 """
@@ -291,10 +338,12 @@ class CompilerTest(
          * @return pi value approximation
          */
         private fun calculatePi() =
-            VarPrinter().print((
-                4.0 * (0..500)
-                    .map { i -> (if (i % 2 == 0) 1.0 else -1.0) / (2 * i + 1) }
-                    .fold(0.0) { x, y -> x + y }
-                ).toVar())
+            VarPrinter().print(
+                (
+                    4.0 * (0..500)
+                        .map { i -> (if (i % 2 == 0) 1.0 else -1.0) / (2 * i + 1) }
+                        .fold(0.0) { x, y -> x + y }
+                    ).toVar()
+            )
     }
 }

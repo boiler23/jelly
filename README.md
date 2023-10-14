@@ -21,6 +21,7 @@ Just navigate to the project folder and execute in the Terminal:
 - Apache's FastMath for expontiation
 - Okio for fire operations
 - AndroidX annotations for code checks
+- Detekt for formatting & simple static analysis.
 - JUnit, kotest & mockk for unit testing
 
 Full list of dependencies can be found in `gradle/libs.versions.toml`

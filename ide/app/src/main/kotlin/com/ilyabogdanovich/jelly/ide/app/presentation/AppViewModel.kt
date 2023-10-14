@@ -2,8 +2,8 @@ package com.ilyabogdanovich.jelly.ide.app.presentation
 
 import androidx.annotation.WorkerThread
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationServiceClient
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.Document

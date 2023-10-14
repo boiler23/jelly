@@ -87,7 +87,7 @@ class ExpressionEvaluator {
 
     private suspend fun JccParser.MuldivContext.binary(evalContext: EvalContext): Either<EvalError, Var> {
         val operation = MULDIV()?.text ?: return toError(EvalError.Type.MissingOperator).asLeft()
-        return binary(evalContext,operation, expression(0), expression(1))
+        return binary(evalContext, operation, expression(0), expression(1))
     }
 
     private suspend fun JccParser.PlusminusContext.binary(evalContext: EvalContext): Either<EvalError, Var> {

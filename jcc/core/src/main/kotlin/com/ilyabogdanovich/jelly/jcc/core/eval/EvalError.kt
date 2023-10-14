@@ -189,7 +189,8 @@ data class EvalError(
             Type.ReduceMissingLambda -> "Missing lambda declaration in reduce(): '$expression'."
             Type.ReduceMissingLambdaAccumulator -> "Missing accumulator declaration in reduce's lambda: '$expression'."
             Type.ReduceMissingLambdaNext -> "Missing next element declaration in reduce's lambda: '$expression'."
-            Type.ReduceMissingLambdaExpression -> "Missing return expression declaration in reduce's lambda: '$expression'."
+            Type.ReduceMissingLambdaExpression ->
+                "Missing return expression declaration in reduce's lambda: '$expression'."
         }
 }
 

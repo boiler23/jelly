@@ -35,8 +35,8 @@ private suspend fun map() {
     val timeSequntial = measureAvgTime { seq.map(mapper) }
     val timeParallel = measureAvgTime { seq.parallelMap(mapper = mapper) }
     println("Done!")
-    println("Time sequential: ${timeSequntial/1000.0}s")
-    println("Time parallel: ${timeParallel/1000.0}s")
+    println("Time sequential: ${timeSequntial / 1000.0}s")
+    println("Time parallel: ${timeParallel / 1000.0}s")
     println("Improvement: ${improvement(from = timeSequntial, to = timeParallel)}%")
 }
 
@@ -52,8 +52,8 @@ private suspend fun reduce() {
     val timeSequntial = measureAvgTime { seq.reduce(1.toVar(), reduction) }
     val timeParallel = measureAvgTime { seq.parallelReduce(1.toVar(), operation = reduction) }
     println("Done!")
-    println("Time sequential: ${timeSequntial/1000.0}s")
-    println("Time parallel: ${timeParallel/1000.0}s")
+    println("Time sequential: ${timeSequntial / 1000.0}s")
+    println("Time parallel: ${timeParallel / 1000.0}s")
     println("Improvement: ${improvement(from = timeSequntial, to = timeParallel)}%")
 }
 
@@ -69,7 +69,7 @@ private suspend fun powerPerformance() {
         )
     }
     println("Done!")
-    println("Average time spent: ${time/1000.0}s")
+    println("Average time spent: ${time / 1000.0}s")
 }
 
 fun main() = runBlocking(Dispatchers.Default) {

@@ -42,9 +42,7 @@ class Seq(val elements: Sequence<Var>, val size: Int) {
 
     companion object {
         fun fromBounds(from: Long, to: Long): Seq {
-            if (from > to) {
-                throw IllegalArgumentException("Sequence from > to: $from > $to")
-            }
+            require(from <= to) { "Sequence from > to: $from > $to" }
             return Seq((from..to).asSequence().map { it.toVar() }, (to - from + 1).toInt())
         }
     }
@@ -92,7 +90,10 @@ suspend inline fun Seq.parallelMap(
             error as Either.Left
             error.value.asLeft()
         } else {
-            out.map { it as Either.Right; it.value }.flatten().toSeq().asRight()
+            out.map {
+                it as Either.Right
+                it.value
+            }.flatten().toSeq().asRight()
         }
     }
 }
@@ -147,7 +148,7 @@ suspend inline fun Seq.parallelReduce(
         if (size == 0) {
             return@coroutineScope neutral.asRight()
         }
-        
+
         elements
             .chunked(size.getParallelChunkSize(maxParallelism))
             .map { chunk ->

@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm")
+    id("jelly.jvm")
 }
 
 group = "com.ilyabogdanovich.jelly.jcc.perf-check"

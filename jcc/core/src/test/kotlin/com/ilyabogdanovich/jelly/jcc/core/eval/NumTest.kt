@@ -1,7 +1,5 @@
 package com.ilyabogdanovich.jelly.jcc.core.eval
 
-import com.ilyabogdanovich.jelly.jcc.core.eval.Num
-import com.ilyabogdanovich.jelly.jcc.core.eval.num
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 

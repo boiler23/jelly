@@ -94,7 +94,7 @@ sealed interface Num {
      * Represents the decimal number.
      */
     @JvmInline
-    value class Real(val r: Double): Num {
+    value class Real(val r: Double) : Num {
         override operator fun plus(n: Num) = Real(r + n.doubleValue)
         override operator fun minus(n: Num) = Real(r - n.doubleValue)
         override operator fun times(n: Num) = Real(r * n.doubleValue)
@@ -107,7 +107,7 @@ sealed interface Num {
     }
 
     private val doubleValue: Double
-        get() = when(this) {
+        get() = when (this) {
             is Integer -> v.toDouble()
             is Real -> r
         }

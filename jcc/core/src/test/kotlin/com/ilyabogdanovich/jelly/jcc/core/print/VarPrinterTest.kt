@@ -157,7 +157,10 @@ class VarPrinterTest {
     fun `print multi-array sequence - many elements`() {
         // Prepare
         val variable = listOf(
-            1.toVar(), listOf(2.0.toVar(), listOf(3.toVar()).toVar()).toVar(), 4.0.toVar(), 5.0.toVar()
+            1.toVar(),
+            listOf(2.0.toVar(), listOf(3.toVar()).toVar()).toVar(),
+            4.0.toVar(),
+            5.0.toVar()
         ).toVar()
 
         // Do

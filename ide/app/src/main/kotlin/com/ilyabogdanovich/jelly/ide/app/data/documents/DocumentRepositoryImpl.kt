@@ -25,7 +25,7 @@ class DocumentRepositoryImpl(
         val text = fileSystem.read(INTERNAL_SOURCE) { readUtf8() }
         Document(text = text)
     } catch (e: FileNotFoundException) {
-        logger.d { "File not found - likely no cache yet" }
+        logger.d(e) { "File not found - likely no cache yet" }
         Document.empty()
     } catch (e: IOException) {
         logger.e(e) { "IO exception occurred while restoring the source state" }
@@ -47,6 +47,7 @@ class DocumentRepositoryImpl(
     companion object {
         @VisibleForTesting
         internal val INTERNAL_DIR = ".jelly".toPath()
+
         @VisibleForTesting
         internal val INTERNAL_SOURCE = INTERNAL_DIR / "source.jy"
     }

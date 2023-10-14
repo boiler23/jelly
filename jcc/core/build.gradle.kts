@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm")
+    id("jelly.jvm")
 }
 
 group = "com.ilyabogdanovich.jelly.jcc.core"
@@ -8,6 +8,7 @@ version = "1.0-SNAPSHOT"
 abstract class GenerateParserTask : JavaExec() {
     @InputFile
     lateinit var grammarFile: File
+
     @OutputDirectory
     lateinit var outputDir: File
 
@@ -17,8 +18,10 @@ abstract class GenerateParserTask : JavaExec() {
             listOf(
                 grammarFile.path,
                 "-Dlanguage=Java",
-                "-package", "com.ilyabogdanovich.jelly.jcc.core.antlr",
-                "-o", outputDir.path,
+                "-package",
+                "com.ilyabogdanovich.jelly.jcc.core.antlr",
+                "-o",
+                outputDir.path,
             )
         )
         super.exec()

@@ -1,10 +1,10 @@
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.ilyabogdanovich.jelly.ide.app.data.compiler.CompilationServiceClientImpl
+import com.ilyabogdanovich.jelly.ide.app.data.documents.DocumentRepositoryImpl
+import com.ilyabogdanovich.jelly.ide.app.presentation.AppViewModel
 import com.ilyabogdanovich.jelly.ide.app.presentation.compose.App
 import com.ilyabogdanovich.jelly.jcc.core.Compiler
-import com.ilyabogdanovich.jelly.ide.app.presentation.AppViewModel
-import com.ilyabogdanovich.jelly.ide.app.data.documents.DocumentRepositoryImpl
 import com.ilyabogdanovich.jelly.logging.DefaultLoggerFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

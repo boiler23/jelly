@@ -1,9 +1,5 @@
 package com.ilyabogdanovich.jelly.jcc.core.eval
 
-import com.ilyabogdanovich.jelly.jcc.core.eval.Num
-import com.ilyabogdanovich.jelly.jcc.core.eval.Seq
-import com.ilyabogdanovich.jelly.jcc.core.eval.Var
-import com.ilyabogdanovich.jelly.jcc.core.eval.toVar
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 
