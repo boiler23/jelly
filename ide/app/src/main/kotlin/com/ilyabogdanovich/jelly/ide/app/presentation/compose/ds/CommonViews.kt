@@ -6,8 +6,10 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -66,8 +68,9 @@ fun EditTextField(
     textColor: Color = MaterialTheme.colors.onSurface,
     onValueChange: (TextFieldValue) -> Unit = {},
 ) {
+    val state = rememberScrollState()
     BasicTextField(
-        modifier = modifier,
+        modifier = modifier.horizontalScroll(state),
         value = value,
         textStyle = EditTextStyle(textColor),
         cursorBrush = SolidColor(MaterialTheme.colors.primary),
