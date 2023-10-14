@@ -1,6 +1,8 @@
-package com.ilyabogdanovich.jelly.ide.app.documents
+package com.ilyabogdanovich.jelly.ide.app.data.documents
 
 import androidx.annotation.VisibleForTesting
+import com.ilyabogdanovich.jelly.ide.app.domain.documents.Document
+import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentRepository
 import com.ilyabogdanovich.jelly.logging.LoggerFactory
 import com.ilyabogdanovich.jelly.logging.get
 import okio.FileSystem

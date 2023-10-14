@@ -1,4 +1,4 @@
-package com.ilyabogdanovich.jelly.ide.app.documents
+package com.ilyabogdanovich.jelly.ide.app.domain.documents
 
 /**
  * Persistent state of the document, opened in the editor.

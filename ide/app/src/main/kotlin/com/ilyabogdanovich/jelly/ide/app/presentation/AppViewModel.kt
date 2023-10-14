@@ -1,12 +1,12 @@
-package com.ilyabogdanovich.jelly.ide.app
+package com.ilyabogdanovich.jelly.ide.app.presentation
 
 import androidx.annotation.WorkerThread
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
-import com.ilyabogdanovich.jelly.ide.app.documents.Document
-import com.ilyabogdanovich.jelly.ide.app.documents.DocumentRepository
+import com.ilyabogdanovich.jelly.ide.app.domain.documents.Document
+import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentRepository
 import com.ilyabogdanovich.jelly.jcc.core.Compiler
 import com.ilyabogdanovich.jelly.logging.LoggerFactory
 import com.ilyabogdanovich.jelly.logging.get

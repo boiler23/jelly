@@ -1,4 +1,4 @@
-package com.ilyabogdanovich.jelly.ide.app
+package com.ilyabogdanovich.jelly.ide.app.presentation.compose
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat

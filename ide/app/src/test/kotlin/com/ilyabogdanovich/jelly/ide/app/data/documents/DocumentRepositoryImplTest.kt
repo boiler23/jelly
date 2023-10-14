@@ -1,7 +1,8 @@
-package com.ilyabogdanovich.jelly.ide.app.documents
+package com.ilyabogdanovich.jelly.ide.app.data.documents
 
-import com.ilyabogdanovich.jelly.ide.app.documents.DocumentRepositoryImpl.Companion.INTERNAL_DIR
-import com.ilyabogdanovich.jelly.ide.app.documents.DocumentRepositoryImpl.Companion.INTERNAL_SOURCE
+import com.ilyabogdanovich.jelly.ide.app.data.documents.DocumentRepositoryImpl.Companion.INTERNAL_DIR
+import com.ilyabogdanovich.jelly.ide.app.data.documents.DocumentRepositoryImpl.Companion.INTERNAL_SOURCE
+import com.ilyabogdanovich.jelly.ide.app.domain.documents.Document
 import com.ilyabogdanovich.jelly.logging.EmptyLoggerFactory
 import io.kotest.matchers.shouldBe
 import okio.fakefilesystem.FakeFileSystem

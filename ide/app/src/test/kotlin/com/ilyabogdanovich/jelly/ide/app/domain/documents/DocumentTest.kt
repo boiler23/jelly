@@ -1,4 +1,4 @@
-package com.ilyabogdanovich.jelly.ide.app.documents
+package com.ilyabogdanovich.jelly.ide.app.domain.documents
 
 import io.kotest.matchers.shouldBe
 import org.junit.Test
