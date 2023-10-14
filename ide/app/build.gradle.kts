@@ -15,14 +15,19 @@ dependencies {
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.currentOs)
     implementation(compose.materialIconsExtended)
+    implementation(libs.androidx.annotation)
     implementation(libs.kotlin.coroutines.core)
     implementation(libs.kotlin.coroutines.swing)
+    implementation(libs.squareup.okio.core)
+
+    implementation(project(":base:logging"))
     implementation(project(":jcc:core"))
 
     testImplementation(libs.test.junit)
     testImplementation(libs.test.kotest.assertions)
     testImplementation(libs.test.kotlin.coroutines)
     testImplementation(libs.test.mockk.jvm)
+    testImplementation(libs.squareup.okio.fakefilesystem)
 }
 
 compose.desktop {

@@ -18,6 +18,8 @@ Just navigate to the project folder and execute in the Terminal:
 - Compose Desktop for the editor UI
 - Kotlin Coroutines to organize concurrency
 - Apache's FastMath for expontiation
-- JUnit, kotest & mmock for unit testing
+- Okio for fire operations
+- AndroidX annotations for code checks
+- JUnit, kotest & mockk for unit testing
 
 Full list of dependencies can be found in `gradle/libs.versions.toml`

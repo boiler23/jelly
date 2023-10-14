@@ -2,9 +2,10 @@
 version-plugin-compose = "1.5.3"
 version-plugin-kotlin = "1.9.10"
 
-version-kotlin-coroutines = "1.7.3"
-
+version-androidx-annotation = "1.7.0"
 version-apache-fastmath = "3.6.1"
+version-kotlin-coroutines = "1.7.3"
+version-squareup-okio = "3.6.0"
 
 version-test-junit = "4.13.2"
 version-test-kotest = "5.6.2"
@@ -14,10 +15,12 @@ version-test-mockk = "1.13.5"
 plugin-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "version-plugin-compose" }
 plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "version-plugin-kotlin" }
 
+androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "version-androidx-annotation" }
+apache-fastmath = { module = "org.apache.commons:commons-math3", version.ref = "version-apache-fastmath" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "version-kotlin-coroutines" }
 kotlin-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "version-kotlin-coroutines" }
-
-apache-fastmath = { module = "org.apache.commons:commons-math3", version.ref = "version-apache-fastmath" }
+squareup-okio-core = { module = "com.squareup.okio:okio", version.ref = "version-squareup-okio" }
+squareup-okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "version-squareup-okio" }
 
 test-junit = { module = "junit:junit", version.ref = "version-test-junit" }
 test-kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "version-test-kotest" }
