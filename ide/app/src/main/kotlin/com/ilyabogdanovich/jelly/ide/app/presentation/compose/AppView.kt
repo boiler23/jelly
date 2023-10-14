@@ -10,21 +10,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.AppTheme
 
 /**
  * Composables for the main application UI.
@@ -41,19 +35,21 @@ fun App(
     compilationInProgress: Boolean,
     onSourceInputChanged: (TextFieldValue) -> Unit,
 ) {
-    MaterialTheme {
-        AnimatedVisibility(splashScreenVisible, enter = fadeIn(), exit = fadeOut()) {
-            SplashScreen()
-        }
-        AnimatedVisibility(!splashScreenVisible, enter = fadeIn(), exit = fadeOut()) {
-            AppView(
-                sourceInput = sourceInput,
-                resultOutput = resultOutput,
-                errorOutput = errorOutput,
-                compilationTimeOutput = compilationTimeOutput,
-                compilationInProgress = compilationInProgress,
-                onSourceInputChanged = onSourceInputChanged,
-            )
+    AppTheme {
+        Surface {
+            AnimatedVisibility(splashScreenVisible, enter = fadeIn(), exit = fadeOut()) {
+                SplashScreen()
+            }
+            AnimatedVisibility(!splashScreenVisible, enter = fadeIn(), exit = fadeOut()) {
+                AppView(
+                    sourceInput = sourceInput,
+                    resultOutput = resultOutput,
+                    errorOutput = errorOutput,
+                    compilationTimeOutput = compilationTimeOutput,
+                    compilationInProgress = compilationInProgress,
+                    onSourceInputChanged = onSourceInputChanged,
+                )
+            }
         }
     }
 }
@@ -67,52 +63,27 @@ fun AppView(
     compilationInProgress: Boolean,
     onSourceInputChanged: (TextFieldValue) -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxHeight().padding(10.dp)) {
-        Row(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text("Input", fontWeight = FontWeight.Bold)
-                BasicTextField(
-                    modifier = Modifier.height(0.dp).weight(1f),
-                    value = sourceInput,
-                    onValueChange = { onSourceInputChanged(it) },
-                )
-                Row {
-                    AnimatedVisibility(compilationInProgress) {
-                        RotatingIcon(
-                            Icons.Filled.Sync,
-                            modifier = Modifier.padding(end = 6.dp).size(12.dp)
-                        )
-                    }
-                    Text(
-                        if (compilationInProgress) {
-                            "Compiling..."
-                        } else {
-                            "Last compile time: $compilationTimeOutput"
-                        },
-                        style = MaterialTheme.typography.overline
-                    )
-                }
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Output", fontWeight = FontWeight.Bold)
-                    BasicTextField(
-                        resultOutput,
-                        onValueChange = {},
-                        readOnly = true,
-                    )
-                }
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Errors", fontWeight = FontWeight.Bold)
-                    BasicTextField(
-                        errorOutput,
-                        onValueChange = {},
-                        textStyle = TextStyle.Default.copy(color = Color.Red),
-                        readOnly = true,
-                    )
-                }
-            }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        CodeEditor(
+            modifier = Modifier.weight(2f),
+            sourceInput = sourceInput,
+            onSourceInputChanged = onSourceInputChanged,
+        )
+        Row(modifier = Modifier.weight(1f)) {
+            CompilationOutput(
+                modifier = Modifier.weight(1f),
+                title = "Output",
+                content = resultOutput,
+            )
+            Divider(modifier = Modifier.fillMaxHeight().width(2.dp))
+            CompilationOutput(
+                modifier = Modifier.weight(1f),
+                title = "Errors",
+                content = errorOutput,
+                textColor = MaterialTheme.colors.error,
+            )
         }
+        CompilationStatus(compilationTimeOutput, compilationInProgress)
     }
 }
 
