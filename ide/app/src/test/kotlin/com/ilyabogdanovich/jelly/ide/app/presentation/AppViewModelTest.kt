@@ -3,9 +3,10 @@
 package com.ilyabogdanovich.jelly.ide.app.presentation
 
 import androidx.compose.ui.text.input.TextFieldValue
+import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationResults
+import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationServiceClient
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.Document
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentRepository
-import com.ilyabogdanovich.jelly.jcc.core.Compiler
 import com.ilyabogdanovich.jelly.logging.EmptyLoggerFactory
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -18,6 +19,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Test for [AppViewModel]
@@ -26,13 +28,13 @@ import org.junit.Test
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppViewModelTest {
-    private val compiler = mockk<Compiler>()
+    private val compilationServiceClient = mockk<CompilationServiceClient>()
     private val documentRepository = mockk<DocumentRepository>()
     private val dispatcher = UnconfinedTestDispatcher()
     private val scope = TestScope(dispatcher)
 
     private val viewModel = AppViewModel(
-        compiler,
+        compilationServiceClient,
         documentRepository,
         EmptyLoggerFactory,
     )
@@ -40,9 +42,10 @@ class AppViewModelTest {
     @Test
     fun `compile on new source text`() = runTest(dispatcher) {
         // Prepare
-        coEvery { compiler.compile("text") } returns Compiler.Result(
-            output = listOf("out", "put"),
-            errors = listOf("err 1", "err 2")
+        coEvery { compilationServiceClient.compile("text") } returns CompilationResults(
+            out = "output",
+            err = "err 1\nerr 2",
+            duration = 1500.milliseconds,
         )
 
         // Do
@@ -51,10 +54,12 @@ class AppViewModelTest {
 
         // Check
         coVerifySequence {
-            compiler.compile("text")
+            compilationServiceClient.compile("text")
         }
         viewModel.resultOutput shouldBe "output"
         viewModel.errorOutput shouldBe "err 1\nerr 2"
+        viewModel.compilationTimeOutput shouldBe "1.5"
+        viewModel.compilationInProgress shouldBe false
     }
 
     @Test
@@ -78,7 +83,11 @@ class AppViewModelTest {
     fun `compile on app start`() = runTest(dispatcher) {
         // Prepare
         every { documentRepository.read() } returns Document(text = "text")
-        coEvery { compiler.compile("text") } returns Compiler.Result(output = listOf("out"), errors = listOf("err"))
+        coEvery { compilationServiceClient.compile("text") } returns CompilationResults(
+            out = "out",
+            err = "err",
+            duration = 1000.milliseconds,
+        )
         viewModel.splashScreenVisible shouldBe true
 
         // Do
@@ -89,10 +98,12 @@ class AppViewModelTest {
         // Check
         coVerifySequence {
             documentRepository.read()
-            compiler.compile("text")
+            compilationServiceClient.compile("text")
         }
         viewModel.resultOutput shouldBe "out"
         viewModel.errorOutput shouldBe "err"
+        viewModel.compilationTimeOutput shouldBe "1.0"
+        viewModel.compilationInProgress shouldBe false
         viewModel.splashScreenVisible shouldBe false
     }
 }

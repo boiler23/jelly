@@ -1,5 +1,6 @@
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import com.ilyabogdanovich.jelly.ide.app.data.compiler.CompilationServiceClientImpl
 import com.ilyabogdanovich.jelly.ide.app.presentation.compose.App
 import com.ilyabogdanovich.jelly.jcc.core.Compiler
 import com.ilyabogdanovich.jelly.ide.app.presentation.AppViewModel
@@ -21,8 +22,9 @@ fun main() {
     // di block begin
     // todo: introduce some DI framework, like Dagger
     val compiler = Compiler()
+    val compilationServiceClient = CompilationServiceClientImpl(compiler)
     val documentRepository = DocumentRepositoryImpl(FileSystem.SYSTEM, DefaultLoggerFactory)
-    val viewModel = AppViewModel(compiler, documentRepository, DefaultLoggerFactory)
+    val viewModel = AppViewModel(compilationServiceClient, documentRepository, DefaultLoggerFactory)
     // di block end
 
     // launch view model event processing

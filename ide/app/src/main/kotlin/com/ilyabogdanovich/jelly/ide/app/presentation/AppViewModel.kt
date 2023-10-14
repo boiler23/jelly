@@ -5,15 +5,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
+import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationServiceClient
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.Document
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentRepository
-import com.ilyabogdanovich.jelly.jcc.core.Compiler
 import com.ilyabogdanovich.jelly.logging.LoggerFactory
 import com.ilyabogdanovich.jelly.logging.get
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlin.time.measureTimedValue
 
 /**
  * Main view model for the IDE application.
@@ -21,7 +20,7 @@ import kotlin.time.measureTimedValue
  * @author Ilya Bogdanovich on 11.10.2023
  */
 class AppViewModel(
-    private val compiler: Compiler,
+    private val compilationServiceClient: CompilationServiceClient,
     private val documentRepository: DocumentRepository,
     loggerFactory: LoggerFactory
 ) {
@@ -75,10 +74,10 @@ class AppViewModel(
     suspend fun processCompilationRequests() = compilationRequests.collectLatest {
         logger.d { "compiling input" }
         compilationInProgress = true
-        val (results, duration) = measureTimedValue { compiler.compile(it) }
+        val compilationResults = compilationServiceClient.compile(it)
         compilationInProgress = false
-        resultOutput = results.output.joinToString("")
-        errorOutput = results.errors.joinToString("\n")
-        compilationTimeOutput = (duration.inWholeMilliseconds / 1000.0).toString()
+        resultOutput = compilationResults.out
+        errorOutput = compilationResults.err
+        compilationTimeOutput = (compilationResults.duration.inWholeMilliseconds / 1000.0).toString()
     }
 }
