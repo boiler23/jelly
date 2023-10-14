@@ -15,6 +15,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Jelly"
 
+include(":base:logging")
 include(":ide:app")
 include(":jcc:core")
 include(":jcc:perf-check")
