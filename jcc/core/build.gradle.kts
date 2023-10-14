@@ -45,7 +45,7 @@ sourceSets {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to "*.jar")))
 
-    implementation(project(":utils"))
+    implementation(project(":base:utils"))
 
     implementation(libs.kotlin.coroutines.core)
     implementation(libs.apache.fastmath)

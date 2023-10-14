@@ -7,6 +7,6 @@ version = "1.0-SNAPSHOT"
 
 dependencies {
     implementation(libs.kotlin.coroutines.core)
+    implementation(project(":base:utils"))
     implementation(project(":jcc:core"))
-    implementation(project(":utils"))
 }
