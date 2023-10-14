@@ -14,8 +14,8 @@ class CompilationServiceClientImpl(private val compiler: Compiler) : Compilation
     override suspend fun compile(input: String): CompilationResults {
         val (result, duration) = measureTimedValue { compiler.compile(input) }
         return CompilationResults(
-            out = result.output.joinToString(""),
-            err = result.errors.joinToString("\n"),
+            out = result.output,
+            err = result.errors.joinToString("\n") { it.formattedMessage },
             duration = duration,
         )
     }

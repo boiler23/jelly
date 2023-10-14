@@ -29,9 +29,7 @@ class CompilerCleanupTest {
         )
 
         // Check
-        result shouldBe Compiler.Result(
-            output = listOf(),
-            errors = listOf("line 1:4 Variable undeclared: 'n'."),
-        )
+        result.output shouldBe ""
+        result.errors.map { it.formattedMessage } shouldBe listOf("line 1:4: Variable undeclared: 'n'.")
     }
 }

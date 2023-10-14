@@ -4,6 +4,7 @@ import com.ilyabogdanovich.jelly.jcc.core.antlr.JccLexer
 import com.ilyabogdanovich.jelly.jcc.core.antlr.JccParser
 import com.ilyabogdanovich.jelly.jcc.core.eval.AssignmentEvaluator
 import com.ilyabogdanovich.jelly.jcc.core.eval.EvalContext
+import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
 import com.ilyabogdanovich.jelly.jcc.core.eval.ExpressionEvaluator
 import com.ilyabogdanovich.jelly.jcc.core.eval.PrintEvaluator
 import com.ilyabogdanovich.jelly.jcc.core.eval.toError
@@ -27,8 +28,8 @@ import java.util.BitSet
  */
 class Compiler {
     class ResultListener {
-        val errors = mutableListOf<String>()
-        val list = mutableListOf<String>()
+        val errors = mutableListOf<EvalError>()
+        val output = StringBuffer()
         private val expressionEvaluator = ExpressionEvaluator()
         private val assignmentEvaluator = AssignmentEvaluator(expressionEvaluator)
         private val varPrinter = VarPrinter()
@@ -37,14 +38,14 @@ class Compiler {
         suspend fun assignment(evalContext: EvalContext, ctx: JccParser.AssignmentContext): EvalContext {
             return when (val evaluated = assignmentEvaluator.evaluate(evalContext, ctx)) {
                 is Either.Left -> {
-                    errors.add(evaluated.value.formattedMessage)
+                    errors.add(evaluated.value)
                     evalContext
                 }
                 is Either.Right -> {
                     val (id, variable) = evaluated.value
                     when (val result = evalContext + mapOf(id to variable)) {
                         is Either.Left -> {
-                            errors.add(ctx.toError(result.value, expression = ctx.NAME()?.text).formattedMessage)
+                            errors.add(ctx.toError(result.value, expression = ctx.NAME()?.text))
                             evalContext
                         }
                         is Either.Right -> {
@@ -57,21 +58,21 @@ class Compiler {
 
         suspend fun out(evalContext: EvalContext, ctx: JccParser.OutputContext) {
             when (val evaluated = expressionEvaluator.evaluateExpression(evalContext, ctx.expression())) {
-                is Either.Left -> errors.add(evaluated.value.formattedMessage)
-                is Either.Right -> list.add(varPrinter.print(evaluated.value))
+                is Either.Left -> errors.add(evaluated.value)
+                is Either.Right -> output.append(varPrinter.print(evaluated.value))
             }
         }
 
         fun print(ctx: JccParser.PrintingContext) {
-            val output = printEvaluator.evaluate(ctx)
-            if (output != null) {
-                list.add(output)
+            val out = printEvaluator.evaluate(ctx)
+            if (out != null) {
+                output.append(out)
             }
         }
     }
 
     class ErrorListener : ANTLRErrorListener {
-        val list = mutableListOf<String>()
+        val errors = mutableListOf<EvalError>()
 
         override fun syntaxError(
             recognizer: Recognizer<*, *>?,
@@ -81,7 +82,14 @@ class Compiler {
             message: String?,
             e: RecognitionException?
         ) {
-            list.add("line $line:$charPositionInLine $message")
+            errors.add(
+                EvalError(
+                    start = EvalError.TokenPosition(line = line, positionInLine = charPositionInLine),
+                    stop = null,
+                    expression = message ?: "",
+                    type = EvalError.Type.SyntaxError,
+                )
+            )
         }
 
         override fun reportAmbiguity(
@@ -114,8 +122,8 @@ class Compiler {
     }
 
     data class Result(
-        val output: List<String>,
-        val errors: List<String>,
+        val output: String,
+        val errors: List<EvalError>,
     )
 
     suspend fun compile(src: String): Result {
@@ -142,8 +150,8 @@ class Compiler {
         }
 
         return Result(
-            output = resultListener.list,
-            errors = errorListener.list + resultListener.errors,
+            output = resultListener.output.toString(),
+            errors = errorListener.errors + resultListener.errors,
         )
     }
 

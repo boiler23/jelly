@@ -61,12 +61,17 @@ class ExpressionEvaluatorTest {
     fun `evaluate wrong number`() = runTest {
         // Prepare
         val startToken = mockk<Token> {
-            every { line } returns 5
-            every { charPositionInLine } returns 11
+            every { line } returns 3
+            every { charPositionInLine } returns 14
+        }
+        val stopToken = mockk<Token> {
+            every { line } returns 4
+            every { charPositionInLine } returns 25
         }
         val numberContext = mockk<NumberContext> {
             every { text } returns "12i+56"
             every { getStart() } returns startToken
+            every { getStop() } returns stopToken
         }
         val parserContext = mockk<ExpressionContext> {
             every { getRuleContext(NumberContext::class.java, 0) } returns numberContext
@@ -77,8 +82,8 @@ class ExpressionEvaluatorTest {
 
         // Check
         result shouldBe EvalError(
-            line = 5,
-            positionInLine = 11,
+            start = EvalError.TokenPosition(line = 3, positionInLine = 14),
+            stop = EvalError.TokenPosition(line = 4, positionInLine = 25),
             expression = "12i+56",
             type = EvalError.Type.InvalidNumber
         ).asLeft()
@@ -110,9 +115,14 @@ class ExpressionEvaluatorTest {
             every { line } returns 3
             every { charPositionInLine } returns 14
         }
+        val stopToken = mockk<Token> {
+            every { line } returns 4
+            every { charPositionInLine } returns 25
+        }
         val identifier = mockk<IdentifierContext> {
             every { text } returns "id"
             every { getStart() } returns startToken
+            every { getStop() } returns stopToken
         }
         val parserContext = mockk<ExpressionContext> {
             every { getRuleContext(NumberContext::class.java, 0) } returns null
@@ -124,8 +134,8 @@ class ExpressionEvaluatorTest {
 
         // Check
         result shouldBe EvalError(
-            line = 3,
-            positionInLine = 14,
+            start = EvalError.TokenPosition(line = 3, positionInLine = 14),
+            stop = EvalError.TokenPosition(line = 4, positionInLine = 25),
             expression = "id",
             type = EvalError.Type.UndeclaredVariable
         ).asLeft()
@@ -271,6 +281,10 @@ class ExpressionEvaluatorTest {
             every { line } returns 2
             every { charPositionInLine } returns 12
         }
+        val stopToken = mockk<Token> {
+            every { line } returns 3
+            every { charPositionInLine } returns 14
+        }
         val parserContext = mockk<ExpressionContext> {
             every { getRuleContext(NumberContext::class.java, 0) } returns null
             every { getRuleContext(IdentifierContext::class.java, 0) } returns null
@@ -279,6 +293,7 @@ class ExpressionEvaluatorTest {
             every { getRuleContext(ReduceContext::class.java, 0) } returns null
             every { text } returns "expr_text"
             every { getStart() } returns startToken
+            every { getStop() } returns stopToken
         }
 
         // Do
@@ -286,8 +301,8 @@ class ExpressionEvaluatorTest {
 
         // Check
         result shouldBe EvalError(
-            line = 2,
-            positionInLine = 12,
+            start = EvalError.TokenPosition(line = 2, positionInLine = 12),
+            stop = EvalError.TokenPosition(line = 3, positionInLine = 14),
             expression = "expr_text",
             type = EvalError.Type.UnsupportedExpression
         ).asLeft()

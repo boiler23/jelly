@@ -29,10 +29,15 @@ class AssignmentEvaluatorTest {
             every { line } returns 3
             every { charPositionInLine } returns 14
         }
+        val stopToken = mockk<Token> {
+            every { line } returns 4
+            every { charPositionInLine } returns 25
+        }
         val parseContext = mockk<JccParser.AssignmentContext> {
             every { expression() } returns null
             every { text } returns "var n ="
             every { getStart() } returns startToken
+            every { getStop() } returns stopToken
         }
 
         // Do
@@ -40,8 +45,8 @@ class AssignmentEvaluatorTest {
 
         // Check
         result shouldBe EvalError(
-            line = 3,
-            positionInLine = 14,
+            start = EvalError.TokenPosition(line = 3, positionInLine = 14),
+            stop = EvalError.TokenPosition(line = 4, positionInLine = 25),
             expression = "var n =",
             type = EvalError.Type.MissingVariableAssignment,
         ).asLeft()
