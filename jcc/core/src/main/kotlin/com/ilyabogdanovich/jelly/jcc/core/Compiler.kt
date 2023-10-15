@@ -151,7 +151,15 @@ class Compiler {
 
         return Result(
             output = resultListener.output.toString(),
-            errors = errorListener.errors + resultListener.errors,
+            errors = (errorListener.errors + resultListener.errors)
+                .sortedWith { o1, o2 ->
+                    val compareLines = o1.start.line.compareTo(o2.start.line)
+                    if (compareLines == 0) {
+                        o1.start.positionInLine.compareTo(o2.start.positionInLine)
+                    } else {
+                        compareLines
+                    }
+                },
         )
     }
 

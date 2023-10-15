@@ -139,13 +139,13 @@ class CompilerTest(
                 """.trimIndent(),
                 "",
                 listOf(
+                    "line 1:0: Missing variable assignment: 'var'.",
                     "line 1:4: Syntax error: mismatched input 'var' expecting NAME.",
                     "line 1:8: Syntax error: missing NAME at '='.",
                     "line 2:4: Syntax error: mismatched input 'var' expecting {'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}.",
-                    "line 2:7: Syntax error: mismatched input '<EOF>' expecting NAME.",
-                    "line 1:0: Missing variable assignment: 'var'.",
                     "line 2:4: Unsupported expression encountered: ''.",
-                    "line 2:4: Missing variable assignment: 'var'."
+                    "line 2:4: Missing variable assignment: 'var'.",
+                    "line 2:7: Syntax error: mismatched input '<EOF>' expecting NAME.",
                 ),
             ),
             arrayOf("out 2 + 3", "5", empty()),
@@ -207,15 +207,16 @@ class CompilerTest(
                 "out {1}",
                 "",
                 listOf(
+                    "line 1:4: Missing sequence's upper bound: '{1}'.",
                     "line 1:6: Syntax error: mismatched input '}' expecting {PLUSMINUS, MULDIV, '^', ','}.",
-                    "line 1:4: Missing sequence's upper bound: '{1}'."
                 )
             ),
             arrayOf(
                 "out {}",
                 "",
                 listOf(
-                    "line 1:5: Syntax error: mismatched input '}' expecting {'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}.", "line 1:4: Missing sequence's upper bound: '{}'."
+                    "line 1:4: Missing sequence's upper bound: '{}'.",
+                    "line 1:5: Syntax error: mismatched input '}' expecting {'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}.",
                 )
             ),
             arrayOf(
