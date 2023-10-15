@@ -6,10 +6,8 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -23,7 +21,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -53,30 +50,13 @@ fun RotatingIcon(
 }
 
 @Composable
-private fun EditTextStyle(
+fun EditTextStyle(
     textColor: Color = MaterialTheme.colors.onSurface,
 ) = MaterialTheme.typography.body1.copy(
     color = textColor,
     fontSize = 14.sp,
     fontFamily = FontFamily.Monospace
 )
-
-@Composable
-fun EditTextField(
-    value: TextFieldValue,
-    modifier: Modifier = Modifier,
-    textColor: Color = MaterialTheme.colors.onSurface,
-    onValueChange: (TextFieldValue) -> Unit = {},
-) {
-    val state = rememberScrollState()
-    BasicTextField(
-        modifier = modifier.horizontalScroll(state),
-        value = value,
-        textStyle = EditTextStyle(textColor),
-        cursorBrush = SolidColor(MaterialTheme.colors.primary),
-        onValueChange = onValueChange,
-    )
-}
 
 @Composable
 fun ReadOnlyEditTextField(

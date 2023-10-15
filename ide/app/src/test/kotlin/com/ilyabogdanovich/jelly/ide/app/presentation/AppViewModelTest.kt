@@ -5,6 +5,7 @@ package com.ilyabogdanovich.jelly.ide.app.presentation
 import androidx.compose.ui.text.input.TextFieldValue
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationResults
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationServiceClient
+import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.Document
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentRepository
 import com.ilyabogdanovich.jelly.logging.EmptyLoggerFactory
@@ -42,10 +43,12 @@ class AppViewModelTest {
     @Test
     fun `compile on new source text`() = runTest(dispatcher) {
         // Prepare
+        val errorMarkup = ErrorMarkup(listOf(ErrorMarkup.Underline(1, 1, 1)))
         coEvery { compilationServiceClient.compile("text") } returns CompilationResults(
             out = "output",
             err = "err 1\nerr 2",
             duration = 1500.milliseconds,
+            errorMarkup = errorMarkup,
         )
 
         // Do
@@ -56,6 +59,7 @@ class AppViewModelTest {
         coVerifySequence {
             compilationServiceClient.compile("text")
         }
+        viewModel.errorMarkup shouldBe errorMarkup
         viewModel.resultOutput shouldBe "output"
         viewModel.errorOutput shouldBe "err 1\nerr 2"
         viewModel.compilationTimeOutput shouldBe "1.5"
@@ -82,11 +86,13 @@ class AppViewModelTest {
     @Test
     fun `compile on app start`() = runTest(dispatcher) {
         // Prepare
+        val errorMarkup = ErrorMarkup(listOf(ErrorMarkup.Underline(1, 1, 1)))
         every { documentRepository.read() } returns Document(text = "text")
         coEvery { compilationServiceClient.compile("text") } returns CompilationResults(
             out = "out",
             err = "err",
             duration = 1000.milliseconds,
+            errorMarkup = errorMarkup,
         )
         viewModel.splashScreenVisible shouldBe true
 
@@ -100,6 +106,7 @@ class AppViewModelTest {
             documentRepository.read()
             compilationServiceClient.compile("text")
         }
+        viewModel.errorMarkup shouldBe errorMarkup
         viewModel.resultOutput shouldBe "out"
         viewModel.errorOutput shouldBe "err"
         viewModel.compilationTimeOutput shouldBe "1.0"

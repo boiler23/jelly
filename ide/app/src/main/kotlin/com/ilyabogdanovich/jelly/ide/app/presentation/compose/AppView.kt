@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
 import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.AppTheme
 
 /**
@@ -29,6 +30,7 @@ import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.AppTheme
 fun App(
     splashScreenVisible: Boolean,
     sourceInput: TextFieldValue,
+    errorMarkup: ErrorMarkup,
     resultOutput: String,
     errorOutput: String,
     compilationTimeOutput: String,
@@ -43,6 +45,7 @@ fun App(
             AnimatedVisibility(!splashScreenVisible, enter = fadeIn(), exit = fadeOut()) {
                 AppView(
                     sourceInput = sourceInput,
+                    errorMarkup = errorMarkup,
                     resultOutput = resultOutput,
                     errorOutput = errorOutput,
                     compilationTimeOutput = compilationTimeOutput,
@@ -57,6 +60,7 @@ fun App(
 @Composable
 fun AppView(
     sourceInput: TextFieldValue,
+    errorMarkup: ErrorMarkup,
     resultOutput: String,
     errorOutput: String,
     compilationTimeOutput: String,
@@ -67,6 +71,7 @@ fun AppView(
         CodeEditor(
             modifier = Modifier.weight(2f),
             sourceInput = sourceInput,
+            errorMarkup = errorMarkup,
             onSourceInputChanged = onSourceInputChanged,
         )
         Row(modifier = Modifier.weight(1f)) {
@@ -92,9 +97,21 @@ fun AppView(
 fun App_Preview() {
     App(
         splashScreenVisible = false,
-        sourceInput = TextFieldValue("""print "Hello, world!" """),
+        sourceInput = TextFieldValue(
+            """
+                print "Hello, world!"
+                out err
+                print "sin^2(x)+cos^2(x)=1"
+            """.trimIndent()
+        ),
+        errorMarkup = ErrorMarkup(
+            listOf(
+                ErrorMarkup.Underline(line = 1, start = 4, stop = 7),
+                ErrorMarkup.Underline(line = 2, start = 1, stop = 10),
+            )
+        ),
         resultOutput = "Hello, world!",
-        errorOutput = "line:1:1 Hello world!",
+        errorOutput = "line:2:5 Undefined variable 'err'.",
         compilationTimeOutput = "Compiling...",
         compilationInProgress = true,
         onSourceInputChanged = {},

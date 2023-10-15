@@ -5,7 +5,7 @@ import org.antlr.v4.runtime.Token
 
 /**
  * Holds inofrmation of an error, that can happen during the expression evaluation.
- * @property start start token of the error occurance.
+ * @property start start token position of the error occurance.
  * @property stop stop token position of the error occurance.
  * @property expression expression that caused the error.
  * @property type type of the error.
@@ -13,15 +13,15 @@ import org.antlr.v4.runtime.Token
  * @author Ilya Bogdanovich on 09.10.2023
  */
 data class EvalError(
-    private val start: TokenPosition,
-    private val stop: TokenPosition?,
+    val start: TokenPosition,
+    val stop: TokenPosition?,
     private val expression: String,
     private val type: Type,
 ) {
     /**
      * Token coordinates in the text input.
-     * @property line line of code where the token is located.
-     * @property positionInLine position in the line of the token.
+     * @property line line of code where the token is located, starting from 1.
+     * @property positionInLine position in the line of the token, starting from 0.
      */
     data class TokenPosition(val line: Int, val positionInLine: Int)
 

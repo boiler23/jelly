@@ -1,6 +1,7 @@
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.ilyabogdanovich.jelly.ide.app.data.compiler.CompilationServiceClientImpl
+import com.ilyabogdanovich.jelly.ide.app.data.compiler.ErrorMarkupBuilderImpl
 import com.ilyabogdanovich.jelly.ide.app.data.documents.DocumentRepositoryImpl
 import com.ilyabogdanovich.jelly.ide.app.presentation.AppViewModel
 import com.ilyabogdanovich.jelly.ide.app.presentation.compose.App
@@ -22,7 +23,8 @@ fun main() {
     // di block begin
     // todo: introduce some DI framework, like Dagger
     val compiler = Compiler()
-    val compilationServiceClient = CompilationServiceClientImpl(compiler)
+    val errorMarkupBuilder = ErrorMarkupBuilderImpl()
+    val compilationServiceClient = CompilationServiceClientImpl(compiler, errorMarkupBuilder)
     val documentRepository = DocumentRepositoryImpl(FileSystem.SYSTEM, DefaultLoggerFactory)
     val viewModel = AppViewModel(compilationServiceClient, documentRepository, DefaultLoggerFactory)
     // di block end
@@ -38,6 +40,7 @@ fun main() {
             App(
                 splashScreenVisible = viewModel.splashScreenVisible,
                 sourceInput = viewModel.sourceInput,
+                errorMarkup = viewModel.errorMarkup,
                 resultOutput = viewModel.resultOutput,
                 errorOutput = viewModel.errorOutput,
                 compilationTimeOutput = viewModel.compilationTimeOutput,

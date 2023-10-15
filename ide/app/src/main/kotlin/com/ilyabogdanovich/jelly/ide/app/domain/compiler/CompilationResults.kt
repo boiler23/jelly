@@ -10,4 +10,9 @@ import kotlin.time.Duration
  *
  * @author Ilya Bogdanovich on 14.10.2023
  */
-data class CompilationResults(val out: String, val err: String, val duration: Duration)
+data class CompilationResults(
+    val out: String,
+    val err: String,
+    val duration: Duration,
+    val errorMarkup: ErrorMarkup,
+)

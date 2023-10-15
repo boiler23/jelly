@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationServiceClient
+import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.Document
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentRepository
 import com.ilyabogdanovich.jelly.logging.LoggerFactory
@@ -27,6 +28,7 @@ class AppViewModel(
     private val logger = loggerFactory.get<AppViewModel>()
     var splashScreenVisible by mutableStateOf(true)
     var sourceInput by mutableStateOf(TextFieldValue(""))
+    var errorMarkup by mutableStateOf(ErrorMarkup.empty())
     var resultOutput by mutableStateOf("")
     var errorOutput by mutableStateOf("")
     var compilationTimeOutput by mutableStateOf("")
@@ -76,6 +78,7 @@ class AppViewModel(
         compilationInProgress = true
         val compilationResults = compilationServiceClient.compile(it)
         compilationInProgress = false
+        errorMarkup = compilationResults.errorMarkup
         resultOutput = compilationResults.out
         errorOutput = compilationResults.err
         compilationTimeOutput = (compilationResults.duration.inWholeMilliseconds / 1000.0).toString()
