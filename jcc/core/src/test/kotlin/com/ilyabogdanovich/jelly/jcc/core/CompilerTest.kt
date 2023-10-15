@@ -349,7 +349,7 @@ class CompilerTest(
             ),
             arrayOf(
                 """
-                    print "Calculating pi, sin(pi/2), cos(pi/2), sin^2(pi/2)+con^2(pi/2)...\n"
+                    print "Calculating pi, sin(pi/2), cos(pi/2), sin^2(pi/2)+cos^2(pi/2)...\n"
                     var n = 500
                     var n2 = 10
                     print "Iterations for pi: "
@@ -383,7 +383,7 @@ class CompilerTest(
                     print "\nDone!"
                 """.trimIndent(),
                 """
-                    Calculating pi, sin(pi/2), cos(pi/2), sin^2(pi/2)+con^2(pi/2)...
+                    Calculating pi, sin(pi/2), cos(pi/2), sin^2(pi/2)+cos^2(pi/2)...
                     Iterations for pi: 500
                     Iterations for sin, cos: 10
                     pi="3.14358866";

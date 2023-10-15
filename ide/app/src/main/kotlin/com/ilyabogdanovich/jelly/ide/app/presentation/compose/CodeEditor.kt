@@ -9,12 +9,15 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
@@ -63,11 +66,13 @@ private fun CodeEditTextField(
 ) {
     val hScrollState = rememberScrollState()
     val vScrollState = rememberScrollState()
+    val focusRequester = remember { FocusRequester() }
     var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
     BasicTextField(
         modifier = modifier
             .verticalScroll(vScrollState)
             .horizontalScroll(hScrollState)
+            .focusRequester(focusRequester)
             .drawBehind {
                 layout?.let {
                     errorMarkup.errors.forEach { markup ->
@@ -94,6 +99,10 @@ private fun CodeEditTextField(
         onValueChange = onValueChange,
         onTextLayout = { layout = it }
     )
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 }
 
 // Error markup line thickness, in dp
