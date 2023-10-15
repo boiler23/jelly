@@ -94,6 +94,24 @@ class CompilerTest(
             ),
             arrayOf("print \"te\\\"xt\"", "te\"xt", empty()),
             arrayOf("print \"te\\xt\"", "te\\xt", empty()),
+            arrayOf("print \"te\txt\"", "te\txt", empty()),
+            arrayOf(
+                """
+                    print "te\nxt"
+                """.trimIndent(),
+                """
+                    te
+                    xt
+                """.trimIndent(),
+                empty()
+            ),
+            arrayOf(
+                """
+                    print "te\rxt"
+                """.trimIndent(),
+                "text",
+                empty()
+            ),
             arrayOf(
                 """
                     print "pi = "
@@ -327,6 +345,52 @@ class CompilerTest(
                     out sinx^2+cosx^2
                 """.trimIndent(),
                 "pi=3.141612653; sin(x)=1; cos(x)=-0.00001; sin^2(x)+cos^2(x)=1",
+                empty(),
+            ),
+            arrayOf(
+                """
+                    print "Calculating pi, sin(pi/2), cos(pi/2), sin^2(pi/2)+con^2(pi/2)...\n"
+                    var n = 500
+                    var n2 = 10
+                    print "Iterations for pi: "
+                    out n
+                    print "\n"
+                    print "Iterations for sin, cos: "
+                    out n2
+                    print "\n"
+                    var seq = map({0, n}, i -> (-1)^i / (2 * i + 1))
+                    var pi = 4 * reduce(seq, 0, x y -> x + y)
+                    print "pi=\""
+                    out pi
+
+                    print "\";\n"
+
+                    var x = pi/2
+                    var seq2 = map({1, n2}, i -> (-1)^i * x^(2*i + 1) / reduce({1,2*i + 1}, 1, j k -> j*k))
+                    var sinx = x + reduce(seq2, 0, j k -> j+k)
+                    print "sin(x)="
+                    out sinx
+
+                    print ";\t" 
+
+                    var seq3 = map({1, n2}, i -> (-1)^i * x^(2*i) / reduce({1,2*i}, 1, j k -> j*k))
+                    var cosx = 1 + reduce(seq3, 0, j k -> j+k)
+                    print "cos(x)="
+                    out cosx
+
+                    print ";\nsin^2(x)+cos^2(x)="
+                    out sinx^2+cosx^2
+                    print "\nDone!"
+                """.trimIndent(),
+                """
+                    Calculating pi, sin(pi/2), cos(pi/2), sin^2(pi/2)+con^2(pi/2)...
+                    Iterations for pi: 500
+                    Iterations for sin, cos: 10
+                    pi="3.14358866";
+                    sin(x)=0.999999502;	cos(x)=-0.000998003;
+                    sin^2(x)+cos^2(x)=1
+                    Done!
+                """.trimIndent(),
                 empty(),
             )
         )

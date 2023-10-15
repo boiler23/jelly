@@ -21,12 +21,13 @@ class PrintEvaluatorTest {
         val ctx = mockk<JccParser.PrintingContext> {
             every { STRING() } returns null
         }
+        val result = StringBuilder()
 
         // Do
-        val result = evaluator.evaluate(ctx)
+        evaluator.evaluate(ctx, result)
 
         // Check
-        result shouldBe null
+        result.toString() shouldBe ""
     }
 
     @Test
@@ -38,12 +39,13 @@ class PrintEvaluatorTest {
         val ctx = mockk<JccParser.PrintingContext> {
             every { STRING() } returns terminalNode
         }
+        val result = StringBuilder()
 
         // Do
-        val result = evaluator.evaluate(ctx)
+        evaluator.evaluate(ctx, result)
 
         // Check
-        result shouldBe null
+        result.toString() shouldBe ""
     }
 
     @Test
@@ -58,12 +60,13 @@ class PrintEvaluatorTest {
         val ctx = mockk<JccParser.PrintingContext> {
             every { STRING() } returns terminalNode
         }
+        val result = StringBuilder()
 
         // Do
-        val result = evaluator.evaluate(ctx)
+        evaluator.evaluate(ctx, result)
 
         // Check
-        result shouldBe null
+        result.toString() shouldBe ""
     }
 
     @Test
@@ -78,12 +81,13 @@ class PrintEvaluatorTest {
         val ctx = mockk<JccParser.PrintingContext> {
             every { STRING() } returns terminalNode
         }
+        val result = StringBuilder()
 
         // Do
-        val result = evaluator.evaluate(ctx)
+        evaluator.evaluate(ctx, result)
 
         // Check
-        result shouldBe "text"
+        result.toString() shouldBe "text"
     }
 
     @Test
@@ -98,12 +102,13 @@ class PrintEvaluatorTest {
         val ctx = mockk<JccParser.PrintingContext> {
             every { STRING() } returns terminalNode
         }
+        val result = StringBuilder()
 
         // Do
-        val result = evaluator.evaluate(ctx)
+        evaluator.evaluate(ctx, result)
 
         // Check
-        result shouldBe "text"
+        result.toString() shouldBe "text"
     }
 
     @Test
@@ -118,12 +123,13 @@ class PrintEvaluatorTest {
         val ctx = mockk<JccParser.PrintingContext> {
             every { STRING() } returns terminalNode
         }
+        val result = StringBuilder()
 
         // Do
-        val result = evaluator.evaluate(ctx)
+        evaluator.evaluate(ctx, result)
 
         // Check
-        result shouldBe """te"xt"""
+        result.toString() shouldBe """te"xt"""
     }
 
     @Test
@@ -138,12 +144,13 @@ class PrintEvaluatorTest {
         val ctx = mockk<JccParser.PrintingContext> {
             every { STRING() } returns terminalNode
         }
+        val result = StringBuilder()
 
         // Do
-        val result = evaluator.evaluate(ctx)
+        evaluator.evaluate(ctx, result)
 
         // Check
-        result shouldBe "text\""
+        result.toString() shouldBe "text\""
     }
 
     @Test
@@ -158,11 +165,104 @@ class PrintEvaluatorTest {
         val ctx = mockk<JccParser.PrintingContext> {
             every { STRING() } returns terminalNode
         }
+        val result = StringBuilder()
 
         // Do
-        val result = evaluator.evaluate(ctx)
+        evaluator.evaluate(ctx, result)
 
         // Check
-        result shouldBe "text\\"
+        result.toString() shouldBe "text\\"
+    }
+
+    @Test
+    fun `evaluate - slash in the middle`() {
+        // Prepare
+        val terminalNode = mockk<TerminalNode> {
+            every { text } returns """
+                "te\\xt"
+            """.trimIndent()
+            every { symbol } returns mockk {
+                every { tokenIndex } returns 1
+            }
+        }
+        val ctx = mockk<JccParser.PrintingContext> {
+            every { STRING() } returns terminalNode
+        }
+        val result = StringBuilder()
+
+        // Do
+        evaluator.evaluate(ctx, result)
+
+        // Check
+        result.toString() shouldBe "te\\xt"
+    }
+
+    @Test
+    fun `evaluate - tabulation`() {
+        // Prepare
+        val terminalNode = mockk<TerminalNode> {
+            every { text } returns """
+                "te\txt"
+            """.trimIndent()
+            every { symbol } returns mockk {
+                every { tokenIndex } returns 1
+            }
+        }
+        val ctx = mockk<JccParser.PrintingContext> {
+            every { STRING() } returns terminalNode
+        }
+        val result = StringBuilder()
+
+        // Do
+        evaluator.evaluate(ctx, result)
+
+        // Check
+        result.toString() shouldBe "te\txt"
+    }
+
+    @Test
+    fun `evaluate - ignore return`() {
+        // Prepare
+        val terminalNode = mockk<TerminalNode> {
+            every { text } returns """
+                "te\rxt"
+            """.trimIndent()
+            every { symbol } returns mockk {
+                every { tokenIndex } returns 1
+            }
+        }
+        val ctx = mockk<JccParser.PrintingContext> {
+            every { STRING() } returns terminalNode
+        }
+        val result = StringBuilder()
+
+        // Do
+        evaluator.evaluate(ctx, result)
+
+        // Check
+        result.toString() shouldBe "text"
+    }
+
+    @Test
+    fun `evaluate - new line`() {
+        // Prepare
+        val terminalNode = mockk<TerminalNode> {
+            every { text } returns """
+                "te\nxt"
+            """.trimIndent()
+            every { symbol } returns mockk {
+                every { tokenIndex } returns 1
+            }
+        }
+        val ctx = mockk<JccParser.PrintingContext> {
+            every { STRING() } returns terminalNode
+        }
+        val result = StringBuilder()
+
+        // Do
+        evaluator.evaluate(ctx, result)
+
+        // Check
+        result.toString() shouldBe "te\nxt"
     }
 }

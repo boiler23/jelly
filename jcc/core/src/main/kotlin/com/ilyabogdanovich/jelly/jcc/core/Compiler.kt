@@ -29,7 +29,7 @@ import java.util.BitSet
 class Compiler {
     class ResultListener {
         val errors = mutableListOf<EvalError>()
-        val output = StringBuffer()
+        val output = StringBuilder()
         private val expressionEvaluator = ExpressionEvaluator()
         private val assignmentEvaluator = AssignmentEvaluator(expressionEvaluator)
         private val varPrinter = VarPrinter()
@@ -63,12 +63,8 @@ class Compiler {
             }
         }
 
-        fun print(ctx: JccParser.PrintingContext) {
-            val out = printEvaluator.evaluate(ctx)
-            if (out != null) {
-                output.append(out)
-            }
-        }
+        fun print(ctx: JccParser.PrintingContext) =
+            printEvaluator.evaluate(ctx, output)
     }
 
     class ErrorListener : ANTLRErrorListener {
