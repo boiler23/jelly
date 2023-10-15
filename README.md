@@ -18,8 +18,8 @@ Just navigate to the project folder and execute in the Terminal:
 - ANTLR for generating the lexer/parser/parse tree
 - Compose Desktop for the editor UI
 - Kotlin Coroutines to organize concurrency
-- Apache's FastMath for expontiation
-- Okio for fire operations
+- Apache's FastMath for exponentiation
+- Okio for file operations
 - AndroidX annotations for code checks
 - Detekt for formatting & simple static analysis.
 - JUnit, kotest & mockk for unit testing
