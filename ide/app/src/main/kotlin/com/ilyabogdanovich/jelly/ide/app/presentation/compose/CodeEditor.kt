@@ -77,20 +77,22 @@ private fun CodeEditTextField(
             .drawBehind {
                 layout?.let {
                     errorMarkup.errors.forEach { markup ->
-                        val dash = ERROR_MARKUP_DASH_INTERVAL.dp.toPx()
-                        drawPath(
-                            path = Path().apply {
-                                val left = it.getHorizontalPosition(markup.start, true)
-                                val right = it.getHorizontalPosition(markup.stop, true)
-                                moveTo(left, it.getLineBottom(markup.line) + ERROR_MARKUP_OFFSET_Y.dp.toPx())
-                                lineTo(right, it.getLineBottom(markup.line) + ERROR_MARKUP_OFFSET_Y.dp.toPx())
-                            },
-                            errorColor,
-                            style = Stroke(
-                                width = ERROR_MARKUP_THICKNESS,
-                                pathEffect = PathEffect.dashPathEffect(floatArrayOf(dash, dash), 0f)
+                        if (markup.line < it.lineCount) {
+                            val dash = ERROR_MARKUP_DASH_INTERVAL.dp.toPx()
+                            drawPath(
+                                path = Path().apply {
+                                    val left = it.getHorizontalPosition(markup.start, true)
+                                    val right = it.getHorizontalPosition(markup.stop, true)
+                                    moveTo(left, it.getLineBottom(markup.line) + ERROR_MARKUP_OFFSET_Y.dp.toPx())
+                                    lineTo(right, it.getLineBottom(markup.line) + ERROR_MARKUP_OFFSET_Y.dp.toPx())
+                                },
+                                errorColor,
+                                style = Stroke(
+                                    width = ERROR_MARKUP_THICKNESS,
+                                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(dash, dash), 0f)
+                                )
                             )
-                        )
+                        }
                     }
                 }
             },
