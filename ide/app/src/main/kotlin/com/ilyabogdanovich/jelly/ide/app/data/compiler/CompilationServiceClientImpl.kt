@@ -12,6 +12,7 @@ import kotlin.time.measureTimedValue
  */
 class CompilationServiceClientImpl(
     private val compiler: Compiler,
+    private val errorListBuilder: ErrorListBuilder,
     private val errorMarkupBuilder: ErrorMarkupBuilder,
 ) : CompilationServiceClient {
     override suspend fun compile(input: String): CompilationResults {
@@ -19,7 +20,7 @@ class CompilationServiceClientImpl(
         val (result, duration) = measureTimedValue { compiler.compile(input) }
         return CompilationResults(
             out = result.output,
-            err = result.errors.joinToString("\n") { it.formattedMessage },
+            errors = errorListBuilder.build(inputLines, result.errors),
             duration = duration,
             errorMarkup = errorMarkupBuilder.buildMarkup(inputLines, result.errors)
         )

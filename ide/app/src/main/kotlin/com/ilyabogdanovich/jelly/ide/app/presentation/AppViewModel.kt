@@ -4,7 +4,10 @@ import androidx.annotation.WorkerThread
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import com.ilyabogdanovich.jelly.ide.app.domain.DeepLink
+import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationResults
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationServiceClient
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.Document
@@ -30,7 +33,7 @@ class AppViewModel(
     var sourceInput by mutableStateOf(TextFieldValue(""))
     var errorMarkup by mutableStateOf(ErrorMarkup.empty())
     var resultOutput by mutableStateOf("")
-    var errorOutput by mutableStateOf("")
+    var errorMessages by mutableStateOf(listOf<CompilationResults.ErrorMessage>())
     var compilationTimeOutput by mutableStateOf("")
     var compilationInProgress by mutableStateOf(false)
 
@@ -47,6 +50,12 @@ class AppViewModel(
     fun notifySourceInputChanged(input: TextFieldValue) {
         notifySourceInputChangedInternal(newInput = input.text, oldInput = sourceInput.text)
         sourceInput = input
+    }
+
+    fun notifyDeepLinkClicked(deepLink: DeepLink) {
+        when (deepLink) {
+            is DeepLink.Cursor -> sourceInput = sourceInput.copy(selection = TextRange(deepLink.position))
+        }
     }
 
     private fun notifySourceInputChangedInternal(newInput: String, oldInput: String) {
@@ -80,7 +89,7 @@ class AppViewModel(
         compilationInProgress = false
         errorMarkup = compilationResults.errorMarkup
         resultOutput = compilationResults.out
-        errorOutput = compilationResults.err
+        errorMessages = compilationResults.errors
         compilationTimeOutput = (compilationResults.duration.inWholeMilliseconds / 1000.0).toString()
     }
 }

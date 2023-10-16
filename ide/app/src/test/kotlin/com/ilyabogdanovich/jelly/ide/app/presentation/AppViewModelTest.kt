@@ -2,7 +2,9 @@
 
 package com.ilyabogdanovich.jelly.ide.app.presentation
 
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import com.ilyabogdanovich.jelly.ide.app.domain.DeepLink
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationResults
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationServiceClient
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
@@ -44,11 +46,15 @@ class AppViewModelTest {
     fun `compile on new source text`() = runTest(dispatcher) {
         // Prepare
         val errorMarkup = ErrorMarkup(listOf(ErrorMarkup.Underline(1, 1, 1)))
+        val errorMessages = listOf(
+            CompilationResults.ErrorMessage("error 1", DeepLink.Cursor(position = 1)),
+            CompilationResults.ErrorMessage("error 2", DeepLink.Cursor(position = 2)),
+        )
         coEvery { compilationServiceClient.compile("text") } returns CompilationResults(
             out = "output",
-            err = "err 1\nerr 2",
-            duration = 1500.milliseconds,
+            errors = errorMessages,
             errorMarkup = errorMarkup,
+            duration = 1500.milliseconds,
         )
 
         // Do
@@ -60,8 +66,8 @@ class AppViewModelTest {
             compilationServiceClient.compile("text")
         }
         viewModel.errorMarkup shouldBe errorMarkup
+        viewModel.errorMessages shouldBe errorMessages
         viewModel.resultOutput shouldBe "output"
-        viewModel.errorOutput shouldBe "err 1\nerr 2"
         viewModel.compilationTimeOutput shouldBe "1.5"
         viewModel.compilationInProgress shouldBe false
     }
@@ -80,19 +86,23 @@ class AppViewModelTest {
             documentRepository.write(Document("text"))
         }
         viewModel.resultOutput shouldBe ""
-        viewModel.errorOutput shouldBe ""
+        viewModel.errorMessages shouldBe listOf()
     }
 
     @Test
     fun `compile on app start`() = runTest(dispatcher) {
         // Prepare
         val errorMarkup = ErrorMarkup(listOf(ErrorMarkup.Underline(1, 1, 1)))
+        val errorMessages = listOf(
+            CompilationResults.ErrorMessage("error 1", DeepLink.Cursor(position = 1)),
+            CompilationResults.ErrorMessage("error 2", DeepLink.Cursor(position = 2)),
+        )
         every { documentRepository.read() } returns Document(text = "text")
         coEvery { compilationServiceClient.compile("text") } returns CompilationResults(
             out = "out",
-            err = "err",
-            duration = 1000.milliseconds,
+            errors = errorMessages,
             errorMarkup = errorMarkup,
+            duration = 1000.milliseconds,
         )
         viewModel.splashScreenVisible shouldBe true
 
@@ -107,10 +117,22 @@ class AppViewModelTest {
             compilationServiceClient.compile("text")
         }
         viewModel.errorMarkup shouldBe errorMarkup
+        viewModel.errorMessages shouldBe errorMessages
         viewModel.resultOutput shouldBe "out"
-        viewModel.errorOutput shouldBe "err"
         viewModel.compilationTimeOutput shouldBe "1.0"
         viewModel.compilationInProgress shouldBe false
         viewModel.splashScreenVisible shouldBe false
+    }
+
+    @Test
+    fun `handle cursor deep link`() {
+        // Prepare
+        viewModel.sourceInput = TextFieldValue("test")
+
+        // Do
+        viewModel.notifyDeepLinkClicked(DeepLink.Cursor(position = 10))
+
+        // Check
+        viewModel.sourceInput shouldBe TextFieldValue("test", TextRange(10))
     }
 }

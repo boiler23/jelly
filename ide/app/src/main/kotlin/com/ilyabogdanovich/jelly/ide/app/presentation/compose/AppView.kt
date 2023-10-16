@@ -12,12 +12,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.ilyabogdanovich.jelly.ide.app.domain.DeepLink
+import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationResults
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
 import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.AppTheme
 
@@ -27,15 +28,17 @@ import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.AppTheme
  * @author Ilya Bogdanovich on 11.10.2023
  */
 @Composable
+@Suppress("LongParameterList")
 fun App(
     splashScreenVisible: Boolean,
     sourceInput: TextFieldValue,
     errorMarkup: ErrorMarkup,
     resultOutput: String,
-    errorOutput: String,
+    errorMessages: List<CompilationResults.ErrorMessage>,
     compilationTimeOutput: String,
     compilationInProgress: Boolean,
     onSourceInputChanged: (TextFieldValue) -> Unit,
+    onDeepLinkClicked: (DeepLink) -> Unit,
 ) {
     AppTheme {
         Surface {
@@ -47,10 +50,11 @@ fun App(
                     sourceInput = sourceInput,
                     errorMarkup = errorMarkup,
                     resultOutput = resultOutput,
-                    errorOutput = errorOutput,
+                    errorMessages = errorMessages,
                     compilationTimeOutput = compilationTimeOutput,
                     compilationInProgress = compilationInProgress,
                     onSourceInputChanged = onSourceInputChanged,
+                    onDeepLinkClicked = onDeepLinkClicked,
                 )
             }
         }
@@ -62,10 +66,11 @@ fun AppView(
     sourceInput: TextFieldValue,
     errorMarkup: ErrorMarkup,
     resultOutput: String,
-    errorOutput: String,
+    errorMessages: List<CompilationResults.ErrorMessage>,
     compilationTimeOutput: String,
     compilationInProgress: Boolean,
     onSourceInputChanged: (TextFieldValue) -> Unit,
+    onDeepLinkClicked: (DeepLink) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         CodeEditor(
@@ -75,17 +80,12 @@ fun AppView(
             onSourceInputChanged = onSourceInputChanged,
         )
         Row(modifier = Modifier.weight(1f)) {
-            CompilationOutput(
-                modifier = Modifier.weight(1f),
-                title = "Output",
-                content = resultOutput,
-            )
+            CompilationOutput(modifier = Modifier.weight(1f), content = resultOutput)
             Divider(modifier = Modifier.fillMaxHeight().width(2.dp))
-            CompilationOutput(
+            CompilationErrorsOutput(
                 modifier = Modifier.weight(1f),
-                title = "Errors",
-                content = errorOutput,
-                textColor = MaterialTheme.colors.error,
+                errorMessages = errorMessages,
+                onDeepLinkClicked = onDeepLinkClicked,
             )
         }
         CompilationStatus(compilationTimeOutput, compilationInProgress)
@@ -111,9 +111,15 @@ fun App_Preview() {
             )
         ),
         resultOutput = "Hello, world!",
-        errorOutput = "line:2:5 Undefined variable 'err'.",
+        errorMessages = listOf(
+            CompilationResults.ErrorMessage(
+                "line:2:5 Undefined variable 'err'.",
+                DeepLink.Cursor(position = 5)
+            )
+        ),
         compilationTimeOutput = "Compiling...",
         compilationInProgress = true,
         onSourceInputChanged = {},
+        onDeepLinkClicked = {},
     )
 }

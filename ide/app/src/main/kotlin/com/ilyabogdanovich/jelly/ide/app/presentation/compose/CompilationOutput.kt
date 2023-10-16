@@ -11,19 +11,18 @@ import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.ReadOnlyEditTex
 import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.TitleText
 
 /**
- * Composable for presenting the compilation output (results or errors).
+ * Composable for presenting the compilation output.
  *
  * @author Ilya Bogdanovich on 14.10.2023
  */
 @Composable
 fun CompilationOutput(
     modifier: Modifier,
-    title: String,
     content: String,
     textColor: Color = MaterialTheme.colors.onSurface,
 ) {
     Column(modifier = modifier) {
-        TitleText(title)
+        TitleText("Output")
         ReadOnlyEditTextField(
             content,
             textColor = textColor,
