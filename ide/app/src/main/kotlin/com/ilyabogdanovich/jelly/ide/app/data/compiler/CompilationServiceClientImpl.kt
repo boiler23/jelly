@@ -2,6 +2,7 @@ package com.ilyabogdanovich.jelly.ide.app.data.compiler
 
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationResults
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationServiceClient
+import com.ilyabogdanovich.jelly.ide.app.domain.compiler.SourceMarkup
 import com.ilyabogdanovich.jelly.jcc.core.Compiler
 import kotlin.time.measureTimedValue
 
@@ -16,13 +17,13 @@ class CompilationServiceClientImpl(
     private val errorMarkupBuilder: ErrorMarkupBuilder,
 ) : CompilationServiceClient {
     override suspend fun compile(input: String): CompilationResults {
-        val inputLines = input.split("\n")
+        val source = SourceMarkup.from(input)
         val (result, duration) = measureTimedValue { compiler.compile(input) }
         return CompilationResults(
             out = result.output,
-            errors = errorListBuilder.build(inputLines, result.errors),
+            errors = errorListBuilder.build(source, result.errors),
             duration = duration,
-            errorMarkup = errorMarkupBuilder.buildMarkup(inputLines, result.errors)
+            errorMarkup = errorMarkupBuilder.buildMarkup(source, result.errors)
         )
     }
 }

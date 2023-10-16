@@ -1,6 +1,7 @@
 package com.ilyabogdanovich.jelly.ide.app.data.compiler
 
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
+import com.ilyabogdanovich.jelly.ide.app.domain.compiler.SourceMarkup
 import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
 import io.kotest.matchers.shouldBe
 import org.junit.Test
@@ -16,10 +17,9 @@ class ErrorMarkupBuilderImplTest {
     @Test
     fun `single-line error without stop token`() {
         // Prepare
-        val inputLines = listOf(
-            "line 1",
-            "line 2",
-            "line 3",
+        val sourceMarkup = SourceMarkup(
+            lineStarts = listOf(0, 6, 12),
+            lineLengths = listOf(5, 5, 5),
         )
         val evalErrors = listOf(
             EvalError(
@@ -31,19 +31,18 @@ class ErrorMarkupBuilderImplTest {
         )
 
         // Do
-        val result = builder.buildMarkup(inputLines, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, evalErrors)
 
         // Check
-        result shouldBe ErrorMarkup(errors = listOf(ErrorMarkup.Underline(line = 1, start = 2, stop = 6)))
+        result shouldBe ErrorMarkup(errors = listOf(ErrorMarkup.Underline(line = 1, start = 8, stop = 11)))
     }
 
     @Test
     fun `single-line error without stop token on wrong line`() {
         // Prepare
-        val inputLines = listOf(
-            "line 1",
-            "line 2",
-            "line 3",
+        val sourceMarkup = SourceMarkup(
+            lineStarts = listOf(0, 6, 12),
+            lineLengths = listOf(5, 5, 5),
         )
         val evalErrors = listOf(
             EvalError(
@@ -55,7 +54,7 @@ class ErrorMarkupBuilderImplTest {
         )
 
         // Do
-        val result = builder.buildMarkup(inputLines, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, evalErrors)
 
         // Check
         result shouldBe ErrorMarkup.empty()
@@ -64,10 +63,9 @@ class ErrorMarkupBuilderImplTest {
     @Test
     fun `single-line error with stop token`() {
         // Prepare
-        val inputLines = listOf(
-            "line 1",
-            "line 2",
-            "line 3",
+        val sourceMarkup = SourceMarkup(
+            lineStarts = listOf(0, 6, 12),
+            lineLengths = listOf(5, 5, 5),
         )
         val evalErrors = listOf(
             EvalError(
@@ -79,19 +77,18 @@ class ErrorMarkupBuilderImplTest {
         )
 
         // Do
-        val result = builder.buildMarkup(inputLines, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, evalErrors)
 
         // Check
-        result shouldBe ErrorMarkup(errors = listOf(ErrorMarkup.Underline(line = 1, start = 2, stop = 4)))
+        result shouldBe ErrorMarkup(errors = listOf(ErrorMarkup.Underline(line = 1, start = 8, stop = 10)))
     }
 
     @Test
     fun `single-line error with stop token on wrong line`() {
         // Prepare
-        val inputLines = listOf(
-            "line 1",
-            "line 2",
-            "line 3",
+        val sourceMarkup = SourceMarkup(
+            lineStarts = listOf(0, 6, 12),
+            lineLengths = listOf(5, 5, 5),
         )
         val evalErrors = listOf(
             EvalError(
@@ -103,7 +100,7 @@ class ErrorMarkupBuilderImplTest {
         )
 
         // Do
-        val result = builder.buildMarkup(inputLines, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, evalErrors)
 
         // Check
         result shouldBe ErrorMarkup.empty()
@@ -112,10 +109,9 @@ class ErrorMarkupBuilderImplTest {
     @Test
     fun `multi-line error - 2 lines`() {
         // Prepare
-        val inputLines = listOf(
-            "line 1",
-            "line 2",
-            "line 3",
+        val sourceMarkup = SourceMarkup(
+            lineStarts = listOf(0, 6, 12),
+            lineLengths = listOf(5, 5, 5),
         )
         val evalErrors = listOf(
             EvalError(
@@ -127,13 +123,13 @@ class ErrorMarkupBuilderImplTest {
         )
 
         // Do
-        val result = builder.buildMarkup(inputLines, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, evalErrors)
 
         // Check
         result shouldBe ErrorMarkup(
             errors = listOf(
-                ErrorMarkup.Underline(line = 1, start = 2, stop = 6),
-                ErrorMarkup.Underline(line = 2, start = 0, stop = 5),
+                ErrorMarkup.Underline(line = 1, start = 8, stop = 11),
+                ErrorMarkup.Underline(line = 2, start = 12, stop = 17),
             )
         )
     }
@@ -141,11 +137,9 @@ class ErrorMarkupBuilderImplTest {
     @Test
     fun `multi-line error - 3 lines`() {
         // Prepare
-        val inputLines = listOf(
-            "line 1",
-            "line 2",
-            "line 3 long",
-            "line 4",
+        val sourceMarkup = SourceMarkup(
+            lineStarts = listOf(0, 6, 12, 24),
+            lineLengths = listOf(5, 5, 11, 5),
         )
         val evalErrors = listOf(
             EvalError(
@@ -157,14 +151,14 @@ class ErrorMarkupBuilderImplTest {
         )
 
         // Do
-        val result = builder.buildMarkup(inputLines, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, evalErrors)
 
         // Check
         result shouldBe ErrorMarkup(
             errors = listOf(
-                ErrorMarkup.Underline(line = 1, start = 3, stop = 6),
-                ErrorMarkup.Underline(line = 2, start = 0, stop = 11),
-                ErrorMarkup.Underline(line = 3, start = 0, stop = 2),
+                ErrorMarkup.Underline(line = 1, start = 9, stop = 11),
+                ErrorMarkup.Underline(line = 2, start = 12, stop = 23),
+                ErrorMarkup.Underline(line = 3, start = 24, stop = 26),
             )
         )
     }
@@ -172,12 +166,9 @@ class ErrorMarkupBuilderImplTest {
     @Test
     fun `multi-line error - 4 lines`() {
         // Prepare
-        val inputLines = listOf(
-            "line 1",
-            "line 2",
-            "line 3 long",
-            "line 4 some more",
-            "line 5",
+        val sourceMarkup = SourceMarkup(
+            lineStarts = listOf(0, 6, 12, 24, 41),
+            lineLengths = listOf(5, 5, 11, 16, 5),
         )
         val evalErrors = listOf(
             EvalError(
@@ -189,15 +180,15 @@ class ErrorMarkupBuilderImplTest {
         )
 
         // Do
-        val result = builder.buildMarkup(inputLines, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, evalErrors)
 
         // Check
         result shouldBe ErrorMarkup(
             errors = listOf(
-                ErrorMarkup.Underline(line = 1, start = 3, stop = 6),
-                ErrorMarkup.Underline(line = 2, start = 0, stop = 11),
-                ErrorMarkup.Underline(line = 3, start = 0, stop = 16),
-                ErrorMarkup.Underline(line = 4, start = 0, stop = 2),
+                ErrorMarkup.Underline(line = 1, start = 9, stop = 11),
+                ErrorMarkup.Underline(line = 2, start = 12, stop = 23),
+                ErrorMarkup.Underline(line = 3, start = 24, stop = 40),
+                ErrorMarkup.Underline(line = 4, start = 41, stop = 43),
             )
         )
     }
@@ -205,9 +196,9 @@ class ErrorMarkupBuilderImplTest {
     @Test
     fun `multi-line error out of source`() {
         // Prepare
-        val inputLines = listOf(
-            "line 1",
-            "line 2",
+        val sourceMarkup = SourceMarkup(
+            lineStarts = listOf(0, 6),
+            lineLengths = listOf(5, 5),
         )
         val evalErrors = listOf(
             EvalError(
@@ -219,12 +210,12 @@ class ErrorMarkupBuilderImplTest {
         )
 
         // Do
-        val result = builder.buildMarkup(inputLines, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, evalErrors)
 
         // Check
         result shouldBe ErrorMarkup(
             errors = listOf(
-                ErrorMarkup.Underline(line = 1, start = 3, stop = 6),
+                ErrorMarkup.Underline(line = 1, start = 9, stop = 11),
             )
         )
     }
@@ -232,7 +223,10 @@ class ErrorMarkupBuilderImplTest {
     @Test
     fun `multiple errors on a single line - no overlaps`() {
         // Prepare
-        val inputLines = listOf("line with errors")
+        val sourceMarkup = SourceMarkup(
+            lineStarts = listOf(0),
+            lineLengths = listOf(16),
+        )
         val evalErrors = listOf(
             EvalError(
                 start = EvalError.TokenPosition(line = 1, positionInLine = 3),
@@ -249,7 +243,7 @@ class ErrorMarkupBuilderImplTest {
         )
 
         // Do
-        val result = builder.buildMarkup(inputLines, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, evalErrors)
 
         // Check
         result shouldBe ErrorMarkup(
@@ -263,7 +257,10 @@ class ErrorMarkupBuilderImplTest {
     @Test
     fun `multiple errors on a single line - with overlaps`() {
         // Prepare
-        val inputLines = listOf("line with errors")
+        val sourceMarkup = SourceMarkup(
+            lineStarts = listOf(0),
+            lineLengths = listOf(16),
+        )
         val evalErrors = listOf(
             EvalError(
                 start = EvalError.TokenPosition(line = 1, positionInLine = 5),
@@ -280,7 +277,7 @@ class ErrorMarkupBuilderImplTest {
         )
 
         // Do
-        val result = builder.buildMarkup(inputLines, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, evalErrors)
 
         // Check
         result shouldBe ErrorMarkup(

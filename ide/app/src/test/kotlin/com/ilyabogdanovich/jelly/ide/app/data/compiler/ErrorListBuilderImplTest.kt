@@ -2,6 +2,7 @@ package com.ilyabogdanovich.jelly.ide.app.data.compiler
 
 import com.ilyabogdanovich.jelly.ide.app.domain.DeepLink
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationResults
+import com.ilyabogdanovich.jelly.ide.app.domain.compiler.SourceMarkup
 import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -19,10 +20,9 @@ class ErrorListBuilderImplTest {
     @Test
     fun build() {
         // Prepare
-        val source = listOf(
-            "test",
-            "code line",
-            "another code line",
+        val sourceMarkup = SourceMarkup(
+            lineStarts = listOf(0, 5, 15),
+            lineLengths = listOf(4, 9, 17),
         )
         val errors = listOf(
             mockk<EvalError> {
@@ -36,7 +36,7 @@ class ErrorListBuilderImplTest {
         )
 
         // Do
-        val result = builder.build(source, errors)
+        val result = builder.build(sourceMarkup, errors)
 
         // Check
         result shouldBe listOf(

@@ -1,6 +1,7 @@
 package com.ilyabogdanovich.jelly.ide.app.data.compiler
 
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
+import com.ilyabogdanovich.jelly.ide.app.domain.compiler.SourceMarkup
 import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
 
 /**
@@ -11,9 +12,9 @@ import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
 interface ErrorMarkupBuilder {
     /**
      * Builds the error markup object.
-     * @param inputLines list of source code lines.
+     * @param sourceMarkup source code markup to use.
      * @param evalErrors list of errors, received from compilation service.
      * @return constructed [ErrorMarkup] object.
      */
-    fun buildMarkup(inputLines: List<String>, evalErrors: List<EvalError>): ErrorMarkup
+    fun buildMarkup(sourceMarkup: SourceMarkup, evalErrors: List<EvalError>): ErrorMarkup
 }
