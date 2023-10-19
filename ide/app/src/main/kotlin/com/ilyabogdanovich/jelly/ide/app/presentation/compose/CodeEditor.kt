@@ -94,7 +94,7 @@ private fun CodeEditTextField(
             .focusRequester(focusRequester)
             .drawBehind {
                 layout?.let {
-                    drawErrorMarkup(decorationOffset.value, it, errorMarkup, errorColor)
+                    drawErrorMarkup(value.text, decorationOffset.value, it, errorMarkup, errorColor)
                     drawHighlight(it, highlightedLine, highlightColor)
                 }
             },
@@ -133,6 +133,7 @@ private fun DrawScope.drawHighlight(layout: TextLayoutResult, line: Int?, color:
 }
 
 private fun DrawScope.drawErrorMarkup(
+    text: String,
     decorationOffset: Float,
     layout: TextLayoutResult,
     errorMarkup: ErrorMarkup,
@@ -141,7 +142,7 @@ private fun DrawScope.drawErrorMarkup(
     val dash = ERROR_MARKUP_DASH_INTERVAL.dp.toPx()
     val path = Path()
     errorMarkup.errors.forEach { markup ->
-        if (markup.line < layout.lineCount) {
+        if (markup.line < layout.lineCount && markup.start <= text.length && markup.stop <= text.length) {
             val left = decorationOffset + layout.getHorizontalPosition(markup.start, true)
             val right = decorationOffset + layout.getHorizontalPosition(markup.stop, true)
             val bottom = layout.getLineBottom(markup.line) + ERROR_MARKUP_OFFSET_Y.dp.toPx()

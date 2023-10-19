@@ -10,8 +10,8 @@ value class ErrorMarkup(val errors: List<Underline>) {
     /**
      * Highlight coordinates, ready to be used by presentation layer.
      * @property line line of the code, starting from 0
-     * @property start index in the [line] to begin highlight (inclusive), starting from zero.
-     * @property stop index in the [line] to end highlight (exclusive), starting from zero.
+     * @property start index of the first highlight symbol in the source code text (inclusive), starting from zero.
+     * @property stop index of the last highlight symbol in the source code text (exclusive), starting from zero.
      */
     data class Underline(val line: Int, val start: Int, val stop: Int)
 
