@@ -171,10 +171,7 @@ private fun LineNumbers(
         if (lineTops.isNotEmpty()) {
             Box(
                 modifier = Modifier
-                    .onGloballyPositioned {
-                        println(it.size.width)
-                        decorationOffset.value = it.size.width.toFloat()
-                    }
+                    .onGloballyPositioned { decorationOffset.value = it.size.width.toFloat() }
                     .padding(horizontal = 8.dp)
             ) {
                 for (lineIndex in lineTops.indices) {
