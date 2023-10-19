@@ -62,7 +62,7 @@ class CompilerTest(
             arrayOf("out -123.456", "-123.456", empty()),
             arrayOf("out +123.456", "123.456", empty()),
             arrayOf("out 500;", "500", listOf("line 1:7: Syntax error: token recognition error at: ';'.")),
-            arrayOf("out 1abc", "1", empty()),
+            arrayOf("out 1abc", "1", listOf("line 1:5: Unexpected top-level expression: 'abc'.")),
             arrayOf(
                 "out 1) out 2",
                 "12",
@@ -74,14 +74,23 @@ class CompilerTest(
             arrayOf("print \"text\"", "text", empty()),
             arrayOf("print \"text\";", "text", listOf("line 1:12: Syntax error: token recognition error at: ';'.")),
             arrayOf(
-                "print \"line 1\nline 2\"",
+                """
+                    print "line 1\nline 2"
+                """.trimIndent(),
+                """
+                    line 1
+                    line 2
+                """.trimIndent(),
+                empty()
+            ),
+            arrayOf(
+                "print text",
                 "",
                 listOf(
-                    "line 1:6: Syntax error: mismatched input '\"line 1' expecting STRING.",
-                    "line 2:6: Syntax error: extraneous input '\"' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}."
+                    "line 1:6: Syntax error: missing STRING at 'text'.",
+                    "line 1:6: Unexpected top-level expression: 'text'."
                 )
             ),
-            arrayOf("print text", "", listOf("line 1:6: Syntax error: missing STRING at 'text'.")),
             arrayOf("print \"'text'\"", "'text'", empty()),
             arrayOf("print \"text", "", listOf("line 1:6: Syntax error: mismatched input '\"text' expecting STRING.")),
             arrayOf(
@@ -89,6 +98,7 @@ class CompilerTest(
                 "",
                 listOf(
                     "line 1:6: Syntax error: missing STRING at 'text'.",
+                    "line 1:6: Unexpected top-level expression: 'text'.",
                     "line 1:10: Syntax error: extraneous input '\"' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}."
                 )
             ),
@@ -232,6 +242,7 @@ class CompilerTest(
                 "{ 1, 2, 3, 4, 5 }",
                 listOf(
                     "line 1:8: Syntax error: mismatched input ',' expecting {PLUSMINUS, MULDIV, '^', '}'}.",
+                    "line 1:9: Unexpected top-level expression: '7'.",
                     "line 1:10: Syntax error: extraneous input '}' expecting {<EOF>, 'print', 'out', 'var', 'map', 'reduce', PLUSMINUS, '(', '{', NUMBER, NAME}."
                 )
             ),
@@ -317,7 +328,7 @@ class CompilerTest(
                     out 1
                 """.trimIndent(),
                 "1",
-                empty(),
+                listOf("line 1:0: Unexpected top-level expression: 'map({0,5},i->i^2)'."),
             ),
             arrayOf(
                 """

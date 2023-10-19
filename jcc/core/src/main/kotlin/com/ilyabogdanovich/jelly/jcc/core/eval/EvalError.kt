@@ -180,6 +180,11 @@ data class EvalError(
         SequenceExpected,
 
         /**
+         * Top-level expression was encountered. They are not supported according to the languguage definition.
+         */
+        TopLevelExpressionsUnsupported,
+
+        /**
          * Unsupported expression was encountered.
          */
         UnsupportedExpression,
@@ -229,6 +234,7 @@ data class EvalError(
                 "Missing return expression declaration in reduce's lambda: '$expression'"
             Type.ReduceNeutralIsNotNumber -> "Neutral element in reduce() should be a number expression: '$expression'"
             Type.ReduceLambdaReturnsNotNumber -> "Lambda in reduce() is expected to return a number: '$expression'"
+            Type.TopLevelExpressionsUnsupported -> "Unexpected top-level expression: '$expression'"
         }
 }
 

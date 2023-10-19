@@ -27,7 +27,7 @@ import java.util.BitSet
  * @author Ilya Bogdanovich on 08.10.2023
  */
 class Compiler {
-    class ResultListener {
+    private class ResultListener {
         val errors = mutableListOf<EvalError>()
         val output = StringBuilder()
         private val expressionEvaluator = ExpressionEvaluator()
@@ -65,9 +65,13 @@ class Compiler {
 
         fun print(ctx: JccParser.PrintingContext) =
             printEvaluator.evaluate(ctx, output)
+
+        fun expression(ctx: JccParser.ExpressionContext) {
+            errors.add(ctx.toError(EvalError.Type.TopLevelExpressionsUnsupported))
+        }
     }
 
-    class ErrorListener : ANTLRErrorListener {
+    private class ErrorListener : ANTLRErrorListener {
         val errors = mutableListOf<EvalError>()
 
         override fun syntaxError(
@@ -142,6 +146,9 @@ class Compiler {
             }
             statement.assignment()?.let { ctx ->
                 evalContext = resultListener.assignment(evalContext, ctx)
+            }
+            statement.expression()?.let { ctx ->
+                resultListener.expression(ctx)
             }
         }
 
