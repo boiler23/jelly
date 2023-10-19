@@ -169,6 +169,7 @@ class CompilerTest(
             arrayOf("out 2 + 3", "5", empty()),
             arrayOf("out 15 - 2.5", "12.5", empty()),
             arrayOf("out 15 / 5", "3", empty()),
+            arrayOf("out 5 / 2", "2.5", empty()),
             arrayOf("out 3 * 5", "15", empty()),
             arrayOf("out 2 ^ 5", "32", empty()),
             arrayOf("out 2 + 3 * 4", "14", empty()),
@@ -178,8 +179,17 @@ class CompilerTest(
             arrayOf("out 2 ^ (5 + 1)", "64", empty()),
             arrayOf("out 2^(5-1)", "16", empty()),
             arrayOf("out 1 / 0", "Infinity", empty()),
+            arrayOf("out 1 / 0.0", "Infinity", empty()),
+            arrayOf("out 1.0 / 0", "Infinity", empty()),
+            arrayOf("out 1.0 / 0.0", "Infinity", empty()),
             arrayOf("out -1/0", "-Infinity", empty()),
+            arrayOf("out -1/0.0", "-Infinity", empty()),
+            arrayOf("out -1.0/0", "-Infinity", empty()),
+            arrayOf("out -1.0/0.0", "-Infinity", empty()),
             arrayOf("out 0/0", "NaN", empty()),
+            arrayOf("out 0/0.0", "NaN", empty()),
+            arrayOf("out 0.0/0", "NaN", empty()),
+            arrayOf("out 0.0/0.0", "NaN", empty()),
             arrayOf(
                 """
                     var num1 = 12
@@ -211,6 +221,10 @@ class CompilerTest(
             ),
             arrayOf("out {1,5}", "{ 1, 2, 3, 4, 5 }", empty()),
             arrayOf("out {1,5-2}", "{ 1, 2, 3 }", empty()),
+            arrayOf("out {1,6/2}", "{ 1, 2, 3 }", empty()),
+            arrayOf("out {3/1,6/2}", "{ 3 }", empty()),
+            arrayOf("out {-4/2,2}", "{ -2, -1, 0, 1, 2 }", empty()),
+            arrayOf("out {2,5/2}", "", listOf("line 1:7: Sequence's end is expected to be an integer: '5/2'.")),
             arrayOf("out {1.5,2}", "", listOf("line 1:5: Sequence's begin is expected to be an integer: '1.5'.")),
             arrayOf("out {1,2.5}", "", listOf("line 1:7: Sequence's end is expected to be an integer: '2.5'.")),
             arrayOf(

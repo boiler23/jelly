@@ -47,14 +47,25 @@ class NumTest {
     }
 
     @Test
-    fun `int div int`() {
+    fun `int div int - int`() {
         // Prepare
 
         // Do
         val result = Num.Integer(6) / Num.Integer(3)
 
         // Check
-        result shouldBe Num.Real(2.0)
+        result shouldBe Num.Integer(2)
+    }
+
+    @Test
+    fun `int div int - real`() {
+        // Prepare
+
+        // Do
+        val result = Num.Integer(5) / Num.Integer(2)
+
+        // Check
+        result shouldBe Num.Real(2.5)
     }
 
     @Test

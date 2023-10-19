@@ -70,7 +70,11 @@ sealed interface Num {
         }
 
         override operator fun div(n: Num): Num = when (n) {
-            is Integer -> Real(v.toDouble() / n.v)
+            is Integer -> if (n.v != 0L && v % n.v == 0L) {
+                Integer(v / n.v)
+            } else {
+                Real(v.toDouble() / n.v)
+            }
             is Real -> Real(v / n.r)
         }
 
