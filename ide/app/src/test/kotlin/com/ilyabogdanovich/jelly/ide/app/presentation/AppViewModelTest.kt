@@ -12,6 +12,7 @@ import com.ilyabogdanovich.jelly.ide.app.domain.documents.Document
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentRepository
 import com.ilyabogdanovich.jelly.logging.EmptyLoggerFactory
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.coEvery
 import io.mockk.coVerifySequence
 import io.mockk.every
@@ -128,11 +129,13 @@ class AppViewModelTest {
     fun `handle cursor deep link`() {
         // Prepare
         viewModel.sourceInput = TextFieldValue("test")
+        val initialNavigationEffect = viewModel.navigationEffect
 
         // Do
         viewModel.notifyDeepLinkClicked(DeepLink.Cursor(position = 10))
 
         // Check
         viewModel.sourceInput shouldBe TextFieldValue("test", TextRange(10))
+        viewModel.navigationEffect shouldNotBe initialNavigationEffect
     }
 }

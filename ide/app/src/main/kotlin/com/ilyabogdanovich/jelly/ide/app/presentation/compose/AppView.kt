@@ -34,6 +34,7 @@ fun App(
     sourceInput: TextFieldValue,
     errorMarkup: ErrorMarkup,
     resultOutput: String,
+    navigationEffect: Any,
     errorMessages: List<CompilationResults.ErrorMessage>,
     compilationTimeOutput: String,
     compilationInProgress: Boolean,
@@ -50,6 +51,7 @@ fun App(
                     sourceInput = sourceInput,
                     errorMarkup = errorMarkup,
                     resultOutput = resultOutput,
+                    navigationEffect = navigationEffect,
                     errorMessages = errorMessages,
                     compilationTimeOutput = compilationTimeOutput,
                     compilationInProgress = compilationInProgress,
@@ -62,10 +64,12 @@ fun App(
 }
 
 @Composable
+@Suppress("LongParameterList")
 fun AppView(
     sourceInput: TextFieldValue,
     errorMarkup: ErrorMarkup,
     resultOutput: String,
+    navigationEffect: Any,
     errorMessages: List<CompilationResults.ErrorMessage>,
     compilationTimeOutput: String,
     compilationInProgress: Boolean,
@@ -76,6 +80,7 @@ fun AppView(
         CodeEditor(
             modifier = Modifier.weight(2f),
             sourceInput = sourceInput,
+            navigationEffect = navigationEffect,
             errorMarkup = errorMarkup,
             onSourceInputChanged = onSourceInputChanged,
         )
@@ -111,6 +116,7 @@ fun App_Preview() {
             )
         ),
         resultOutput = "Hello, world!",
+        navigationEffect = Any(),
         errorMessages = listOf(
             CompilationResults.ErrorMessage(
                 "line:2:5 Undefined variable 'err'.",

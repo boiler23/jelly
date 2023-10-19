@@ -52,6 +52,7 @@ import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.TitleText
 fun CodeEditor(
     modifier: Modifier = Modifier,
     sourceInput: TextFieldValue,
+    navigationEffect: Any,
     errorMarkup: ErrorMarkup,
     onSourceInputChanged: (TextFieldValue) -> Unit,
 ) {
@@ -63,6 +64,7 @@ fun CodeEditor(
                 .fillMaxWidth()
                 .padding(vertical = 2.dp),
             value = sourceInput,
+            navigationEffect = navigationEffect,
             errorMarkup = errorMarkup,
             onValueChange = { onSourceInputChanged(it) },
         )
@@ -72,6 +74,7 @@ fun CodeEditor(
 @Composable
 private fun CodeEditTextField(
     value: TextFieldValue,
+    navigationEffect: Any,
     errorMarkup: ErrorMarkup,
     modifier: Modifier = Modifier,
     errorColor: Color = MaterialTheme.colors.error,
@@ -124,7 +127,7 @@ private fun CodeEditTextField(
         focusRequester.requestFocus()
     }
 
-    DisposableEffect(value) {
+    DisposableEffect(navigationEffect) {
         focusRequester.requestFocus()
         updateHighlight(value.selection.start)
         onDispose { }

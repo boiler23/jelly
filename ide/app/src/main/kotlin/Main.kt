@@ -44,6 +44,7 @@ fun main() {
                 sourceInput = viewModel.sourceInput,
                 errorMarkup = viewModel.errorMarkup,
                 resultOutput = viewModel.resultOutput,
+                navigationEffect = viewModel.navigationEffect,
                 errorMessages = viewModel.errorMessages,
                 compilationTimeOutput = viewModel.compilationTimeOutput,
                 compilationInProgress = viewModel.compilationInProgress,

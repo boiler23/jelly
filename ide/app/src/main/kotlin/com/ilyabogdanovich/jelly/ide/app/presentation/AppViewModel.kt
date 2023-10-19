@@ -33,6 +33,7 @@ class AppViewModel(
     var sourceInput by mutableStateOf(TextFieldValue(""))
     var errorMarkup by mutableStateOf(ErrorMarkup.empty())
     var resultOutput by mutableStateOf("")
+    var navigationEffect by mutableStateOf(Any())
     var errorMessages by mutableStateOf(listOf<CompilationResults.ErrorMessage>())
     var compilationTimeOutput by mutableStateOf("")
     var compilationInProgress by mutableStateOf(false)
@@ -54,7 +55,13 @@ class AppViewModel(
 
     fun notifyDeepLinkClicked(deepLink: DeepLink) {
         when (deepLink) {
-            is DeepLink.Cursor -> sourceInput = sourceInput.copy(selection = TextRange(deepLink.position))
+            is DeepLink.Cursor -> {
+                sourceInput = sourceInput.copy(selection = TextRange(deepLink.position))
+                // to make sure we don't lose the editor focus on consequent clicks on the error message,
+                // we assign a new value to this effect on every deep link.
+                // This will make sure to run the recomposition, and hence execute the DisposableEffect block.
+                navigationEffect = Any()
+            }
         }
     }
 
