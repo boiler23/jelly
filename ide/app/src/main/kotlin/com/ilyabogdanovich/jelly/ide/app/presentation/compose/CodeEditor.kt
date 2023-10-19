@@ -92,6 +92,7 @@ private fun CodeEditTextField(
             .verticalScroll(vScrollState)
             .horizontalScroll(hScrollState)
             .focusRequester(focusRequester)
+            .padding(bottom = 2.dp)
             .drawBehind {
                 layout?.let {
                     drawErrorMarkup(value.text, decorationOffset.value, it, errorMarkup, errorColor)
@@ -110,7 +111,7 @@ private fun CodeEditTextField(
             lineTops = List(l.lineCount) { l.getLineTop(it) }
             updateHighlight(value.selection.start)
         },
-        decorationBox = { innerTextField -> LineNumbers(decorationOffset, innerTextField, lineTops, highlightedLine) }
+        decorationBox = { innerTextField -> DecorationBox(decorationOffset, innerTextField, lineTops, highlightedLine) }
     )
 
     LaunchedEffect(Unit) {
@@ -162,7 +163,7 @@ private fun DrawScope.drawErrorMarkup(
 }
 
 @Composable
-private fun LineNumbers(
+private fun DecorationBox(
     decorationOffset: MutableState<Float>,
     innerTextField: @Composable () -> Unit,
     lineTops: List<Float>,
@@ -170,31 +171,40 @@ private fun LineNumbers(
 ) {
     Row {
         if (lineTops.isNotEmpty()) {
-            Box(
-                modifier = Modifier
-                    .onGloballyPositioned { decorationOffset.value = it.size.width.toFloat() }
-                    .padding(horizontal = 8.dp)
-            ) {
-                for (lineIndex in lineTops.indices) {
-                    val line = lineIndex + 1
-                    val top = lineTops[lineIndex]
-                    Text(
-                        modifier = Modifier
-                            .offset(y = with(LocalDensity.current) { top.toDp() })
-                            .align(Alignment.CenterEnd),
-                        text = line.toString(),
-                        style = EditTextStyle(
-                            textColor = if (lineIndex == highlighted) {
-                                MaterialTheme.colors.onSurface
-                            } else {
-                                MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
-                            }
-                        ),
-                    )
-                }
-            }
+            LineNumbers(decorationOffset, lineTops, highlighted)
         }
         innerTextField()
+    }
+}
+
+@Composable
+private fun LineNumbers(
+    decorationOffset: MutableState<Float>,
+    lineTops: List<Float>,
+    highlighted: Int?,
+) {
+    Box(
+        modifier = Modifier
+            .onGloballyPositioned { decorationOffset.value = it.size.width.toFloat() }
+            .padding(horizontal = 8.dp)
+    ) {
+        for (lineIndex in lineTops.indices) {
+            val line = lineIndex + 1
+            val top = lineTops[lineIndex]
+            Text(
+                modifier = Modifier
+                    .offset(y = with(LocalDensity.current) { top.toDp() })
+                    .align(Alignment.CenterEnd),
+                text = line.toString(),
+                style = EditTextStyle(
+                    textColor = if (lineIndex == highlighted) {
+                        MaterialTheme.colors.onSurface
+                    } else {
+                        MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
+                    }
+                ),
+            )
+        }
     }
 }
 
