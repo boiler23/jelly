@@ -4,6 +4,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -32,11 +33,12 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
 import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.EditTextStyle
 import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.TitleText
@@ -55,14 +57,15 @@ fun CodeEditor(
 ) {
     Column(modifier = modifier) {
         TitleText("Input")
-        Row {
-            CodeEditTextField(
-                modifier = Modifier.padding(vertical = 2.dp),
-                value = sourceInput,
-                errorMarkup = errorMarkup,
-                onValueChange = { onSourceInputChanged(it) },
-            )
-        }
+        CodeEditTextField(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(vertical = 2.dp),
+            value = sourceInput,
+            errorMarkup = errorMarkup,
+            onValueChange = { onSourceInputChanged(it) },
+        )
     }
 }
 
@@ -81,7 +84,9 @@ private fun CodeEditTextField(
     var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
     var lineTops by remember { mutableStateOf<List<Float>>(listOf()) }
     val decorationOffset = remember { mutableStateOf(0f) }
+    var textFieldSize by remember { mutableStateOf(Size.Zero) }
     var highlightedLine by remember { mutableStateOf<Int?>(null) }
+    val localDensity = LocalDensity.current
 
     fun updateHighlight(offset: Int) {
         layout?.let { l -> highlightedLine = l.getLineForOffset(offset) }
@@ -93,10 +98,11 @@ private fun CodeEditTextField(
             .horizontalScroll(hScrollState)
             .focusRequester(focusRequester)
             .padding(bottom = 2.dp)
+            .onSizeChanged { textFieldSize = localDensity.run { it.toSize() } }
             .drawBehind {
                 layout?.let {
                     drawErrorMarkup(value.text, decorationOffset.value, it, errorMarkup, errorColor)
-                    drawHighlight(it, highlightedLine, highlightColor)
+                    drawHighlight(it, size, highlightedLine, highlightColor)
                 }
             },
         value = value,
@@ -125,11 +131,11 @@ private fun CodeEditTextField(
     }
 }
 
-private fun DrawScope.drawHighlight(layout: TextLayoutResult, line: Int?, color: Color) {
+private fun DrawScope.drawHighlight(layout: TextLayoutResult, size: Size, line: Int?, color: Color) {
     if (line != null) {
         val top = layout.getLineTop(line)
         val bottom = layout.getLineBottom(line)
-        drawRect(color, Offset(0f, top), Size(layout.size.width.toFloat(), bottom - top))
+        drawRect(color, Offset(0f, top), Size(size.width, bottom - top))
     }
 }
 
@@ -183,9 +189,10 @@ private fun LineNumbers(
     lineTops: List<Float>,
     highlighted: Int?,
 ) {
+    val localDensity = LocalDensity.current
     Box(
         modifier = Modifier
-            .onGloballyPositioned { decorationOffset.value = it.size.width.toFloat() }
+            .onSizeChanged { decorationOffset.value = localDensity.run { it.width.toFloat() } }
             .padding(horizontal = 8.dp)
     ) {
         for (lineIndex in lineTops.indices) {
