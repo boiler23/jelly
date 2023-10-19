@@ -2,6 +2,8 @@ package com.ilyabogdanovich.jelly.jcc.core.print
 
 import com.ilyabogdanovich.jelly.jcc.core.eval.Seq
 import com.ilyabogdanovich.jelly.jcc.core.eval.Var
+import com.ilyabogdanovich.jelly.jcc.core.eval.num
+import com.ilyabogdanovich.jelly.jcc.core.eval.toSeq
 import com.ilyabogdanovich.jelly.jcc.core.eval.toVar
 import io.kotest.matchers.shouldBe
 import org.junit.Before
@@ -15,6 +17,8 @@ import java.util.Locale
  */
 class VarPrinterTest {
     private val printer = VarPrinter()
+
+    private fun Seq.toVar() = Var.SeqVar(this)
 
     @Before
     fun setUp() {
@@ -120,7 +124,7 @@ class VarPrinterTest {
     @Test
     fun `print array sequence - many elements`() {
         // Prepare
-        val variable = listOf(1.toVar(), 2.0.toVar(), 3.toVar(), 4.0.toVar(), 5.0.toVar()).toVar()
+        val variable = listOf(1.num, 2.0.num, 3.num, 4.0.num, 5.0.num).toSeq().toVar()
 
         // Do
         val result = printer.print(variable)
@@ -132,7 +136,7 @@ class VarPrinterTest {
     @Test
     fun `print array sequence - 1 element`() {
         // Prepare
-        val variable = listOf(3.1415926.toVar()).toVar()
+        val variable = listOf(3.1415926.num).toSeq().toVar()
 
         // Do
         val result = printer.print(variable)
@@ -151,46 +155,5 @@ class VarPrinterTest {
 
         // Check
         result shouldBe "{  }"
-    }
-
-    @Test
-    fun `print multi-array sequence - many elements`() {
-        // Prepare
-        val variable = listOf(
-            1.toVar(),
-            listOf(2.0.toVar(), listOf(3.toVar()).toVar()).toVar(),
-            4.0.toVar(),
-            5.0.toVar()
-        ).toVar()
-
-        // Do
-        val result = printer.print(variable)
-
-        // Check
-        result shouldBe "{ 1, { 2, { 3 } }, 4, 5 }"
-    }
-
-    @Test
-    fun `print multi-array sequence - 1 element`() {
-        // Prepare
-        val variable = listOf(listOf(3.1415926.toVar()).toVar()).toVar()
-
-        // Do
-        val result = printer.print(variable)
-
-        // Check
-        result shouldBe "{ { 3.1415926 } }"
-    }
-
-    @Test
-    fun `print multi-array sequence - empty`() {
-        // Prepare
-        val variable = listOf(listOf<Var>().toVar()).toVar()
-
-        // Do
-        val result = printer.print(variable)
-
-        // Check
-        result shouldBe "{ {  } }"
     }
 }

@@ -213,7 +213,7 @@ class ExpressionEvaluatorTest {
         val result = evaluator.evaluateExpression(EvalContext(), parserContext)
 
         // Check
-        result shouldBe listOf(1.toVar(), 1.toVar()).toVar().asRight()
+        result shouldBe Var.SeqVar(listOf(1.num, 1.num).toSeq()).asRight()
     }
 
     @Test

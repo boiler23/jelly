@@ -15,10 +15,13 @@ import kotlin.math.ceil
  * It helps to reduce memory footprint for storing simple sequences like {0,10000},
  * because memory allocation is not required.
  * Once the map operation is performed, new mapped sequence is stored in memory effectively as an array.
+ * @property elements represents the numbers in this sequence.
+ * @property size size of the sequence,
+ *                as kotlin's [Sequence] doesn't hold it's size, but in our case we know it in advance.
  *
  * @author Ilya Bogdanovich on 09.10.2023
  */
-class Seq(val elements: Sequence<Var>, val size: Int) {
+class Seq(val elements: Sequence<Num>, val size: Int) {
     // equals & hashCode are needed to simplify test cases.
     // they aren't used in production code.
     // quick dirty, but quick solution.
@@ -43,7 +46,7 @@ class Seq(val elements: Sequence<Var>, val size: Int) {
     companion object {
         fun fromBounds(from: Long, to: Long): Seq {
             require(from <= to) { "Sequence from > to: $from > $to" }
-            return Seq((from..to).asSequence().map { it.toVar() }, (to - from + 1).toInt())
+            return Seq((from..to).asSequence().map { it.num }, (to - from + 1).toInt())
         }
     }
 }
@@ -62,7 +65,7 @@ class Seq(val elements: Sequence<Var>, val size: Int) {
  */
 suspend inline fun Seq.parallelMap(
     maxParallelism: Int = Runtime.getRuntime().availableProcessors(),
-    crossinline mapper: suspend (Var) -> Either<EvalError, Var>
+    crossinline mapper: suspend (Num) -> Either<EvalError, Num>
 ): Either<EvalError, Seq> {
     return coroutineScope {
         if (size == 0) {
@@ -73,14 +76,14 @@ suspend inline fun Seq.parallelMap(
             .chunked(size.getParallelChunkSize(maxParallelism))
             .map { chunk ->
                 async {
-                    val output = ArrayList<Var>(size)
+                    val output = ArrayList<Num>(size)
                     for (e in chunk) {
                         when (val mapResult = mapper(e)) {
                             is Either.Left -> return@async mapResult.value.asLeft()
                             is Either.Right -> output.add(mapResult.value)
                         }
                     }
-                    output.asRight<EvalError, List<Var>>()
+                    output.asRight<EvalError, List<Num>>()
                 }
             }
             .toList()
@@ -109,9 +112,9 @@ suspend inline fun Seq.parallelMap(
  * @return wither [Seq] or [EvalError].
  */
 inline fun Seq.map(
-    crossinline mapper: (Var) -> Either<EvalError, Var>
+    crossinline mapper: (Num) -> Either<EvalError, Num>
 ): Either<EvalError, Seq> {
-    val output = ArrayList<Var>(size)
+    val output = ArrayList<Num>(size)
     for (e in elements) {
         when (val mapResult = mapper(e)) {
             is Either.Left -> return mapResult.value.asLeft()
@@ -137,13 +140,13 @@ inline fun Seq.map(
  *                  It takes to parameters as an input: first one is the accumulated value,
  *                  second one is the next element picked.
  *                  Returned result is used to update the accumulated value.
- * @return either [Seq] or [EvalError].
+ * @return either [Num] or [EvalError].
  */
 suspend inline fun Seq.parallelReduce(
-    neutral: Var,
+    neutral: Num,
     maxParallelism: Int = Runtime.getRuntime().availableProcessors(),
-    crossinline operation: suspend (Var, Var) -> Either<EvalError, Var>
-): Either<EvalError, Var> {
+    crossinline operation: suspend (Num, Num) -> Either<EvalError, Num>
+): Either<EvalError, Num> {
     return coroutineScope {
         if (size == 0) {
             return@coroutineScope neutral.asRight()
@@ -160,7 +163,7 @@ suspend inline fun Seq.parallelReduce(
                             is Either.Right -> accumulator = operationResult.value
                         }
                     }
-                    accumulator.asRight<EvalError, Var>()
+                    accumulator.asRight<EvalError, Num>()
                 }
             }
             .toList()
@@ -183,12 +186,12 @@ suspend inline fun Seq.parallelReduce(
  *                  It takes to parameters as an input: first one is the accumulated value,
  *                  second one is the next element picked.
  *                  Returned result is used to update the accumulated value.
- * @return either [Seq] or [EvalError].
+ * @return either [Num] or [EvalError].
  */
 inline fun Seq.reduce(
-    neutral: Var,
-    crossinline operation: (Var, Var) -> Either<EvalError, Var>
-): Either<EvalError, Var> {
+    neutral: Num,
+    crossinline operation: (Num, Num) -> Either<EvalError, Num>
+): Either<EvalError, Num> {
     var accumulator = neutral
     for (element in elements) {
         when (val operationResult = operation(accumulator, element)) {
@@ -210,4 +213,4 @@ internal fun Int.getParallelChunkSize(maxParallelism: Int): Int {
 /**
  * Helper to create [Seq] from list of [Var]'s.
  */
-fun List<Var>.toSeq() = Seq(asSequence(), size)
+fun List<Num>.toSeq() = Seq(asSequence(), size)

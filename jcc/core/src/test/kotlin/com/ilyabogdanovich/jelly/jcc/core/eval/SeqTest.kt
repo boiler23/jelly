@@ -16,13 +16,13 @@ class SeqTest {
     @Test
     fun `list to seq`() {
         // Prepare
-        val list = listOf(1.toVar(), 2.5.toVar())
+        val list = listOf(1.num, 2.5.num)
 
         // Do
         val result = list.toSeq()
 
         // Check
-        result shouldBe Seq(sequenceOf(1.toVar(), 2.5.toVar()), 2)
+        result shouldBe Seq(sequenceOf(1.num, 2.5.num), 2)
     }
 
     @Test
@@ -30,13 +30,10 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = listOf(1.toVar(), 2.toVar(), 3.toVar()).toSeq().map {
-            it as Var.NumVar
-            Var.NumVar(it.v + 1.num).asRight()
-        }
+        val result = listOf(1.num, 2.num, 3.num).toSeq().map { (it + 1.num).asRight() }
 
         // Check
-        result shouldBe listOf(2.toVar(), 3.toVar(), 4.toVar()).toSeq().asRight()
+        result shouldBe listOf(2.num, 3.num, 4.num).toSeq().asRight()
     }
 
     @Test
@@ -45,7 +42,7 @@ class SeqTest {
         val error = mockk<EvalError>()
 
         // Do
-        val result = listOf(1.toVar(), 2.toVar(), 3.toVar()).toSeq().map { error.asLeft() }
+        val result = listOf(1.num, 2.num, 3.num).toSeq().map { error.asLeft() }
 
         // Check
         result shouldBe error.asLeft()
@@ -56,13 +53,10 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = listOf<Var>().toSeq().map {
-            it as Var.NumVar
-            Var.NumVar(it.v + 1.num).asRight()
-        }
+        val result = listOf<Num>().toSeq().map { (it + 1.num).asRight() }
 
         // Check
-        result shouldBe listOf<Var>().toSeq().asRight()
+        result shouldBe listOf<Num>().toSeq().asRight()
     }
 
     @Test
@@ -70,13 +64,10 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = Seq.fromBounds(1, 3).map {
-            it as Var.NumVar
-            Var.NumVar(it.v + 1.num).asRight()
-        }
+        val result = Seq.fromBounds(1, 3).map { (it + 1.num).asRight() }
 
         // Check
-        result shouldBe listOf(2.toVar(), 3.toVar(), 4.toVar()).toSeq().asRight()
+        result shouldBe listOf(2.num, 3.num, 4.num).toSeq().asRight()
     }
 
     @Test
@@ -96,13 +87,10 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = listOf(1.toVar(), 2.toVar(), 3.toVar()).toSeq().parallelMap {
-            it as Var.NumVar
-            Var.NumVar(it.v + 1.num).asRight()
-        }
+        val result = listOf(1.num, 2.num, 3.num).toSeq().parallelMap { (it + 1.num).asRight() }
 
         // Check
-        result shouldBe listOf(2.toVar(), 3.toVar(), 4.toVar()).toSeq().asRight()
+        result shouldBe listOf(2.num, 3.num, 4.num).toSeq().asRight()
     }
 
     @Test
@@ -111,7 +99,7 @@ class SeqTest {
         val error = mockk<EvalError>()
 
         // Do
-        val result = listOf(1.toVar(), 2.toVar(), 3.toVar()).toSeq().parallelMap { error.asLeft() }
+        val result = listOf(1.num, 2.num, 3.num).toSeq().parallelMap { error.asLeft() }
 
         // Check
         result shouldBe error.asLeft()
@@ -122,13 +110,10 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = listOf<Var>().toSeq().parallelMap {
-            it as Var.NumVar
-            Var.NumVar(it.v + 1.num).asRight()
-        }
+        val result = listOf<Num>().toSeq().parallelMap { (it + 1.num).asRight() }
 
         // Check
-        result shouldBe listOf<Var>().toSeq().asRight()
+        result shouldBe listOf<Num>().toSeq().asRight()
     }
 
     @Test
@@ -136,13 +121,10 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = Seq.fromBounds(1, 3).parallelMap {
-            it as Var.NumVar
-            Var.NumVar(it.v + 1.num).asRight()
-        }
+        val result = Seq.fromBounds(1, 3).parallelMap { (it + 1.num).asRight() }
 
         // Check
-        result shouldBe listOf(2.toVar(), 3.toVar(), 4.toVar()).toSeq().asRight()
+        result shouldBe listOf(2.num, 3.num, 4.num).toSeq().asRight()
     }
 
     @Test
@@ -162,14 +144,10 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = listOf<Var>().toSeq().reduce(0.toVar()) { acc, n ->
-            acc as Var.NumVar
-            n as Var.NumVar
-            Var.NumVar(acc.v + n.v).asRight()
-        }
+        val result = listOf<Num>().toSeq().reduce(0.num) { acc, n -> (acc + n).asRight() }
 
         // Check
-        result shouldBe 0.toVar().asRight()
+        result shouldBe 0.num.asRight()
     }
 
     @Test
@@ -177,14 +155,10 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = listOf(1.toVar(), 2.toVar(), 3.toVar()).toSeq().reduce(0.toVar()) { acc, n ->
-            acc as Var.NumVar
-            n as Var.NumVar
-            Var.NumVar(acc.v + n.v).asRight()
-        }
+        val result = listOf(1.num, 2.num, 3.num).toSeq().reduce(0.num) { acc, n -> (acc + n).asRight() }
 
         // Check
-        result shouldBe 6.toVar().asRight()
+        result shouldBe 6.num.asRight()
     }
 
     @Test
@@ -193,8 +167,7 @@ class SeqTest {
         val error = mockk<EvalError>()
 
         // Do
-        val result = listOf(1.toVar(), 2.toVar(), 3.toVar()).toSeq()
-            .reduce(0.toVar()) { _, _ -> error.asLeft() }
+        val result = listOf(1.num, 2.num, 3.num).toSeq().reduce(0.num) { _, _ -> error.asLeft() }
 
         // Check
         result shouldBe error.asLeft()
@@ -205,14 +178,10 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = Seq.fromBounds(1, 3).reduce(0.toVar()) { acc, n ->
-            acc as Var.NumVar
-            n as Var.NumVar
-            Var.NumVar(acc.v + n.v).asRight()
-        }
+        val result = Seq.fromBounds(1, 3).reduce(0.num) { acc, n -> (acc + n).asRight() }
 
         // Check
-        result shouldBe 6.toVar().asRight()
+        result shouldBe 6.num.asRight()
     }
 
     @Test
@@ -221,7 +190,7 @@ class SeqTest {
         val error = mockk<EvalError>()
 
         // Do
-        val result = Seq.fromBounds(1, 3).reduce(0.toVar()) { _, _ -> error.asLeft() }
+        val result = Seq.fromBounds(1, 3).reduce(0.num) { _, _ -> error.asLeft() }
 
         // Check
         result shouldBe error.asLeft()
@@ -232,14 +201,10 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = listOf<Var>().toSeq().parallelReduce(0.toVar()) { acc, n ->
-            acc as Var.NumVar
-            n as Var.NumVar
-            Var.NumVar(acc.v + n.v).asRight()
-        }
+        val result = listOf<Num>().toSeq().parallelReduce(0.num) { acc, n -> (acc + n).asRight() }
 
         // Check
-        result shouldBe 0.toVar().asRight()
+        result shouldBe 0.num.asRight()
     }
 
     @Test
@@ -247,14 +212,10 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = listOf(1.toVar(), 2.toVar(), 3.toVar()).toSeq().parallelReduce(0.toVar()) { acc, n ->
-            acc as Var.NumVar
-            n as Var.NumVar
-            Var.NumVar(acc.v + n.v).asRight()
-        }
+        val result = listOf(1.num, 2.num, 3.num).toSeq().parallelReduce(0.num) { acc, n -> (acc + n).asRight() }
 
         // Check
-        result shouldBe 6.toVar().asRight()
+        result shouldBe 6.num.asRight()
     }
 
     @Test
@@ -263,8 +224,7 @@ class SeqTest {
         val error = mockk<EvalError>()
 
         // Do
-        val result = listOf(1.toVar(), 2.toVar(), 3.toVar()).toSeq()
-            .parallelReduce(0.toVar()) { _, _ -> error.asLeft() }
+        val result = listOf(1.num, 2.num, 3.num).toSeq().parallelReduce(0.num) { _, _ -> error.asLeft() }
 
         // Check
         result shouldBe error.asLeft()
@@ -275,14 +235,10 @@ class SeqTest {
         // Prepare
 
         // Do
-        val result = Seq.fromBounds(1, 3).parallelReduce(0.toVar()) { acc, n ->
-            acc as Var.NumVar
-            n as Var.NumVar
-            Var.NumVar(acc.v + n.v).asRight()
-        }
+        val result = Seq.fromBounds(1, 3).parallelReduce(0.num) { acc, n -> (acc + n).asRight() }
 
         // Check
-        result shouldBe 6.toVar().asRight()
+        result shouldBe 6.num.asRight()
     }
 
     @Test
@@ -291,7 +247,7 @@ class SeqTest {
         val error = mockk<EvalError>()
 
         // Do
-        val result = Seq.fromBounds(1, 3).parallelReduce(0.toVar()) { _, _ -> error.asLeft() }
+        val result = Seq.fromBounds(1, 3).parallelReduce(0.num) { _, _ -> error.asLeft() }
 
         // Check
         result shouldBe error.asLeft()

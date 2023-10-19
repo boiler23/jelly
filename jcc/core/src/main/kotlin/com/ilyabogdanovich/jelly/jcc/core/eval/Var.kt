@@ -35,6 +35,6 @@ fun Long.toVar() = Var.NumVar(this.num)
 fun Double.toVar() = Var.NumVar(this.num)
 
 /**
- * Helper to create sequence [Var] from a list of [Var]'s.
+ * Helper to create [Var] from [Num].
  */
-fun List<Var>.toVar() = Var.SeqVar(this.toSeq())
+fun Num.toVar() = Var.NumVar(this)

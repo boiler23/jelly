@@ -41,7 +41,7 @@ class VarPrinter {
         append("{ ")
         val i = elements.iterator()
         while (i.hasNext()) {
-            append(print(i.next()))
+            append(i.next().print())
             if (i.hasNext()) {
                 append(", ")
             }

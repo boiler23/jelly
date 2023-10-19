@@ -211,6 +211,8 @@ class CompilerTest(
             ),
             arrayOf("out {1,5}", "{ 1, 2, 3, 4, 5 }", empty()),
             arrayOf("out {1,5-2}", "{ 1, 2, 3 }", empty()),
+            arrayOf("out {1.5,2}", "", listOf("line 1:5: Sequence's begin is expected to be an integer: '1.5'.")),
+            arrayOf("out {1,2.5}", "", listOf("line 1:7: Sequence's end is expected to be an integer: '2.5'.")),
             arrayOf(
                 "out {1,5,7}",
                 "{ 1, 2, 3, 4, 5 }",
@@ -248,13 +250,11 @@ class CompilerTest(
                 empty()
             ),
             arrayOf("out map({1,5},i->i^2)", "{ 1, 4, 9, 16, 25 }", empty()),
-            arrayOf(
-                "out map({1,5},i->{i,i+2})",
-                "{ { 1, 2, 3 }, { 2, 3, 4 }, { 3, 4, 5 }, { 4, 5, 6 }, { 5, 6, 7 } }",
-                empty()
-            ),
+            arrayOf("out map({1,5},i->{i,i+2})", "", listOf("line 1:17: Lambda in map() is expected to return a number: '{i,i+2}'.")),
             arrayOf("out reduce(map({1,5},i->i^2), 1, x y -> x*y)", "14400", empty()),
             arrayOf("out reduce({1,5},0,i j->i+j)", "15", empty()),
+            arrayOf("out reduce({1,5},{1,2},i j->i+j)", "", listOf("line 1:17: Neutral element in reduce() should be a number expression: '{1,2}'.")),
+            arrayOf("out reduce({1,5},1,i j->{i,j})", "", listOf("line 1:24: Lambda in reduce() is expected to return a number: '{i,j}'.")),
             arrayOf(
                 """
                     var r = reduce(
@@ -270,8 +270,8 @@ class CompilerTest(
                     )
                     out r
                 """.trimIndent(),
-                "60",
-                empty()
+                "",
+                listOf("line 5:17: Lambda in map() is expected to return a number: 'map({i,i+2},j->j)'.", "line 12:4: Variable undeclared: 'r'.")
             ),
             arrayOf(
                 """

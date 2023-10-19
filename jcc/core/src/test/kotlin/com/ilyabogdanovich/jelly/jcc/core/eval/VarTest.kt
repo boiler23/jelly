@@ -32,14 +32,13 @@ class VarTest {
     }
 
     @Test
-    fun `var list to sequence var`() {
+    fun `num to var`() {
         // Prepare
-        val list = listOf(1.toVar(), 2.toVar())
 
         // Do
-        val result = list.toVar()
+        val result = 123.456.num.toVar()
 
         // Check
-        result shouldBe Var.SeqVar(Seq(sequenceOf(1.toVar(), 2.toVar()), 2))
+        result shouldBe Var.NumVar(Num.Real(123.456))
     }
 }

@@ -110,6 +110,11 @@ data class EvalError(
         MapMissingLambdaExpression,
 
         /**
+         * Lambda function in map() is expected to return a number, however it doesn't.
+         */
+        MapLambdaReturnsNotNumber,
+
+        /**
          * Sequence declaration is missing in reduce().
          */
         ReduceMissingSequence,
@@ -140,6 +145,16 @@ data class EvalError(
         ReduceMissingLambdaExpression,
 
         /**
+         * Reduce's neutral element is expected to be a number, however it is not.
+         */
+        ReduceNeutralIsNotNumber,
+
+        /**
+         * Lambda function in reduce() is expected to return a number, however it doesn't.
+         */
+        ReduceLambdaReturnsNotNumber,
+
+        /**
          * Invalid operand detected in arithmetic operation.
          */
         InvalidArithmeticOperand,
@@ -150,9 +165,14 @@ data class EvalError(
         InvalidArithmeticOperator,
 
         /**
-         * Expression has to be evaluated to integer, however it can't.
+         * Sequence start is expected to be an integer value, however it is not.
          */
-        IntegerExpected,
+        SequenceStartIsNotInteger,
+
+        /**
+         * Sequence stop is expected to be an integer value, however it is not.
+         */
+        SequenceStopIsNotInteger,
 
         /**
          * Expression has to be evaluated to sequence, however it can't.
@@ -184,7 +204,8 @@ data class EvalError(
             Type.UnsupportedExpression -> "Unsupported expression encountered: '$expression'"
             Type.InvalidArithmeticOperand -> "Invalid arithmetic operand: '$expression'"
             Type.InvalidArithmeticOperator -> "Invalid arithmetic operator: '$expression'"
-            Type.IntegerExpected -> "Expected integer: '$expression'"
+            Type.SequenceStartIsNotInteger -> "Sequence's begin is expected to be an integer: '$expression'"
+            Type.SequenceStopIsNotInteger -> "Sequence's end is expected to be an integer: '$expression'"
             Type.SequenceExpected -> "Expected sequence: '$expression'"
             Type.MissingVariableAssignment -> "Missing variable assignment: '$expression'"
             Type.MissingSequenceLowerBound -> "Missing sequence's lower bound: '$expression'"
@@ -198,6 +219,7 @@ data class EvalError(
             Type.MapMissingLambda -> "Missing lambda declaration in map(): '$expression'"
             Type.MapMissingLambdaId -> "Missing iterator declaration in map's lambda: '$expression'"
             Type.MapMissingLambdaExpression -> "Missing return expression in map's lambda: '$expression'"
+            Type.MapLambdaReturnsNotNumber -> "Lambda in map() is expected to return a number: '$expression'"
             Type.ReduceMissingSequence -> "Missing sequence declaration in reduce(): '$expression'"
             Type.ReduceMissingNeutral -> "Missing neutral element declaration in reduce(): '$expression'"
             Type.ReduceMissingLambda -> "Missing lambda declaration in reduce(): '$expression'"
@@ -205,6 +227,8 @@ data class EvalError(
             Type.ReduceMissingLambdaNext -> "Missing next element declaration in reduce's lambda: '$expression'"
             Type.ReduceMissingLambdaExpression ->
                 "Missing return expression declaration in reduce's lambda: '$expression'"
+            Type.ReduceNeutralIsNotNumber -> "Neutral element in reduce() should be a number expression: '$expression'"
+            Type.ReduceLambdaReturnsNotNumber -> "Lambda in reduce() is expected to return a number: '$expression'"
         }
 }
 
