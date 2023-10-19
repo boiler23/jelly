@@ -1,5 +1,6 @@
 package com.ilyabogdanovich.jelly.ide.app.presentation.compose
 
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -37,8 +37,8 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
 import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.EditTextStyle
 import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.TitleText
@@ -56,16 +56,18 @@ fun CodeEditor(
     errorMarkup: ErrorMarkup,
     onSourceInputChanged: (TextFieldValue) -> Unit,
 ) {
+    var viewportSize by remember { mutableStateOf(IntSize.Zero) }
     Column(modifier = modifier) {
         TitleText("Input")
         CodeEditTextField(
             modifier = Modifier
-                .weight(1f)
                 .fillMaxWidth()
-                .padding(vertical = 2.dp),
+                .padding(vertical = 2.dp)
+                .onSizeChanged { viewportSize = it },
             value = sourceInput,
             navigationEffect = navigationEffect,
             errorMarkup = errorMarkup,
+            viewportSize = viewportSize,
             onValueChange = { onSourceInputChanged(it) },
         )
     }
@@ -79,6 +81,7 @@ private fun CodeEditTextField(
     modifier: Modifier = Modifier,
     errorColor: Color = MaterialTheme.colors.error,
     highlightColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.05f),
+    viewportSize: IntSize,
     onValueChange: (TextFieldValue) -> Unit = {},
 ) {
     val hScrollState = rememberScrollState()
@@ -87,9 +90,7 @@ private fun CodeEditTextField(
     var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
     var lineTops by remember { mutableStateOf<List<Float>>(listOf()) }
     val decorationOffset = remember { mutableStateOf(0f) }
-    var textFieldSize by remember { mutableStateOf(Size.Zero) }
     var highlightedLine by remember { mutableStateOf<Int?>(null) }
-    val localDensity = LocalDensity.current
 
     fun updateHighlight(offset: Int) {
         layout?.let { l -> highlightedLine = l.getLineForOffset(offset) }
@@ -101,7 +102,6 @@ private fun CodeEditTextField(
             .horizontalScroll(hScrollState)
             .focusRequester(focusRequester)
             .padding(bottom = 2.dp)
-            .onSizeChanged { textFieldSize = localDensity.run { it.toSize() } }
             .drawBehind {
                 layout?.let {
                     drawErrorMarkup(value.text, decorationOffset.value, it, errorMarkup, errorColor)
@@ -127,10 +127,25 @@ private fun CodeEditTextField(
         focusRequester.requestFocus()
     }
 
-    DisposableEffect(navigationEffect) {
+    LaunchedEffect(vScrollState.maxValue to value.selection) {
+        layout?.let { l ->
+            // check if cursor
+            val line = l.getLineForOffset(value.selection.end)
+            val top = l.getLineTop(line)
+            val bottom = l.getLineBottom(line)
+            val lineHeight = bottom - top
+            val viewportBottom = vScrollState.value + viewportSize.height
+            if (bottom > viewportBottom - lineHeight) {
+                vScrollState.animateScrollBy(lineHeight)
+            } else if (top < vScrollState.value + lineHeight) {
+                vScrollState.animateScrollBy(-lineHeight)
+            }
+        }
+    }
+
+    LaunchedEffect(navigationEffect) {
         focusRequester.requestFocus()
         updateHighlight(value.selection.start)
-        onDispose { }
     }
 }
 
