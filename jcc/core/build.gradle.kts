@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id("jelly.jvm")
 }
@@ -5,6 +7,10 @@ plugins {
 group = "com.ilyabogdanovich.jelly.jcc.core"
 version = "1.0-SNAPSHOT"
 
+/**
+ * Task to generate the ANTLR's parsing code.
+ * Takes [grammarFile] in G4 format as an input, and writes the generated code into the [outputDir].
+ */
 abstract class GenerateParserTask : JavaExec() {
     @InputFile
     lateinit var grammarFile: File
@@ -33,8 +39,8 @@ tasks.register<GenerateParserTask>("generateParser") {
     outputDir = project.file("build/gen/antlr4/com/ilyabogdanovich/jelly/jcc/core/antlr")
 }
 
-tasks.named("compileKotlin").configure {
-    dependsOn(tasks.named("generateParser"))
+tasks.withType<KotlinCompile>().configureEach {
+    dependsOn(tasks.withType<GenerateParserTask>())
 }
 
 sourceSets {

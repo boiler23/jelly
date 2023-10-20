@@ -7,5 +7,6 @@ package com.ilyabogdanovich.jelly.logging
  * @author Ilya Bogdanovich on 13.10.2023
  */
 object DefaultLoggerFactory : LoggerFactory {
-    override fun get(tag: String): LocalLogger = PrintLocalLogger(tag)
+    override fun get(tag: String): LocalLogger =
+        if (ENABLE_LOGGING) PrintLocalLogger(tag) else EmptyLocalLogger
 }

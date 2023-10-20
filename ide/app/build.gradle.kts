@@ -39,5 +39,13 @@ compose.desktop {
             packageName = "Jelly"
             packageVersion = "1.0.0"
         }
+
+        buildTypes {
+            release {
+                proguard {
+                    configurationFiles.from(project.file("compose-desktop.pro"))
+                }
+            }
+        }
     }
 }

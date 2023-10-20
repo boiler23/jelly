@@ -14,6 +14,12 @@ Just navigate to the project folder and execute in the Terminal:
 ./gradlew :ide:app:run
 ```
 
+## Building the distribution
+
+Debug build: `./gradlew packageDistributionForCurrentOS`
+
+Release build: `./gradlew packageReleaseDistributionForCurrentOS -Penv=release`
+
 ## Frameworks/Libraries used
 - ANTLR for generating the lexer/parser/parse tree
 - Compose Desktop for the editor UI
