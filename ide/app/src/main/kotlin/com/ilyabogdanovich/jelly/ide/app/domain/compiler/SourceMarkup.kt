@@ -12,14 +12,26 @@ data class SourceMarkup(
     companion object {
         // todo: optimize it
         fun from(source: String): SourceMarkup {
-            val inputLines = source.split("\n")
-            var cur = 0
-            val lineStarts = inputLines.map {
-                val start = cur
-                cur += it.length + 1
-                start
+            val lineStarts = mutableListOf<Int>()
+            val lineLengths = mutableListOf<Int>()
+            var curLength = 0
+            var curStart = 0
+            for (i in source.indices) {
+                val c = source[i]
+                if (c == '\n') {
+                    lineStarts.add(curStart)
+                    lineLengths.add(curLength)
+                    curLength = 0
+                    curStart = i + 1
+                } else {
+                    curLength++
+                }
             }
-            return SourceMarkup(inputLines.map { it.length }, lineStarts)
+
+            lineLengths.add(curLength)
+            lineStarts.add(curStart)
+
+            return SourceMarkup(lineLengths, lineStarts)
         }
     }
 }
