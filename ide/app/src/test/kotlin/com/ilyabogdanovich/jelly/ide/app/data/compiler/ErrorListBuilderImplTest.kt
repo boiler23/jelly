@@ -3,7 +3,7 @@ package com.ilyabogdanovich.jelly.ide.app.data.compiler
 import com.ilyabogdanovich.jelly.ide.app.domain.DeepLink
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationResults
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.SourceMarkup
-import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
+import com.ilyabogdanovich.jelly.jcc.core.Error
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -25,13 +25,13 @@ class ErrorListBuilderImplTest {
             lineLengths = listOf(4, 9, 17),
         )
         val errors = listOf(
-            mockk<EvalError> {
+            mockk<Error> {
                 every { formattedMessage } returns "error 1"
-                every { start } returns EvalError.TokenPosition(line = 2, positionInLine = 3)
+                every { start } returns Error.TokenPosition(line = 2, positionInLine = 3)
             },
-            mockk<EvalError> {
+            mockk<Error> {
                 every { formattedMessage } returns "error 2"
-                every { start } returns EvalError.TokenPosition(line = 3, positionInLine = 5)
+                every { start } returns Error.TokenPosition(line = 3, positionInLine = 5)
             },
         )
 

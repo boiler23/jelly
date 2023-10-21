@@ -2,7 +2,7 @@ package com.ilyabogdanovich.jelly.ide.app.data.compiler
 
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.SourceMarkup
-import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
+import com.ilyabogdanovich.jelly.jcc.core.Error
 import kotlin.math.max
 
 /**
@@ -11,7 +11,7 @@ import kotlin.math.max
  * @author Ilya Bogdanovich on 15.10.2023
  */
 class ErrorMarkupBuilderImpl : ErrorMarkupBuilder {
-    override fun buildMarkup(sourceMarkup: SourceMarkup, evalErrors: List<EvalError>): ErrorMarkup {
+    override fun buildMarkup(sourceMarkup: SourceMarkup, errors: List<Error>): ErrorMarkup {
         val result = mutableMapOf<Int, MutableList<Pair<Int, Int>>>()
 
         fun SourceMarkup.markup(line: Int, pos: Int) {
@@ -26,7 +26,7 @@ class ErrorMarkupBuilderImpl : ErrorMarkupBuilder {
             }
         }
 
-        fun SourceMarkup.between(start: EvalError.TokenPosition, stop: EvalError.TokenPosition) {
+        fun SourceMarkup.between(start: Error.TokenPosition, stop: Error.TokenPosition) {
             markup(line = start.line, pos = start.positionInLine)
             for (line in start.line + 1 until stop.line) {
                 markup(line = line, pos = 0)
@@ -34,7 +34,7 @@ class ErrorMarkupBuilderImpl : ErrorMarkupBuilder {
             markup(line = stop.line, start = 0, stop = stop.positionInLine)
         }
 
-        fun SourceMarkup.lineRange(start: EvalError.TokenPosition, stop: EvalError.TokenPosition) {
+        fun SourceMarkup.lineRange(start: Error.TokenPosition, stop: Error.TokenPosition) {
             if (start.line < stop.line) {
                 between(start = start, stop = stop)
             } else {
@@ -42,7 +42,7 @@ class ErrorMarkupBuilderImpl : ErrorMarkupBuilder {
             }
         }
 
-        for (error in evalErrors) {
+        for (error in errors) {
             val start = error.start
             val stop = error.stop
             if (stop != null) {

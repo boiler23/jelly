@@ -1,5 +1,6 @@
 package com.ilyabogdanovich.jelly.jcc.core.eval
 
+import com.ilyabogdanovich.jelly.jcc.core.Error
 import com.ilyabogdanovich.jelly.utils.asLeft
 import com.ilyabogdanovich.jelly.utils.asRight
 import io.kotest.matchers.shouldBe
@@ -39,7 +40,7 @@ class SeqTest {
     @Test
     fun `map array with errors`() = runTest {
         // Prepare
-        val error = mockk<EvalError>()
+        val error = mockk<Error>()
 
         // Do
         val result = listOf(1.num, 2.num, 3.num).toSeq().map { error.asLeft() }
@@ -73,7 +74,7 @@ class SeqTest {
     @Test
     fun `map bounds with errors`() = runTest {
         // Prepare
-        val error = mockk<EvalError>()
+        val error = mockk<Error>()
 
         // Do
         val result = Seq.fromBounds(1, 3).map { error.asLeft() }
@@ -96,7 +97,7 @@ class SeqTest {
     @Test
     fun `parallel map array with errors`() = runTest {
         // Prepare
-        val error = mockk<EvalError>()
+        val error = mockk<Error>()
 
         // Do
         val result = listOf(1.num, 2.num, 3.num).toSeq().parallelMap { error.asLeft() }
@@ -130,7 +131,7 @@ class SeqTest {
     @Test
     fun `parallel map bounds with errors`() = runTest {
         // Prepare
-        val error = mockk<EvalError>()
+        val error = mockk<Error>()
 
         // Do
         val result = Seq.fromBounds(1, 3).parallelMap { error.asLeft() }
@@ -164,7 +165,7 @@ class SeqTest {
     @Test
     fun `reduce array with errors`() = runTest {
         // Prepare
-        val error = mockk<EvalError>()
+        val error = mockk<Error>()
 
         // Do
         val result = listOf(1.num, 2.num, 3.num).toSeq().reduce(0.num) { _, _ -> error.asLeft() }
@@ -187,7 +188,7 @@ class SeqTest {
     @Test
     fun `reduce bounds with errors`() = runTest {
         // Prepare
-        val error = mockk<EvalError>()
+        val error = mockk<Error>()
 
         // Do
         val result = Seq.fromBounds(1, 3).reduce(0.num) { _, _ -> error.asLeft() }
@@ -221,7 +222,7 @@ class SeqTest {
     @Test
     fun `parallel reduce array with errors`() = runTest {
         // Prepare
-        val error = mockk<EvalError>()
+        val error = mockk<Error>()
 
         // Do
         val result = listOf(1.num, 2.num, 3.num).toSeq().parallelReduce(0.num) { _, _ -> error.asLeft() }
@@ -244,7 +245,7 @@ class SeqTest {
     @Test
     fun `parallel reduce bounds with errors`() = runTest {
         // Prepare
-        val error = mockk<EvalError>()
+        val error = mockk<Error>()
 
         // Do
         val result = Seq.fromBounds(1, 3).parallelReduce(0.num) { _, _ -> error.asLeft() }

@@ -1,5 +1,6 @@
 package com.ilyabogdanovich.jelly.jcc.core.eval
 
+import com.ilyabogdanovich.jelly.jcc.core.Error
 import com.ilyabogdanovich.jelly.jcc.core.antlr.JccParser
 import com.ilyabogdanovich.jelly.utils.asLeft
 import com.ilyabogdanovich.jelly.utils.asRight
@@ -44,11 +45,11 @@ class AssignmentEvaluatorTest {
         val result = assignmentEvaluator.evaluate(evalContext, parseContext)
 
         // Check
-        result shouldBe EvalError(
-            start = EvalError.TokenPosition(line = 3, positionInLine = 14),
-            stop = EvalError.TokenPosition(line = 4, positionInLine = 25),
+        result shouldBe Error(
+            start = Error.TokenPosition(line = 3, positionInLine = 14),
+            stop = Error.TokenPosition(line = 4, positionInLine = 25),
             expression = "var n =",
-            type = EvalError.Type.MissingVariableAssignment,
+            type = Error.Type.MissingVariableAssignment,
         ).asLeft()
     }
 
@@ -93,17 +94,17 @@ class AssignmentEvaluatorTest {
         }
         val variable = mockk<Var>()
         coEvery { expressionEvaluator.evaluateExpression(evalContext, expression) } returns variable.asRight()
-        every { evalContext + mapOf("id" to variable) } returns EvalError.Type.VariableRedeclaration.asLeft()
+        every { evalContext + mapOf("id" to variable) } returns Error.Type.VariableRedeclaration.asLeft()
 
         // Do
         val result = assignmentEvaluator.evaluate(evalContext, parseContext)
 
         // Check
-        result shouldBe EvalError(
-            start = EvalError.TokenPosition(line = 1, positionInLine = 2),
+        result shouldBe Error(
+            start = Error.TokenPosition(line = 1, positionInLine = 2),
             stop = null,
             expression = "id",
-            type = EvalError.Type.VariableRedeclaration,
+            type = Error.Type.VariableRedeclaration,
         ).asLeft()
     }
 
@@ -114,7 +115,7 @@ class AssignmentEvaluatorTest {
         val parseContext = mockk<JccParser.AssignmentContext> {
             every { expression() } returns expression
         }
-        val error = mockk<EvalError>()
+        val error = mockk<Error>()
         coEvery { expressionEvaluator.evaluateExpression(evalContext, expression) } returns error.asLeft()
 
         // Do

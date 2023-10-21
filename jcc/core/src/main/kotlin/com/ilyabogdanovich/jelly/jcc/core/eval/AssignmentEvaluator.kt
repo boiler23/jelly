@@ -1,6 +1,8 @@
 package com.ilyabogdanovich.jelly.jcc.core.eval
 
+import com.ilyabogdanovich.jelly.jcc.core.Error
 import com.ilyabogdanovich.jelly.jcc.core.antlr.JccParser
+import com.ilyabogdanovich.jelly.jcc.core.toError
 import com.ilyabogdanovich.jelly.utils.Either
 import com.ilyabogdanovich.jelly.utils.asLeft
 import com.ilyabogdanovich.jelly.utils.asRight
@@ -21,9 +23,9 @@ internal class AssignmentEvaluator(private val expressionEvaluator: ExpressionEv
     suspend fun evaluate(
         evalContext: EvalContext,
         assignmentContext: JccParser.AssignmentContext
-    ): Either<EvalError, EvalContext> {
+    ): Either<Error, EvalContext> {
         val expression = assignmentContext.expression()
-            ?: return assignmentContext.toError(EvalError.Type.MissingVariableAssignment).asLeft()
+            ?: return assignmentContext.toError(Error.Type.MissingVariableAssignment).asLeft()
         val evaluated = expressionEvaluator.evaluateExpression(evalContext, expression)
             .mapRight { variable ->
                 val id = assignmentContext.NAME().text

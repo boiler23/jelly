@@ -3,7 +3,7 @@ package com.ilyabogdanovich.jelly.ide.app.data.compiler
 import com.ilyabogdanovich.jelly.ide.app.domain.DeepLink
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationResults
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.SourceMarkup
-import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
+import com.ilyabogdanovich.jelly.jcc.core.Error
 
 /**
  * Implementation for [ErrorListBuilder]
@@ -11,7 +11,7 @@ import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
  * @author Ilya Bogdanovich on 16.10.2023
  */
 class ErrorListBuilderImpl : ErrorListBuilder {
-    override fun build(sourceMarkup: SourceMarkup, errors: List<EvalError>): List<CompilationResults.ErrorMessage> {
+    override fun build(sourceMarkup: SourceMarkup, errors: List<Error>): List<CompilationResults.ErrorMessage> {
         return errors.map {
             CompilationResults.ErrorMessage(
                 it.formattedMessage,

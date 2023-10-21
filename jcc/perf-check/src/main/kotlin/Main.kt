@@ -1,5 +1,5 @@
 import com.ilyabogdanovich.jelly.jcc.core.Compiler
-import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
+import com.ilyabogdanovich.jelly.jcc.core.Error
 import com.ilyabogdanovich.jelly.jcc.core.eval.Num
 import com.ilyabogdanovich.jelly.jcc.core.eval.Seq
 import com.ilyabogdanovich.jelly.jcc.core.eval.map
@@ -25,7 +25,7 @@ private fun improvement(from: Double, to: Double): Int {
 
 private suspend fun map() {
     val seq = Seq.fromBounds(1, 10_000_000)
-    val mapper: (Num) -> Either<EvalError, Num> = { (it.pow(3.num) + it.pow(2.num) + 1.num).asRight() }
+    val mapper: (Num) -> Either<Error, Num> = { (it.pow(3.num) + it.pow(2.num) + 1.num).asRight() }
 
     print("Measuring map performance... ")
     val timeSequntial = measureAvgTime { seq.map(mapper) }
@@ -38,7 +38,7 @@ private suspend fun map() {
 
 private suspend fun reduce() {
     val seq = Seq.fromBounds(1, 10_000_000)
-    val reduction: (Num, Num) -> Either<EvalError, Num> = { acc, p ->
+    val reduction: (Num, Num) -> Either<Error, Num> = { acc, p ->
         (acc.pow(p) * p.pow(acc)).asRight()
     }
 

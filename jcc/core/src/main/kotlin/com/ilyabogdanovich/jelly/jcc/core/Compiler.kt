@@ -3,10 +3,8 @@ package com.ilyabogdanovich.jelly.jcc.core
 import com.ilyabogdanovich.jelly.jcc.core.antlr.JccParser
 import com.ilyabogdanovich.jelly.jcc.core.eval.AssignmentEvaluator
 import com.ilyabogdanovich.jelly.jcc.core.eval.EvalContext
-import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
 import com.ilyabogdanovich.jelly.jcc.core.eval.ExpressionEvaluator
 import com.ilyabogdanovich.jelly.jcc.core.eval.PrintEvaluator
-import com.ilyabogdanovich.jelly.jcc.core.eval.toError
 import com.ilyabogdanovich.jelly.jcc.core.parse.ParseTreeBuilder
 import com.ilyabogdanovich.jelly.jcc.core.print.VarPrinter
 import com.ilyabogdanovich.jelly.utils.Either
@@ -20,7 +18,7 @@ class Compiler {
     private val parseTreeBuilder = ParseTreeBuilder()
 
     private class ResultListener {
-        val errors = mutableListOf<EvalError>()
+        val errors = mutableListOf<Error>()
         val output = StringBuilder()
         private val expressionEvaluator = ExpressionEvaluator()
         private val assignmentEvaluator = AssignmentEvaluator(expressionEvaluator)
@@ -45,12 +43,12 @@ class Compiler {
             printEvaluator.evaluate(ctx, output)
 
         fun expression(ctx: JccParser.ExpressionContext) =
-            errors.add(ctx.toError(EvalError.Type.TopLevelExpressionsUnsupported))
+            errors.add(ctx.toError(Error.Type.TopLevelExpressionsUnsupported))
     }
 
     data class Result(
         val output: String,
-        val errors: List<EvalError>,
+        val errors: List<Error>,
     )
 
     suspend fun compile(src: String): Result {

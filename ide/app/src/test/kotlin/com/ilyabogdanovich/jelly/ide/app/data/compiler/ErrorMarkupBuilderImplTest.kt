@@ -2,7 +2,7 @@ package com.ilyabogdanovich.jelly.ide.app.data.compiler
 
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.SourceMarkup
-import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
+import com.ilyabogdanovich.jelly.jcc.core.Error
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 
@@ -21,17 +21,17 @@ class ErrorMarkupBuilderImplTest {
             lineStarts = listOf(0, 6, 12),
             lineLengths = listOf(5, 5, 5),
         )
-        val evalErrors = listOf(
-            EvalError(
-                start = EvalError.TokenPosition(line = 2, positionInLine = 2),
+        val errors = listOf(
+            Error(
+                start = Error.TokenPosition(line = 2, positionInLine = 2),
                 stop = null,
                 expression = "",
-                type = EvalError.Type.SyntaxError,
+                type = Error.Type.SyntaxError,
             )
         )
 
         // Do
-        val result = builder.buildMarkup(sourceMarkup, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, errors)
 
         // Check
         result shouldBe ErrorMarkup(errors = listOf(ErrorMarkup.Underline(line = 1, start = 8, stop = 11)))
@@ -44,17 +44,17 @@ class ErrorMarkupBuilderImplTest {
             lineStarts = listOf(0, 6, 12),
             lineLengths = listOf(5, 5, 5),
         )
-        val evalErrors = listOf(
-            EvalError(
-                start = EvalError.TokenPosition(line = 5, positionInLine = 2),
+        val errors = listOf(
+            Error(
+                start = Error.TokenPosition(line = 5, positionInLine = 2),
                 stop = null,
                 expression = "",
-                type = EvalError.Type.SyntaxError,
+                type = Error.Type.SyntaxError,
             )
         )
 
         // Do
-        val result = builder.buildMarkup(sourceMarkup, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, errors)
 
         // Check
         result shouldBe ErrorMarkup.empty()
@@ -67,17 +67,17 @@ class ErrorMarkupBuilderImplTest {
             lineStarts = listOf(0, 6, 12),
             lineLengths = listOf(5, 5, 5),
         )
-        val evalErrors = listOf(
-            EvalError(
-                start = EvalError.TokenPosition(line = 2, positionInLine = 2),
-                stop = EvalError.TokenPosition(line = 2, positionInLine = 3),
+        val errors = listOf(
+            Error(
+                start = Error.TokenPosition(line = 2, positionInLine = 2),
+                stop = Error.TokenPosition(line = 2, positionInLine = 3),
                 expression = "",
-                type = EvalError.Type.SyntaxError,
+                type = Error.Type.SyntaxError,
             )
         )
 
         // Do
-        val result = builder.buildMarkup(sourceMarkup, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, errors)
 
         // Check
         result shouldBe ErrorMarkup(errors = listOf(ErrorMarkup.Underline(line = 1, start = 8, stop = 10)))
@@ -90,17 +90,17 @@ class ErrorMarkupBuilderImplTest {
             lineStarts = listOf(0, 6, 12),
             lineLengths = listOf(5, 5, 5),
         )
-        val evalErrors = listOf(
-            EvalError(
-                start = EvalError.TokenPosition(line = 5, positionInLine = 2),
-                stop = EvalError.TokenPosition(line = 5, positionInLine = 3),
+        val errors = listOf(
+            Error(
+                start = Error.TokenPosition(line = 5, positionInLine = 2),
+                stop = Error.TokenPosition(line = 5, positionInLine = 3),
                 expression = "",
-                type = EvalError.Type.SyntaxError,
+                type = Error.Type.SyntaxError,
             )
         )
 
         // Do
-        val result = builder.buildMarkup(sourceMarkup, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, errors)
 
         // Check
         result shouldBe ErrorMarkup.empty()
@@ -113,17 +113,17 @@ class ErrorMarkupBuilderImplTest {
             lineStarts = listOf(0, 6, 12),
             lineLengths = listOf(5, 5, 5),
         )
-        val evalErrors = listOf(
-            EvalError(
-                start = EvalError.TokenPosition(line = 2, positionInLine = 2),
-                stop = EvalError.TokenPosition(line = 3, positionInLine = 4),
+        val errors = listOf(
+            Error(
+                start = Error.TokenPosition(line = 2, positionInLine = 2),
+                stop = Error.TokenPosition(line = 3, positionInLine = 4),
                 expression = "",
-                type = EvalError.Type.SyntaxError,
+                type = Error.Type.SyntaxError,
             )
         )
 
         // Do
-        val result = builder.buildMarkup(sourceMarkup, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, errors)
 
         // Check
         result shouldBe ErrorMarkup(
@@ -141,17 +141,17 @@ class ErrorMarkupBuilderImplTest {
             lineStarts = listOf(0, 6, 12, 24),
             lineLengths = listOf(5, 5, 11, 5),
         )
-        val evalErrors = listOf(
-            EvalError(
-                start = EvalError.TokenPosition(line = 2, positionInLine = 3),
-                stop = EvalError.TokenPosition(line = 4, positionInLine = 1),
+        val errors = listOf(
+            Error(
+                start = Error.TokenPosition(line = 2, positionInLine = 3),
+                stop = Error.TokenPosition(line = 4, positionInLine = 1),
                 expression = "",
-                type = EvalError.Type.SyntaxError,
+                type = Error.Type.SyntaxError,
             )
         )
 
         // Do
-        val result = builder.buildMarkup(sourceMarkup, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, errors)
 
         // Check
         result shouldBe ErrorMarkup(
@@ -170,17 +170,17 @@ class ErrorMarkupBuilderImplTest {
             lineStarts = listOf(0, 6, 12, 24, 41),
             lineLengths = listOf(5, 5, 11, 16, 5),
         )
-        val evalErrors = listOf(
-            EvalError(
-                start = EvalError.TokenPosition(line = 2, positionInLine = 3),
-                stop = EvalError.TokenPosition(line = 5, positionInLine = 1),
+        val errors = listOf(
+            Error(
+                start = Error.TokenPosition(line = 2, positionInLine = 3),
+                stop = Error.TokenPosition(line = 5, positionInLine = 1),
                 expression = "",
-                type = EvalError.Type.SyntaxError,
+                type = Error.Type.SyntaxError,
             )
         )
 
         // Do
-        val result = builder.buildMarkup(sourceMarkup, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, errors)
 
         // Check
         result shouldBe ErrorMarkup(
@@ -200,17 +200,17 @@ class ErrorMarkupBuilderImplTest {
             lineStarts = listOf(0, 6),
             lineLengths = listOf(5, 5),
         )
-        val evalErrors = listOf(
-            EvalError(
-                start = EvalError.TokenPosition(line = 2, positionInLine = 3),
-                stop = EvalError.TokenPosition(line = 5, positionInLine = 1),
+        val errors = listOf(
+            Error(
+                start = Error.TokenPosition(line = 2, positionInLine = 3),
+                stop = Error.TokenPosition(line = 5, positionInLine = 1),
                 expression = "",
-                type = EvalError.Type.SyntaxError,
+                type = Error.Type.SyntaxError,
             )
         )
 
         // Do
-        val result = builder.buildMarkup(sourceMarkup, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, errors)
 
         // Check
         result shouldBe ErrorMarkup(
@@ -227,23 +227,23 @@ class ErrorMarkupBuilderImplTest {
             lineStarts = listOf(0),
             lineLengths = listOf(16),
         )
-        val evalErrors = listOf(
-            EvalError(
-                start = EvalError.TokenPosition(line = 1, positionInLine = 3),
-                stop = EvalError.TokenPosition(line = 1, positionInLine = 3),
+        val errors = listOf(
+            Error(
+                start = Error.TokenPosition(line = 1, positionInLine = 3),
+                stop = Error.TokenPosition(line = 1, positionInLine = 3),
                 expression = "",
-                type = EvalError.Type.SyntaxError,
+                type = Error.Type.SyntaxError,
             ),
-            EvalError(
-                start = EvalError.TokenPosition(line = 1, positionInLine = 7),
-                stop = EvalError.TokenPosition(line = 1, positionInLine = 8),
+            Error(
+                start = Error.TokenPosition(line = 1, positionInLine = 7),
+                stop = Error.TokenPosition(line = 1, positionInLine = 8),
                 expression = "",
-                type = EvalError.Type.SyntaxError,
+                type = Error.Type.SyntaxError,
             )
         )
 
         // Do
-        val result = builder.buildMarkup(sourceMarkup, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, errors)
 
         // Check
         result shouldBe ErrorMarkup(
@@ -261,23 +261,23 @@ class ErrorMarkupBuilderImplTest {
             lineStarts = listOf(0),
             lineLengths = listOf(16),
         )
-        val evalErrors = listOf(
-            EvalError(
-                start = EvalError.TokenPosition(line = 1, positionInLine = 5),
-                stop = EvalError.TokenPosition(line = 1, positionInLine = 5),
+        val errors = listOf(
+            Error(
+                start = Error.TokenPosition(line = 1, positionInLine = 5),
+                stop = Error.TokenPosition(line = 1, positionInLine = 5),
                 expression = "",
-                type = EvalError.Type.SyntaxError,
+                type = Error.Type.SyntaxError,
             ),
-            EvalError(
-                start = EvalError.TokenPosition(line = 1, positionInLine = 3),
-                stop = EvalError.TokenPosition(line = 1, positionInLine = 8),
+            Error(
+                start = Error.TokenPosition(line = 1, positionInLine = 3),
+                stop = Error.TokenPosition(line = 1, positionInLine = 8),
                 expression = "",
-                type = EvalError.Type.SyntaxError,
+                type = Error.Type.SyntaxError,
             )
         )
 
         // Do
-        val result = builder.buildMarkup(sourceMarkup, evalErrors)
+        val result = builder.buildMarkup(sourceMarkup, errors)
 
         // Check
         result shouldBe ErrorMarkup(

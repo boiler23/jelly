@@ -1,10 +1,10 @@
-package com.ilyabogdanovich.jelly.jcc.core.eval
+package com.ilyabogdanovich.jelly.jcc.core
 
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
 
 /**
- * Holds inofrmation of an error, that can happen during the expression evaluation.
+ * Holds inofrmation of all errors, that can happen during any phase of the source code compilation.
  * @property start start token position of the error occurance.
  * @property stop stop token position of the error occurance.
  * @property expression expression that caused the error.
@@ -12,7 +12,7 @@ import org.antlr.v4.runtime.Token
  *
  * @author Ilya Bogdanovich on 09.10.2023
  */
-data class EvalError(
+data class Error(
     val start: TokenPosition,
     val stop: TokenPosition?,
     private val expression: String,
@@ -30,7 +30,7 @@ data class EvalError(
      */
     enum class Type {
         /**
-         * Syntax error happened.
+         * Syntax error. Details are written in the expression.
          */
         SyntaxError,
 
@@ -239,12 +239,12 @@ data class EvalError(
 }
 
 private fun Token.toPosition() =
-    EvalError.TokenPosition(line = line, positionInLine = charPositionInLine)
+    Error.TokenPosition(line = line, positionInLine = charPositionInLine)
 
-internal fun ParserRuleContext.toError(type: EvalError.Type, expression: String? = null): EvalError {
+internal fun ParserRuleContext.toError(type: Error.Type, expression: String? = null): Error {
     val startToken = getStart()
     val stopToken = getStop()
-    return EvalError(
+    return Error(
         start = startToken.toPosition(),
         stop = stopToken?.toPosition(),
         expression = expression ?: text,

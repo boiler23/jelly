@@ -1,7 +1,7 @@
 package com.ilyabogdanovich.jelly.jcc.core.parse
 
+import com.ilyabogdanovich.jelly.jcc.core.Error
 import com.ilyabogdanovich.jelly.jcc.core.antlr.JccParser
-import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
 
 /**
  * Holds the results of lexer/parser phases, done via ANTLR.
@@ -14,6 +14,6 @@ import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
  */
 class ParseResult(
     val tree: JccParser.ProgramContext,
-    val syntaxErrors: List<EvalError>,
+    val syntaxErrors: List<Error>,
     val ruleNames: Array<String>,
 )

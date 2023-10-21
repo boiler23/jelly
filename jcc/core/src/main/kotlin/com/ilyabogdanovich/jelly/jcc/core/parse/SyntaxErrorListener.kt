@@ -1,6 +1,6 @@
 package com.ilyabogdanovich.jelly.jcc.core.parse
 
-import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
+import com.ilyabogdanovich.jelly.jcc.core.Error
 import org.antlr.v4.runtime.ANTLRErrorListener
 import org.antlr.v4.runtime.Parser
 import org.antlr.v4.runtime.RecognitionException
@@ -18,7 +18,7 @@ internal class SyntaxErrorListener : ANTLRErrorListener {
     /**
      * Holds the list of collected errors.
      */
-    val errors = mutableListOf<EvalError>()
+    val errors = mutableListOf<Error>()
 
     /**
      * Upon syntax error, notify any interested parties.
@@ -32,11 +32,11 @@ internal class SyntaxErrorListener : ANTLRErrorListener {
         e: RecognitionException?
     ) {
         errors.add(
-            EvalError(
-                start = EvalError.TokenPosition(line = line, positionInLine = charPositionInLine),
+            Error(
+                start = Error.TokenPosition(line = line, positionInLine = charPositionInLine),
                 stop = null,
                 expression = message ?: "",
-                type = EvalError.Type.SyntaxError,
+                type = Error.Type.SyntaxError,
             )
         )
     }

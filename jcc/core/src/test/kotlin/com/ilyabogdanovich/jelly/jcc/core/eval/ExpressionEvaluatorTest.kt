@@ -1,5 +1,6 @@
 package com.ilyabogdanovich.jelly.jcc.core.eval
 
+import com.ilyabogdanovich.jelly.jcc.core.Error
 import com.ilyabogdanovich.jelly.jcc.core.antlr.JccParser.ExpressionContext
 import com.ilyabogdanovich.jelly.jcc.core.antlr.JccParser.IdentifierContext
 import com.ilyabogdanovich.jelly.jcc.core.antlr.JccParser.MapContext
@@ -81,11 +82,11 @@ class ExpressionEvaluatorTest {
         val result = evaluator.evaluateExpression(EvalContext(), parserContext)
 
         // Check
-        result shouldBe EvalError(
-            start = EvalError.TokenPosition(line = 3, positionInLine = 14),
-            stop = EvalError.TokenPosition(line = 4, positionInLine = 25),
+        result shouldBe Error(
+            start = Error.TokenPosition(line = 3, positionInLine = 14),
+            stop = Error.TokenPosition(line = 4, positionInLine = 25),
             expression = "12i+56",
-            type = EvalError.Type.InvalidNumber
+            type = Error.Type.InvalidNumber
         ).asLeft()
     }
 
@@ -133,11 +134,11 @@ class ExpressionEvaluatorTest {
         val result = evaluator.evaluateExpression(EvalContext(), parserContext)
 
         // Check
-        result shouldBe EvalError(
-            start = EvalError.TokenPosition(line = 3, positionInLine = 14),
-            stop = EvalError.TokenPosition(line = 4, positionInLine = 25),
+        result shouldBe Error(
+            start = Error.TokenPosition(line = 3, positionInLine = 14),
+            stop = Error.TokenPosition(line = 4, positionInLine = 25),
             expression = "id",
-            type = EvalError.Type.UndeclaredVariable
+            type = Error.Type.UndeclaredVariable
         ).asLeft()
     }
 
@@ -300,11 +301,11 @@ class ExpressionEvaluatorTest {
         val result = evaluator.evaluateExpression(EvalContext(), parserContext)
 
         // Check
-        result shouldBe EvalError(
-            start = EvalError.TokenPosition(line = 2, positionInLine = 12),
-            stop = EvalError.TokenPosition(line = 3, positionInLine = 14),
+        result shouldBe Error(
+            start = Error.TokenPosition(line = 2, positionInLine = 12),
+            stop = Error.TokenPosition(line = 3, positionInLine = 14),
             expression = "expr_text",
-            type = EvalError.Type.UnsupportedExpression
+            type = Error.Type.UnsupportedExpression
         ).asLeft()
     }
 }
