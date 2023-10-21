@@ -71,7 +71,9 @@ DOT: '.';
 
 // Integers
 fragment DIGIT: [0-9];
-NUMBER: (DIGIT+[.]*DIGIT*|DIGIT*[.]*DIGIT+);
+fragment DECIMAL: (DIGIT+[.]*DIGIT*|DIGIT*[.]*DIGIT+);
+fragment SCIENTIFIC: DECIMAL[e][-|+]?DIGIT+;
+NUMBER: (DECIMAL|SCIENTIFIC);
 
 // Variable names
 NAME: [a-zA-Z|_][a-zA-Z0-9|_]*;

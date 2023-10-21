@@ -31,7 +31,7 @@ class VarPrinter {
                 r.isNaN() -> "NaN"
                 else -> {
                     val bd = BigDecimal(r)
-                    bd.setScale(9, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
+                    bd.setScale(9, RoundingMode.HALF_UP).stripTrailingZeros().toString()
                 }
             }
         }

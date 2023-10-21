@@ -62,6 +62,78 @@ class VarPrinterTest {
     }
 
     @Test
+    fun `print double with trimmed fraction`() {
+        // Prepare
+        val variable = 3.14159265359.toVar()
+
+        // Do
+        val result = printer.print(variable)
+
+        // Check
+        result shouldBe "3.141592654"
+    }
+
+    @Test
+    fun `print double - scale down too large`() {
+        // Prepare
+        val variable = 0.0000000001.toVar()
+
+        // Do
+        val result = printer.print(variable)
+
+        // Check
+        result shouldBe "0"
+    }
+
+    @Test
+    fun `print double - scale up too large`() {
+        // Prepare
+        val variable = 10000000000.0.toVar()
+
+        // Do
+        val result = printer.print(variable)
+
+        // Check
+        result shouldBe "1E+10"
+    }
+
+    @Test
+    fun `print double scientific`() {
+        // Prepare
+        val variable = 1e+6.toVar()
+
+        // Do
+        val result = printer.print(variable)
+
+        // Check
+        result shouldBe "1E+6"
+    }
+
+    @Test
+    fun `print double scientific - scale down too large`() {
+        // Prepare
+        val variable = 1E-15.toVar()
+
+        // Do
+        val result = printer.print(variable)
+
+        // Check
+        result shouldBe "0"
+    }
+
+    @Test
+    fun `print double scientific - scale up too large`() {
+        // Prepare
+        val variable = 1E+15.toVar()
+
+        // Do
+        val result = printer.print(variable)
+
+        // Check
+        result shouldBe "1E+15"
+    }
+
+    @Test
     fun `print positive infinity`() {
         // Prepare
         val variable = Double.POSITIVE_INFINITY.toVar()
