@@ -10,6 +10,7 @@ import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationServiceClien
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.Document
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentRepository
+import com.ilyabogdanovich.jelly.ide.app.presentation.compiler.CompilationStatus
 import com.ilyabogdanovich.jelly.logging.EmptyLoggerFactory
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -44,7 +45,7 @@ class AppViewModelTest {
     )
 
     @Test
-    fun `compile on new source text`() = runTest(dispatcher) {
+    fun `compile on new source text - success`() = runTest(dispatcher) {
         // Prepare
         val errorMarkup = ErrorMarkup(listOf(ErrorMarkup.Underline(1, 1, 1)))
         val errorMessages = listOf(
@@ -69,8 +70,27 @@ class AppViewModelTest {
         viewModel.errorMarkup shouldBe errorMarkup
         viewModel.errorMessages shouldBe errorMessages
         viewModel.resultOutput shouldBe "output"
-        viewModel.compilationTimeOutput shouldBe "1.5"
-        viewModel.compilationInProgress shouldBe false
+        viewModel.compilationStatus shouldBe CompilationStatus.Done(1500.milliseconds)
+    }
+
+    @Test
+    fun `compile on new source text - exception`() = runTest(dispatcher) {
+        // Prepare
+        val exception = OutOfMemoryError("Failed to allocate")
+        coEvery { compilationServiceClient.compile("text") } throws exception
+
+        // Do
+        scope.launch { viewModel.processCompilationRequests() }
+        viewModel.notifySourceInputChanged(TextFieldValue("text"))
+
+        // Check
+        coVerifySequence {
+            compilationServiceClient.compile("text")
+        }
+        viewModel.errorMarkup shouldBe ErrorMarkup.empty()
+        viewModel.errorMessages shouldBe listOf()
+        viewModel.resultOutput shouldBe ""
+        viewModel.compilationStatus shouldBe CompilationStatus.Exception(exception)
     }
 
     @Test
@@ -102,6 +122,7 @@ class AppViewModelTest {
         // Check
         viewModel.errorMarkup shouldBe ErrorMarkup.empty()
         viewModel.sourceInput shouldBe TextFieldValue("new text")
+        viewModel.compilationStatus shouldBe CompilationStatus.InProgress
     }
 
     @Test
@@ -117,6 +138,7 @@ class AppViewModelTest {
         // Check
         viewModel.errorMarkup shouldBe markup
         viewModel.sourceInput shouldBe TextFieldValue("text")
+        viewModel.compilationStatus shouldBe CompilationStatus.Empty
     }
 
     @Test
@@ -149,8 +171,7 @@ class AppViewModelTest {
         viewModel.errorMarkup shouldBe errorMarkup
         viewModel.errorMessages shouldBe errorMessages
         viewModel.resultOutput shouldBe "out"
-        viewModel.compilationTimeOutput shouldBe "1.0"
-        viewModel.compilationInProgress shouldBe false
+        viewModel.compilationStatus shouldBe CompilationStatus.Done(1000.milliseconds)
         viewModel.splashScreenVisible shouldBe false
     }
 

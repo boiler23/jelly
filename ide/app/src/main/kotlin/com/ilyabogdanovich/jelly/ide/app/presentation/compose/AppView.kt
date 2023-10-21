@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.ilyabogdanovich.jelly.ide.app.domain.DeepLink
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationResults
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
+import com.ilyabogdanovich.jelly.ide.app.presentation.compiler.CompilationStatus
 import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.AppTheme
 
 /**
@@ -36,8 +37,7 @@ fun App(
     resultOutput: String,
     navigationEffect: Any,
     errorMessages: List<CompilationResults.ErrorMessage>,
-    compilationTimeOutput: String,
-    compilationInProgress: Boolean,
+    compilationStatus: CompilationStatus,
     onSourceInputChanged: (TextFieldValue) -> Unit,
     onDeepLinkClicked: (DeepLink) -> Unit,
 ) {
@@ -53,8 +53,7 @@ fun App(
                     resultOutput = resultOutput,
                     navigationEffect = navigationEffect,
                     errorMessages = errorMessages,
-                    compilationTimeOutput = compilationTimeOutput,
-                    compilationInProgress = compilationInProgress,
+                    compilationStatus = compilationStatus,
                     onSourceInputChanged = onSourceInputChanged,
                     onDeepLinkClicked = onDeepLinkClicked,
                 )
@@ -71,8 +70,7 @@ fun AppView(
     resultOutput: String,
     navigationEffect: Any,
     errorMessages: List<CompilationResults.ErrorMessage>,
-    compilationTimeOutput: String,
-    compilationInProgress: Boolean,
+    compilationStatus: CompilationStatus,
     onSourceInputChanged: (TextFieldValue) -> Unit,
     onDeepLinkClicked: (DeepLink) -> Unit,
 ) {
@@ -93,7 +91,7 @@ fun AppView(
                 onDeepLinkClicked = onDeepLinkClicked,
             )
         }
-        CompilationStatus(compilationTimeOutput, compilationInProgress)
+        CompilationStatusPanel(compilationStatus)
     }
 }
 
@@ -123,8 +121,7 @@ fun App_Preview() {
                 DeepLink.Cursor(position = 5)
             )
         ),
-        compilationTimeOutput = "Compiling...",
-        compilationInProgress = true,
+        compilationStatus = CompilationStatus.InProgress,
         onSourceInputChanged = {},
         onDeepLinkClicked = {},
     )

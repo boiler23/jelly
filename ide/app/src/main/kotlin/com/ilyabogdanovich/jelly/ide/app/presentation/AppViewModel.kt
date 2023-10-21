@@ -12,8 +12,10 @@ import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationServiceClien
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.Document
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentRepository
+import com.ilyabogdanovich.jelly.ide.app.presentation.compiler.CompilationStatus
 import com.ilyabogdanovich.jelly.logging.LoggerFactory
 import com.ilyabogdanovich.jelly.logging.get
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -35,8 +37,7 @@ class AppViewModel(
     var resultOutput by mutableStateOf("")
     var navigationEffect by mutableStateOf(Any())
     var errorMessages by mutableStateOf(listOf<CompilationResults.ErrorMessage>())
-    var compilationTimeOutput by mutableStateOf("")
-    var compilationInProgress by mutableStateOf(false)
+    var compilationStatus by mutableStateOf<CompilationStatus>(CompilationStatus.Empty)
 
     private val documentUpdates = MutableSharedFlow<Document>(
         extraBufferCapacity = 1,
@@ -69,6 +70,7 @@ class AppViewModel(
         if (newInput != oldInput) {
             logger.d { "source input changed" }
             errorMarkup = ErrorMarkup.empty()
+            compilationStatus = CompilationStatus.InProgress
             compilationRequests.tryEmit(newInput)
             documentUpdates.tryEmit(Document(newInput))
         }
@@ -90,14 +92,19 @@ class AppViewModel(
     }
 
     @WorkerThread
+    @Suppress("TooGenericExceptionCaught")
     suspend fun processCompilationRequests() = compilationRequests.collectLatest {
         logger.d { "compiling input" }
-        compilationInProgress = true
-        val compilationResults = compilationServiceClient.compile(it)
-        compilationInProgress = false
-        errorMarkup = compilationResults.errorMarkup
-        resultOutput = compilationResults.out
-        errorMessages = compilationResults.errors
-        compilationTimeOutput = (compilationResults.duration.inWholeMilliseconds / 1000.0).toString()
+        try {
+            val compilationResults = compilationServiceClient.compile(it)
+            compilationStatus = CompilationStatus.Done(compilationResults.duration)
+            errorMarkup = compilationResults.errorMarkup
+            resultOutput = compilationResults.out
+            errorMessages = compilationResults.errors
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Throwable) {
+            compilationStatus = CompilationStatus.Exception(e)
+        }
     }
 }

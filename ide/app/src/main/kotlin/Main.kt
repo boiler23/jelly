@@ -47,8 +47,7 @@ fun main() {
                 resultOutput = viewModel.resultOutput,
                 navigationEffect = viewModel.navigationEffect,
                 errorMessages = viewModel.errorMessages,
-                compilationTimeOutput = viewModel.compilationTimeOutput,
-                compilationInProgress = viewModel.compilationInProgress,
+                compilationStatus = viewModel.compilationStatus,
                 onSourceInputChanged = viewModel::notifySourceInputChanged,
                 onDeepLinkClicked = viewModel::notifyDeepLinkClicked,
             )
