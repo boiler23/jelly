@@ -25,12 +25,12 @@ import kotlinx.coroutines.flow.collectLatest
  *
  * @author Ilya Bogdanovich on 11.10.2023
  */
-class AppViewModel(
+class MainViewModel(
     private val compilationServiceClient: CompilationServiceClient,
     private val documentRepository: DocumentRepository,
     loggerFactory: LoggerFactory
 ) {
-    private val logger = loggerFactory.get<AppViewModel>()
+    private val logger = loggerFactory.get<MainViewModel>()
     var splashScreenVisible by mutableStateOf(true)
     var sourceInput by mutableStateOf(TextFieldValue(""))
     var errorMarkup by mutableStateOf(ErrorMarkup.empty())

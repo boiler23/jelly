@@ -30,7 +30,7 @@ import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.AppTheme
  */
 @Composable
 @Suppress("LongParameterList")
-fun App(
+fun MainView(
     splashScreenVisible: Boolean,
     sourceInput: TextFieldValue,
     errorMarkup: ErrorMarkup,
@@ -47,7 +47,7 @@ fun App(
                 SplashScreen()
             }
             AnimatedVisibility(!splashScreenVisible, enter = fadeIn(), exit = fadeOut()) {
-                AppView(
+                MainViewContent(
                     sourceInput = sourceInput,
                     errorMarkup = errorMarkup,
                     resultOutput = resultOutput,
@@ -64,7 +64,7 @@ fun App(
 
 @Composable
 @Suppress("LongParameterList")
-fun AppView(
+private fun MainViewContent(
     sourceInput: TextFieldValue,
     errorMarkup: ErrorMarkup,
     resultOutput: String,
@@ -97,8 +97,8 @@ fun AppView(
 
 @Composable
 @Preview
-fun App_Preview() {
-    App(
+fun MainView_Preview() {
+    MainView(
         splashScreenVisible = false,
         sourceInput = TextFieldValue(
             """

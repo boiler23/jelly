@@ -27,18 +27,18 @@ import org.junit.Test
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * Test for [AppViewModel]
+ * Test for [MainViewModel]
  *
  * @author Ilya Bogdanovich on 11.10.2023
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppViewModelTest {
+class MainViewModelTest {
     private val compilationServiceClient = mockk<CompilationServiceClient>()
     private val documentRepository = mockk<DocumentRepository>()
     private val dispatcher = UnconfinedTestDispatcher()
     private val scope = TestScope(dispatcher)
 
-    private val viewModel = AppViewModel(
+    private val viewModel = MainViewModel(
         compilationServiceClient,
         documentRepository,
         EmptyLoggerFactory,

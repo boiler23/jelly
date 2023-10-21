@@ -1,12 +1,11 @@
-import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.ilyabogdanovich.jelly.ide.app.data.compiler.CompilationServiceClientImpl
 import com.ilyabogdanovich.jelly.ide.app.data.compiler.ErrorListBuilderImpl
 import com.ilyabogdanovich.jelly.ide.app.data.compiler.ErrorMarkupBuilderImpl
 import com.ilyabogdanovich.jelly.ide.app.data.compiler.OutputTrimmerImpl
 import com.ilyabogdanovich.jelly.ide.app.data.documents.DocumentRepositoryImpl
-import com.ilyabogdanovich.jelly.ide.app.presentation.AppViewModel
-import com.ilyabogdanovich.jelly.ide.app.presentation.compose.App
+import com.ilyabogdanovich.jelly.ide.app.presentation.MainViewModel
+import com.ilyabogdanovich.jelly.ide.app.presentation.compose.MainWindow
 import com.ilyabogdanovich.jelly.jcc.core.di.CompilationServiceApi
 import com.ilyabogdanovich.jelly.logging.DefaultLoggerFactory
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +30,7 @@ fun main() {
     val compilationServiceClient =
         CompilationServiceClientImpl(compilationService, outputTrimmer, errorListBuilder, errorMarkupBuilder)
     val documentRepository = DocumentRepositoryImpl(FileSystem.SYSTEM, DefaultLoggerFactory)
-    val viewModel = AppViewModel(compilationServiceClient, documentRepository, DefaultLoggerFactory)
+    val viewModel = MainViewModel(compilationServiceClient, documentRepository, DefaultLoggerFactory)
     // di block end
 
     // launch view model event processing
@@ -40,19 +39,5 @@ fun main() {
     scope.launch { viewModel.startApp() }
 
     // launch application UI
-    application {
-        Window(onCloseRequest = ::exitApplication) {
-            App(
-                splashScreenVisible = viewModel.splashScreenVisible,
-                sourceInput = viewModel.sourceInput,
-                errorMarkup = viewModel.errorMarkup,
-                resultOutput = viewModel.resultOutput,
-                navigationEffect = viewModel.navigationEffect,
-                errorMessages = viewModel.errorMessages,
-                compilationStatus = viewModel.compilationStatus,
-                onSourceInputChanged = viewModel::notifySourceInputChanged,
-                onDeepLinkClicked = viewModel::notifyDeepLinkClicked,
-            )
-        }
-    }
+    application { MainWindow(viewModel) }
 }
