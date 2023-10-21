@@ -65,7 +65,12 @@ internal class ExpressionEvaluator {
         return evaluateToInt(evalContext, lower, Error.Type.SequenceStartIsNotInteger).mapEitherRight { start ->
             evaluateToInt(evalContext, upper, Error.Type.SequenceStopIsNotInteger).mapEitherRight { end ->
                 if (start <= end) {
-                    Var.SeqVar(Seq.fromBounds(from = start, to = end)).asRight()
+                    val length = end - start
+                    if (length <= MAX_SEQUENCE_LENGTH) {
+                        Var.SeqVar(Seq.fromBounds(from = start, to = end)).asRight()
+                    } else {
+                        toError(Error.Type.SequenceTooLong, expression = "$length > $MAX_SEQUENCE_LENGTH").asLeft()
+                    }
                 } else {
                     toError(Error.Type.SequenceInvalidBounds, expression = "$start > $end").asLeft()
                 }
@@ -234,3 +239,6 @@ internal class ExpressionEvaluator {
         }
     }
 }
+
+// maximum supported sequence length
+private const val MAX_SEQUENCE_LENGTH = 200_000_000

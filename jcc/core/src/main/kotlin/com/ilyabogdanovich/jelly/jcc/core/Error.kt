@@ -70,6 +70,11 @@ data class Error(
         SequenceInvalidBounds,
 
         /**
+         * Sequence exceeds maximum supported length.
+         */
+        SequenceTooLong,
+
+        /**
          * Left operand is missing in an arithmetic operation.
          */
         MissingLeftOperand,
@@ -216,6 +221,7 @@ data class Error(
             Type.MissingSequenceLowerBound -> "Missing sequence's lower bound: '$expression'"
             Type.MissingSequenceUpperBound -> "Missing sequence's upper bound: '$expression'"
             Type.SequenceInvalidBounds -> "Sequence's upper bound is less than lower bound: $expression"
+            Type.SequenceTooLong -> "Sequence's length is exceeding the limits: $expression"
             Type.MissingLeftOperand -> "Missing left operand: '$expression'"
             Type.MissingRightOperand -> "Missing right operand: '$expression'"
             Type.MissingUnaryOperand -> "Missing unary operand: '$expression'"

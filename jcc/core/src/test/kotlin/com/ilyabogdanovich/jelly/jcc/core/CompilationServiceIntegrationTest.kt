@@ -264,6 +264,8 @@ class CompilationServiceIntegrationTest(
             arrayOf("out {2,5/2}", "", listOf("line 1:7: Sequence's end is expected to be an integer: '5/2'.")),
             arrayOf("out {1.5,2}", "", listOf("line 1:5: Sequence's begin is expected to be an integer: '1.5'.")),
             arrayOf("out {1,2.5}", "", listOf("line 1:7: Sequence's end is expected to be an integer: '2.5'.")),
+            arrayOf("var seq = {0,200000000}", "", empty()),
+            arrayOf("var seq = {0,200000001}", "", listOf("line 1:10: Sequence's length is exceeding the limits: 200000001 > 200000000.")),
             arrayOf(
                 "out {1,5,7}",
                 "{ 1, 2, 3, 4, 5 }",
