@@ -91,6 +91,35 @@ class AppViewModelTest {
     }
 
     @Test
+    fun `clear error markup on new source text - text changed`() {
+        // Prepare
+        viewModel.errorMarkup = ErrorMarkup(listOf(ErrorMarkup.Underline(line = 1, start = 2, stop = 3)))
+        viewModel.sourceInput = TextFieldValue("old text")
+
+        // Do
+        viewModel.notifySourceInputChanged(TextFieldValue("new text"))
+
+        // Check
+        viewModel.errorMarkup shouldBe ErrorMarkup.empty()
+        viewModel.sourceInput shouldBe TextFieldValue("new text")
+    }
+
+    @Test
+    fun `clear error markup on new source text - text not changed`() {
+        // Prepare
+        val markup = ErrorMarkup(listOf(ErrorMarkup.Underline(line = 1, start = 2, stop = 3)))
+        viewModel.errorMarkup = markup
+        viewModel.sourceInput = TextFieldValue("text")
+
+        // Do
+        viewModel.notifySourceInputChanged(TextFieldValue("text"))
+
+        // Check
+        viewModel.errorMarkup shouldBe markup
+        viewModel.sourceInput shouldBe TextFieldValue("text")
+    }
+
+    @Test
     fun `compile on app start`() = runTest(dispatcher) {
         // Prepare
         val errorMarkup = ErrorMarkup(listOf(ErrorMarkup.Underline(1, 1, 1)))

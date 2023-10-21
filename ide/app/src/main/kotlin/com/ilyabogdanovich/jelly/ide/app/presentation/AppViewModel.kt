@@ -68,6 +68,7 @@ class AppViewModel(
     private fun notifySourceInputChangedInternal(newInput: String, oldInput: String) {
         if (newInput != oldInput) {
             logger.d { "source input changed" }
+            errorMarkup = ErrorMarkup.empty()
             compilationRequests.tryEmit(newInput)
             documentUpdates.tryEmit(Document(newInput))
         }
