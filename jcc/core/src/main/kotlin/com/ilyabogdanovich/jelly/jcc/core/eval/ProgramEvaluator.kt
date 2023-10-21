@@ -6,6 +6,8 @@ import com.ilyabogdanovich.jelly.jcc.core.antlr.JccParser
 import com.ilyabogdanovich.jelly.jcc.core.print.VarPrinter
 import com.ilyabogdanovich.jelly.jcc.core.toError
 import com.ilyabogdanovich.jelly.utils.Either
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
 
 /**
  * Helper to evaluate program statements.
@@ -42,7 +44,7 @@ internal class ProgramEvaluator(
         val errors = mutableListOf<Error>()
         var evalContext = EvalContext()
 
-        ctx.statement().forEach { statement ->
+        ctx.statement().asFlow().collect { statement ->
             statement.output()?.let {
                 val outErrors = output.out(it, evalContext)
                 errors.addAll(outErrors)
