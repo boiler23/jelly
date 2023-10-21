@@ -8,6 +8,9 @@ import com.ilyabogdanovich.jelly.utils.asLeft
 import com.ilyabogdanovich.jelly.utils.asRight
 import com.ilyabogdanovich.jelly.utils.mapEitherRight
 import com.ilyabogdanovich.jelly.utils.mapRight
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.isActive
 import org.antlr.v4.runtime.ParserRuleContext
 
 /**
@@ -26,6 +29,10 @@ internal class ExpressionEvaluator {
         evalContext: EvalContext,
         parseContext: JccParser.ExpressionContext
     ): Either<Error, Var> {
+        if (!currentCoroutineContext().isActive) {
+            throw CancellationException()
+        }
+
         return parseContext.ruleContext<JccParser.NumberContext>()?.number()
             ?: parseContext.ruleContext<JccParser.IdentifierContext>()?.id(evalContext)
             ?: parseContext.ruleContext<JccParser.SequenceContext>()?.seq(evalContext)
@@ -199,6 +206,9 @@ internal class ExpressionEvaluator {
 
         return evaluateToSeq(evalContext, seqExpr).mapEitherRight { seq ->
             val result = seq.parallelMap { e ->
+                if (!currentCoroutineContext().isActive) {
+                    throw CancellationException()
+                }
                 when (val localEvalContext = evalContext + mapOf(id to e.toVar())) {
                     is Either.Left -> lambdaExpr.toError(localEvalContext.value).asLeft()
                     is Either.Right ->
@@ -223,6 +233,9 @@ internal class ExpressionEvaluator {
             evaluateToNumber(evalContext, neutralExpr, Error.Type.ReduceNeutralIsNotNumber)
                 .mapEitherRight { neutral ->
                     val result = seq.parallelReduce(neutral) { accumulatorValue, nextValue ->
+                        if (!currentCoroutineContext().isActive) {
+                            throw CancellationException()
+                        }
                         val localEvalContext = evalContext +
                             mapOf(accumulatorId to accumulatorValue.toVar(), nextId to nextValue.toVar())
                         when (localEvalContext) {
