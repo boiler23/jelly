@@ -1,4 +1,4 @@
-package com.ilyabogdanovich.jelly.jcc.core
+package com.ilyabogdanovich.jelly.jcc.core.parse
 
 import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
 import org.antlr.v4.runtime.ANTLRErrorListener

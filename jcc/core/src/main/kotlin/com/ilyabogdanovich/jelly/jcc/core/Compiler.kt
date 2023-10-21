@@ -1,6 +1,5 @@
 package com.ilyabogdanovich.jelly.jcc.core
 
-import com.ilyabogdanovich.jelly.jcc.core.antlr.JccLexer
 import com.ilyabogdanovich.jelly.jcc.core.antlr.JccParser
 import com.ilyabogdanovich.jelly.jcc.core.eval.AssignmentEvaluator
 import com.ilyabogdanovich.jelly.jcc.core.eval.EvalContext
@@ -8,10 +7,9 @@ import com.ilyabogdanovich.jelly.jcc.core.eval.EvalError
 import com.ilyabogdanovich.jelly.jcc.core.eval.ExpressionEvaluator
 import com.ilyabogdanovich.jelly.jcc.core.eval.PrintEvaluator
 import com.ilyabogdanovich.jelly.jcc.core.eval.toError
+import com.ilyabogdanovich.jelly.jcc.core.parse.ParseTreeBuilder
 import com.ilyabogdanovich.jelly.jcc.core.print.VarPrinter
 import com.ilyabogdanovich.jelly.utils.Either
-import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
 
 /**
  * Compiler for our language.
@@ -19,6 +17,8 @@ import org.antlr.v4.runtime.CommonTokenStream
  * @author Ilya Bogdanovich on 08.10.2023
  */
 class Compiler {
+    private val parseTreeBuilder = ParseTreeBuilder()
+
     private class ResultListener {
         val errors = mutableListOf<EvalError>()
         val output = StringBuilder()
@@ -55,16 +55,10 @@ class Compiler {
 
     suspend fun compile(src: String): Result {
         val resultListener = ResultListener()
-        val syntaxErrorListener = SyntaxErrorListener()
-
-        val lexer = JccLexer(CharStreams.fromString(src))
-        lexer.addErrorListener(syntaxErrorListener)
-        val parser = JccParser(CommonTokenStream(lexer))
-        parser.addErrorListener(syntaxErrorListener)
-        val tree = parser.program()
+        val parseTree = parseTreeBuilder.build(src)
 
         var evalContext = EvalContext()
-        tree.statement().forEach { statement ->
+        parseTree.tree.statement().forEach { statement ->
             statement.output()?.let { ctx ->
                 resultListener.out(evalContext, ctx)
             }
@@ -81,7 +75,7 @@ class Compiler {
 
         return Result(
             output = resultListener.output.toString(),
-            errors = (syntaxErrorListener.errors + resultListener.errors)
+            errors = (parseTree.syntaxErrors + resultListener.errors)
                 .sortedWith { o1, o2 ->
                     val compareLines = o1.start.line.compareTo(o2.start.line)
                     if (compareLines == 0) {

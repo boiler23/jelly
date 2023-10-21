@@ -1,4 +1,4 @@
-import com.ilyabogdanovich.jelly.jcc.core.ParseTreeViewer
+import com.ilyabogdanovich.jelly.jcc.core.parse.ParseTreeViewer
 
 fun main() {
     val parseTreeViewer = ParseTreeViewer()
