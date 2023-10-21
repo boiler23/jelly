@@ -3,6 +3,7 @@ import androidx.compose.ui.window.application
 import com.ilyabogdanovich.jelly.ide.app.data.compiler.CompilationServiceClientImpl
 import com.ilyabogdanovich.jelly.ide.app.data.compiler.ErrorListBuilderImpl
 import com.ilyabogdanovich.jelly.ide.app.data.compiler.ErrorMarkupBuilderImpl
+import com.ilyabogdanovich.jelly.ide.app.data.compiler.OutputTrimmerImpl
 import com.ilyabogdanovich.jelly.ide.app.data.documents.DocumentRepositoryImpl
 import com.ilyabogdanovich.jelly.ide.app.presentation.AppViewModel
 import com.ilyabogdanovich.jelly.ide.app.presentation.compose.App
@@ -26,8 +27,9 @@ fun main() {
     val compilationService = CompilationServiceApi.create().compilationService
     val errorListBuilder = ErrorListBuilderImpl()
     val errorMarkupBuilder = ErrorMarkupBuilderImpl()
+    val outputTrimmer = OutputTrimmerImpl()
     val compilationServiceClient =
-        CompilationServiceClientImpl(compilationService, errorListBuilder, errorMarkupBuilder)
+        CompilationServiceClientImpl(compilationService, outputTrimmer, errorListBuilder, errorMarkupBuilder)
     val documentRepository = DocumentRepositoryImpl(FileSystem.SYSTEM, DefaultLoggerFactory)
     val viewModel = AppViewModel(compilationServiceClient, documentRepository, DefaultLoggerFactory)
     // di block end

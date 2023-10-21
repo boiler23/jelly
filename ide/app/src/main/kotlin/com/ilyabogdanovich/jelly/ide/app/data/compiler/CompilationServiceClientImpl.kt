@@ -11,19 +11,20 @@ import kotlin.time.measureTimedValue
  *
  * @author Ilya Bogdanovich on 14.10.2023
  */
-class CompilationServiceClientImpl(
+internal class CompilationServiceClientImpl(
     private val compilationService: CompilationService,
+    private val outputTrimmer: OutputTrimmer,
     private val errorListBuilder: ErrorListBuilder,
     private val errorMarkupBuilder: ErrorMarkupBuilder,
 ) : CompilationServiceClient {
     override suspend fun compile(input: String): CompilationResults {
-        val source = SourceMarkup.from(input)
+        val sourceMarkup = SourceMarkup.from(input)
         val (result, duration) = measureTimedValue { compilationService.compile(input) }
         return CompilationResults(
-            out = result.output,
-            errors = errorListBuilder.build(source, result.errors),
+            out = outputTrimmer.trim(result.output),
+            errors = errorListBuilder.build(sourceMarkup, result.errors),
             duration = duration,
-            errorMarkup = errorMarkupBuilder.buildMarkup(source, result.errors)
+            errorMarkup = errorMarkupBuilder.buildMarkup(sourceMarkup, result.errors)
         )
     }
 }
