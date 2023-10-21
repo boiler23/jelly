@@ -53,7 +53,7 @@ class AssignmentEvaluatorTest {
     }
 
     @Test
-    fun `evaluate - expression evaluated`() = runTest {
+    fun `evaluate - expression evaluated - eval context updated`() = runTest {
         // Prepare
         val name = mockk<TerminalNode> {
             every { text } returns "id"
@@ -65,12 +65,46 @@ class AssignmentEvaluatorTest {
         }
         val variable = mockk<Var>()
         coEvery { expressionEvaluator.evaluateExpression(evalContext, expression) } returns variable.asRight()
+        val newEvalContext = mockk<EvalContext>()
+        every { evalContext + mapOf("id" to variable) } returns newEvalContext.asRight()
 
         // Do
         val result = assignmentEvaluator.evaluate(evalContext, parseContext)
 
         // Check
-        result shouldBe ("id" to variable).asRight()
+        result shouldBe newEvalContext.asRight()
+    }
+
+    @Test
+    fun `evaluate - expression evaluated - eval context update error`() = runTest {
+        // Prepare
+        val name = mockk<TerminalNode> {
+            every { text } returns "id"
+        }
+        val expression = mockk<JccParser.ExpressionContext>()
+        val parseContext = mockk<JccParser.AssignmentContext> {
+            every { getStart() } returns mockk {
+                every { line } returns 1
+                every { charPositionInLine } returns 2
+            }
+            every { getStop() } returns null
+            every { expression() } returns expression
+            every { NAME() } returns name
+        }
+        val variable = mockk<Var>()
+        coEvery { expressionEvaluator.evaluateExpression(evalContext, expression) } returns variable.asRight()
+        every { evalContext + mapOf("id" to variable) } returns EvalError.Type.VariableRedeclaration.asLeft()
+
+        // Do
+        val result = assignmentEvaluator.evaluate(evalContext, parseContext)
+
+        // Check
+        result shouldBe EvalError(
+            start = EvalError.TokenPosition(line = 1, positionInLine = 2),
+            stop = null,
+            expression = "id",
+            type = EvalError.Type.VariableRedeclaration,
+        ).asLeft()
     }
 
     @Test

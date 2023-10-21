@@ -3,6 +3,7 @@ package com.ilyabogdanovich.jelly.jcc.core.eval
 import com.ilyabogdanovich.jelly.jcc.core.antlr.JccParser
 import com.ilyabogdanovich.jelly.utils.Either
 import com.ilyabogdanovich.jelly.utils.asLeft
+import com.ilyabogdanovich.jelly.utils.asRight
 import com.ilyabogdanovich.jelly.utils.mapRight
 
 /**
@@ -20,13 +21,30 @@ class AssignmentEvaluator(private val expressionEvaluator: ExpressionEvaluator) 
     suspend fun evaluate(
         evalContext: EvalContext,
         assignmentContext: JccParser.AssignmentContext
-    ): Either<EvalError, Pair<String, Var>> {
+    ): Either<EvalError, EvalContext> {
         val expression = assignmentContext.expression()
             ?: return assignmentContext.toError(EvalError.Type.MissingVariableAssignment).asLeft()
-        return expressionEvaluator.evaluateExpression(evalContext, expression)
+        val evaluated = expressionEvaluator.evaluateExpression(evalContext, expression)
             .mapRight { variable ->
                 val id = assignmentContext.NAME().text
                 id to variable
             }
+
+        return when (evaluated) {
+            is Either.Left -> {
+                evaluated.value.asLeft()
+            }
+            is Either.Right -> {
+                val (id, variable) = evaluated.value
+                when (val result = evalContext + mapOf(id to variable)) {
+                    is Either.Left -> {
+                        assignmentContext.toError(result.value, expression = assignmentContext.NAME()?.text).asLeft()
+                    }
+                    is Either.Right -> {
+                        result.value.asRight()
+                    }
+                }
+            }
+        }
     }
 }

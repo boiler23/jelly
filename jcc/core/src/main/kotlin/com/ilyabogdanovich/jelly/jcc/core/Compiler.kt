@@ -36,23 +36,9 @@ class Compiler {
         private val printEvaluator = PrintEvaluator()
 
         suspend fun assignment(evalContext: EvalContext, ctx: JccParser.AssignmentContext): EvalContext {
-            return when (val evaluated = assignmentEvaluator.evaluate(evalContext, ctx)) {
-                is Either.Left -> {
-                    errors.add(evaluated.value)
-                    evalContext
-                }
-                is Either.Right -> {
-                    val (id, variable) = evaluated.value
-                    when (val result = evalContext + mapOf(id to variable)) {
-                        is Either.Left -> {
-                            errors.add(ctx.toError(result.value, expression = ctx.NAME()?.text))
-                            evalContext
-                        }
-                        is Either.Right -> {
-                            result.value
-                        }
-                    }
-                }
+            return when (val newEvalContextOrError = assignmentEvaluator.evaluate(evalContext, ctx)) {
+                is Either.Left -> evalContext.also { errors.add(newEvalContextOrError.value) }
+                is Either.Right -> newEvalContextOrError.value
             }
         }
 
