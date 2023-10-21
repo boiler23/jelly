@@ -8,11 +8,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -57,8 +62,23 @@ fun CodeEditor(
     onSourceInputChanged: (TextFieldValue) -> Unit,
 ) {
     var viewportSize by remember { mutableStateOf(IntSize.Zero) }
+    val showSyntaxHelp = remember { mutableStateOf(false) }
     Column(modifier = modifier) {
-        TitleText("Input")
+        Box {
+            TitleText("Input")
+            IconButton(
+                onClick = { showSyntaxHelp.value = true },
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(6.dp)
+                    .size(24.dp)
+            ) {
+                Icon(
+                    Icons.Filled.QuestionMark,
+                    contentDescription = "",
+                )
+            }
+        }
         CodeEditTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -71,6 +91,8 @@ fun CodeEditor(
             onValueChange = { onSourceInputChanged(it) },
         )
     }
+
+    SyntaxHelpDialog(showSyntaxHelp)
 }
 
 @Composable
