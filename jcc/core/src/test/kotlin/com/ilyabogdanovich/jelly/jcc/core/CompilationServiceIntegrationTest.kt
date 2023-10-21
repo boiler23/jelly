@@ -424,7 +424,7 @@ class CompilationServiceIntegrationTest(
                     print "; sin^2(x)+cos^2(x)="
                     out sinx^2+cosx^2
                 """.trimIndent(),
-                "pi=3.141612653; sin(x)=1; cos(x)=-0.00001; sin^2(x)+cos^2(x)=1",
+                "pi=3.14161265319; sin(x)=0.99999999995; cos(x)=-0.0000099998; sin^2(x)+cos^2(x)=1",
                 empty(),
             ),
             arrayOf(
@@ -466,8 +466,8 @@ class CompilationServiceIntegrationTest(
                     Calculating pi, sin(pi/2), cos(pi/2), sin^2(pi/2)+cos^2(pi/2)...
                     Iterations for pi: 500
                     Iterations for sin, cos: 10
-                    pi="3.14358866";
-                    sin(x)=0.999999502;	cos(x)=-0.000998003;
+                    pi="3.143588659586";
+                    sin(x)=0.999999501995;	cos(x)=-0.000998002832;
                     sin^2(x)+cos^2(x)=1
                     Done!
                 """.trimIndent(),

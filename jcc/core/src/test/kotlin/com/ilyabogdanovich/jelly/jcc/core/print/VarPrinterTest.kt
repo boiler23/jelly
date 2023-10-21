@@ -64,19 +64,19 @@ class VarPrinterTest {
     @Test
     fun `print double with trimmed fraction`() {
         // Prepare
-        val variable = 3.14159265359.toVar()
+        val variable = 3.141592653589793.toVar()
 
         // Do
         val result = printer.print(variable)
 
         // Check
-        result shouldBe "3.141592654"
+        result shouldBe "3.14159265359"
     }
 
     @Test
     fun `print double - scale down too large`() {
         // Prepare
-        val variable = 0.0000000001.toVar()
+        val variable = 0.00000000000001.toVar()
 
         // Do
         val result = printer.print(variable)
@@ -88,13 +88,13 @@ class VarPrinterTest {
     @Test
     fun `print double - scale up too large`() {
         // Prepare
-        val variable = 10000000000.0.toVar()
+        val variable = 100000000000000.0.toVar()
 
         // Do
         val result = printer.print(variable)
 
         // Check
-        result shouldBe "1E+10"
+        result shouldBe "1E+14"
     }
 
     @Test
