@@ -6,7 +6,7 @@ import com.ilyabogdanovich.jelly.ide.app.data.compiler.ErrorMarkupBuilderImpl
 import com.ilyabogdanovich.jelly.ide.app.data.documents.DocumentRepositoryImpl
 import com.ilyabogdanovich.jelly.ide.app.presentation.AppViewModel
 import com.ilyabogdanovich.jelly.ide.app.presentation.compose.App
-import com.ilyabogdanovich.jelly.jcc.core.Compiler
+import com.ilyabogdanovich.jelly.jcc.core.di.CompilationServiceApi
 import com.ilyabogdanovich.jelly.logging.DefaultLoggerFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,10 +23,11 @@ fun main() {
 
     // di block begin
     // todo: introduce some DI framework, like Dagger
-    val compiler = Compiler()
+    val compilationService = CompilationServiceApi.create().compilationService
     val errorListBuilder = ErrorListBuilderImpl()
     val errorMarkupBuilder = ErrorMarkupBuilderImpl()
-    val compilationServiceClient = CompilationServiceClientImpl(compiler, errorListBuilder, errorMarkupBuilder)
+    val compilationServiceClient =
+        CompilationServiceClientImpl(compilationService, errorListBuilder, errorMarkupBuilder)
     val documentRepository = DocumentRepositoryImpl(FileSystem.SYSTEM, DefaultLoggerFactory)
     val viewModel = AppViewModel(compilationServiceClient, documentRepository, DefaultLoggerFactory)
     // di block end

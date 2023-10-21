@@ -1,5 +1,5 @@
-import com.ilyabogdanovich.jelly.jcc.core.Compiler
 import com.ilyabogdanovich.jelly.jcc.core.Error
+import com.ilyabogdanovich.jelly.jcc.core.di.CompilationServiceApi
 import com.ilyabogdanovich.jelly.jcc.core.eval.Num
 import com.ilyabogdanovich.jelly.jcc.core.eval.Seq
 import com.ilyabogdanovich.jelly.jcc.core.eval.map
@@ -52,7 +52,7 @@ private suspend fun reduce() {
 }
 
 private suspend fun powerPerformance() {
-    val compiler = Compiler()
+    val compiler = CompilationServiceApi.create().compilationService
     print("Measuring calculate power performance...")
     val time = measureAvgTime {
         compiler.compile(

@@ -1,5 +1,6 @@
 package com.ilyabogdanovich.jelly.jcc.core
 
+import com.ilyabogdanovich.jelly.jcc.core.di.CompilationServiceApi
 import com.ilyabogdanovich.jelly.jcc.core.eval.toVar
 import com.ilyabogdanovich.jelly.jcc.core.print.VarPrinter
 import io.kotest.matchers.shouldBe
@@ -11,17 +12,17 @@ import org.junit.runners.Parameterized
 import java.util.Locale
 
 /**
- * Integration test for [Compiler] components all together.
+ * Integration test for [CompilationServiceApi] components all together.
  *
  * @author Ilya Bogdanovich on 09.10.2023
  */
 @RunWith(Parameterized::class)
-class CompilerTest(
+class CompilationServiceIntegrationTest(
     private val src: String,
     private val output: String,
     private val errors: List<String>,
 ) {
-    private val compiler = Compiler()
+    private val compiler = CompilationServiceApi.create().compilationService
 
     @Before
     fun setUp() {

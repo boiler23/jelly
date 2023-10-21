@@ -1,7 +1,7 @@
-import com.ilyabogdanovich.jelly.jcc.core.parse.ParseTreeViewer
+import com.ilyabogdanovich.jelly.jcc.core.di.CompilationServiceApi
 
 fun main() {
-    val parseTreeViewer = ParseTreeViewer()
+    val parseTreeViewer = CompilationServiceApi.create().parseTreeViewer
     parseTreeViewer.run(
         """
             map({0, 5}, i -> i^2)
