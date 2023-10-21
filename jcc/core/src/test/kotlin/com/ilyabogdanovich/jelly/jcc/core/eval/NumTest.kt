@@ -79,6 +79,50 @@ class NumTest {
         result shouldBe Num.Integer(32)
     }
 
+    @Test
+    fun `int pow int negative`() {
+        // Prepare
+
+        // Do
+        val result = Num.Integer(2).pow(Num.Integer(-5))
+
+        // Check
+        result shouldBe Num.Real(0.03125)
+    }
+
+    @Test
+    fun `int pow int zero zero`() {
+        // Prepare
+
+        // Do
+        val result = Num.Integer(0).pow(Num.Integer(0))
+
+        // Check
+        result shouldBe Num.Integer(1)
+    }
+
+    @Test
+    fun `int pow int zero positive`() {
+        // Prepare
+
+        // Do
+        val result = Num.Integer(0).pow(Num.Integer(2))
+
+        // Check
+        result shouldBe Num.Integer(0)
+    }
+
+    @Test
+    fun `int pow int zero negative`() {
+        // Prepare
+
+        // Do
+        val result = Num.Integer(0).pow(Num.Integer(-2))
+
+        // Check
+        result shouldBe Num.Real(Double.POSITIVE_INFINITY)
+    }
+
     //
     // operations with Int and Real
     //

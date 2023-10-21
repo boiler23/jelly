@@ -1,6 +1,7 @@
 package com.ilyabogdanovich.jelly.jcc.core.eval
 
 import org.apache.commons.math3.util.FastMath
+import kotlin.math.round
 
 /**
  * Represents the evaluated number, either integer or double.
@@ -80,16 +81,36 @@ sealed interface Num {
 
         override operator fun unaryMinus() = Integer(-v)
 
-        override fun pow(n: Num) = when (n) {
-            is Integer -> {
-                when (v) {
-                    1L -> Integer(1L)
-                    -1L -> Integer(if (n.v % 2 == 0L) 1L else -1L)
-                    else -> Integer(FastMath.pow(v.toDouble(), n.v).toLong())
+        override fun pow(n: Num): Num {
+            if (v == 0L) {
+                return if (n.doubleValue < 0.0) {
+                    return Real(Double.POSITIVE_INFINITY)
+                } else if (n.doubleValue > 0.0) {
+                    Integer(0)
+                } else {
+                    Integer(1)
                 }
             }
-            is Real -> {
-                Real(FastMath.pow(v.toDouble(), n.r))
+
+            return when (n) {
+                is Integer -> {
+                    when (v) {
+                        1L -> Integer(1L)
+                        -1L -> Integer(if (n.v % 2 == 0L) 1L else -1L)
+                        else -> {
+                            val res = FastMath.pow(v.toDouble(), n.v)
+                            if (res == round(res)) {
+                                Integer(res.toLong())
+                            } else {
+                                Real(res)
+                            }
+                        }
+                    }
+                }
+
+                is Real -> {
+                    Real(FastMath.pow(v.toDouble(), n.r))
+                }
             }
         }
     }
