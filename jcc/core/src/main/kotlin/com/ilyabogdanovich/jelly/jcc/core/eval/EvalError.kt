@@ -241,7 +241,7 @@ data class EvalError(
 private fun Token.toPosition() =
     EvalError.TokenPosition(line = line, positionInLine = charPositionInLine)
 
-fun ParserRuleContext.toError(type: EvalError.Type, expression: String? = null): EvalError {
+internal fun ParserRuleContext.toError(type: EvalError.Type, expression: String? = null): EvalError {
     val startToken = getStart()
     val stopToken = getStop()
     return EvalError(

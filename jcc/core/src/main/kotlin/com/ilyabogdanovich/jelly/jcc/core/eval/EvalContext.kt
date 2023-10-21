@@ -10,7 +10,7 @@ import com.ilyabogdanovich.jelly.utils.asRight
  *
  * @author Ilya Bogdanovich on 09.10.2023
  */
-class EvalContext(private val vars: Map<String, Var> = mapOf()) {
+internal class EvalContext(private val vars: Map<String, Var> = mapOf()) {
     operator fun get(id: String): Var? = vars[id]
 
     operator fun plus(vars: Map<String, Var>): Either<EvalError.Type, EvalContext> {

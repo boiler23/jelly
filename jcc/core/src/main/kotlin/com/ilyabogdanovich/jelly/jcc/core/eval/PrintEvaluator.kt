@@ -7,7 +7,7 @@ import com.ilyabogdanovich.jelly.jcc.core.antlr.JccParser
  *
  * @author Ilya Bogdanovich on 09.10.2023
  */
-class PrintEvaluator {
+internal class PrintEvaluator {
     /**
      * Evaluates the given printing context and prints the result to the given builder.
      * Special sequences supported: \n - newlines, \t - tabulation. \r is ignored and skipped.

@@ -5,7 +5,7 @@ package com.ilyabogdanovich.jelly.jcc.core.eval
  *
  * @author Ilya Bogdanovich on 09.10.2023
  */
-sealed interface Var {
+internal sealed interface Var {
     /**
      * Represents a numeric variable.
      */
@@ -22,19 +22,19 @@ sealed interface Var {
 /**
  * Helper to create [Var] from [Int].
  */
-fun Int.toVar() = Var.NumVar(this.num)
+internal fun Int.toVar() = Var.NumVar(this.num)
 
 /**
  * Helper to create [Var] from [Long].
  */
-fun Long.toVar() = Var.NumVar(this.num)
+internal fun Long.toVar() = Var.NumVar(this.num)
 
 /**
  * Helper to create [Var] from [Double].
  */
-fun Double.toVar() = Var.NumVar(this.num)
+internal fun Double.toVar() = Var.NumVar(this.num)
 
 /**
  * Helper to create [Var] from [Num].
  */
-fun Num.toVar() = Var.NumVar(this)
+internal fun Num.toVar() = Var.NumVar(this)

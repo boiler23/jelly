@@ -213,4 +213,5 @@ internal fun Int.getParallelChunkSize(maxParallelism: Int): Int {
 /**
  * Helper to create [Seq] from list of [Var]'s.
  */
-fun List<Num>.toSeq() = Seq(asSequence(), size)
+@PublishedApi
+internal fun List<Num>.toSeq() = Seq(asSequence(), size)

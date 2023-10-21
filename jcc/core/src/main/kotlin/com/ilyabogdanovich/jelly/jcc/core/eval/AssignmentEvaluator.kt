@@ -11,7 +11,7 @@ import com.ilyabogdanovich.jelly.utils.mapRight
  *
  * @author Ilya Bogdanovich on 09.10.2023
  */
-class AssignmentEvaluator(private val expressionEvaluator: ExpressionEvaluator) {
+internal class AssignmentEvaluator(private val expressionEvaluator: ExpressionEvaluator) {
     /**
      * Evaluates the assignment context into either a name-value pair or error.
      * @param evalContext evaluation context with the current variables.

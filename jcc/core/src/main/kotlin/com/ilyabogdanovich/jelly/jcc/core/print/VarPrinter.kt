@@ -11,7 +11,7 @@ import java.math.RoundingMode
  *
  * @author Ilya Bogdanovich on 09.10.2023
  */
-class VarPrinter {
+internal class VarPrinter {
     /**
      * Prints the given variable [variable]. Result is returned in a string.
      * @param variable to print.

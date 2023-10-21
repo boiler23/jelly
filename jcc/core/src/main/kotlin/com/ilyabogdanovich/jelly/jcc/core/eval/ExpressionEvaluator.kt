@@ -13,7 +13,7 @@ import org.antlr.v4.runtime.ParserRuleContext
  *
  * @author Ilya Bogdanovich on 09.10.2023
  */
-class ExpressionEvaluator {
+internal class ExpressionEvaluator {
     /**
      * Does evaluation of the expression into [Var] instance.
      * @param evalContext current context to use.
