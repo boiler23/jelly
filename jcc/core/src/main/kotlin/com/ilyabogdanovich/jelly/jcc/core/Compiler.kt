@@ -10,7 +10,6 @@ import com.ilyabogdanovich.jelly.jcc.core.eval.PrintEvaluator
 import com.ilyabogdanovich.jelly.jcc.core.eval.toError
 import com.ilyabogdanovich.jelly.jcc.core.print.VarPrinter
 import com.ilyabogdanovich.jelly.utils.Either
-import org.antlr.v4.gui.TreeViewer
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
@@ -92,17 +91,5 @@ class Compiler {
                     }
                 },
         )
-    }
-
-    fun view(src: String) {
-        val errorListener = SyntaxErrorListener()
-        val lexer = JccLexer(CharStreams.fromString(src))
-        lexer.addErrorListener(errorListener)
-        val parser = JccParser(CommonTokenStream(lexer))
-        parser.addErrorListener(errorListener)
-        val tree = parser.program()
-        @Suppress("SpreadOperator")
-        val viewer = TreeViewer(listOf(*parser.ruleNames), tree)
-        viewer.open()
     }
 }
