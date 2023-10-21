@@ -94,7 +94,7 @@ class AssignmentEvaluatorTest {
         }
         val variable = mockk<Var>()
         coEvery { expressionEvaluator.evaluateExpression(evalContext, expression) } returns variable.asRight()
-        every { evalContext + mapOf("id" to variable) } returns Error.Type.VariableRedeclaration.asLeft()
+        every { evalContext + mapOf("id" to variable) } returns setOf("id").asLeft()
 
         // Do
         val result = assignmentEvaluator.evaluate(evalContext, parseContext)

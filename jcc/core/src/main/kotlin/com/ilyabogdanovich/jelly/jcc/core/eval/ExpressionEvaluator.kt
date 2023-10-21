@@ -210,7 +210,7 @@ internal class ExpressionEvaluator {
                     throw CancellationException()
                 }
                 when (val localEvalContext = evalContext + mapOf(id to e.toVar())) {
-                    is Either.Left -> lambdaExpr.toError(localEvalContext.value).asLeft()
+                    is Either.Left -> lambda.identifier().toError(Error.Type.VariableRedeclaration).asLeft()
                     is Either.Right ->
                         evaluateToNumber(localEvalContext.value, lambdaExpr, Error.Type.MapLambdaReturnsNotNumber)
                 }
@@ -239,7 +239,13 @@ internal class ExpressionEvaluator {
                         val localEvalContext = evalContext +
                             mapOf(accumulatorId to accumulatorValue.toVar(), nextId to nextValue.toVar())
                         when (localEvalContext) {
-                            is Either.Left -> lambdaExpr.toError(localEvalContext.value).asLeft()
+                            is Either.Left -> if (accumulatorId in localEvalContext.value) {
+                                lambda.identifier(0).toError(Error.Type.VariableRedeclaration).asLeft()
+                            } else if (nextId in localEvalContext.value) {
+                                lambda.identifier(1).toError(Error.Type.VariableRedeclaration).asLeft()
+                            } else {
+                                lambda.toError(Error.Type.VariableRedeclaration).asLeft()
+                            }
                             is Either.Right -> evaluateToNumber(
                                 localEvalContext.value,
                                 lambdaExpr,

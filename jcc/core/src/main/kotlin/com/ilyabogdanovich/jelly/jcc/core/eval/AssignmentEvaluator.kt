@@ -39,12 +39,13 @@ internal class AssignmentEvaluator(private val expressionEvaluator: ExpressionEv
             is Either.Right -> {
                 val (id, variable) = evaluated.value
                 when (val result = evalContext + mapOf(id to variable)) {
-                    is Either.Left -> {
-                        assignmentContext.toError(result.value, expression = assignmentContext.NAME()?.text).asLeft()
-                    }
-                    is Either.Right -> {
+                    is Either.Left ->
+                        assignmentContext.toError(
+                            Error.Type.VariableRedeclaration,
+                            expression = assignmentContext.NAME()?.text
+                        ).asLeft()
+                    is Either.Right ->
                         result.value.asRight()
-                    }
                 }
             }
         }

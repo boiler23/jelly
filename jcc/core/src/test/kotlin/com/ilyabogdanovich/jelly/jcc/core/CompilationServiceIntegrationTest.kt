@@ -305,10 +305,13 @@ class CompilationServiceIntegrationTest(
             ),
             arrayOf("out map({1,5},i->i^2)", "{ 1, 4, 9, 16, 25 }", empty()),
             arrayOf("out map({1,5},i->{i,i+2})", "", listOf("line 1:17: Lambda in map() is expected to return a number: '{i,i+2}'.")),
+            arrayOf("var i = 1 out map({1,5},i->i^2)", "", listOf("line 1:24: Variable redeclaration: 'i'.")),
             arrayOf("out reduce(map({1,5},i->i^2), 1, x y -> x*y)", "14400", empty()),
             arrayOf("out reduce({1,5},0,i j->i+j)", "15", empty()),
             arrayOf("out reduce({1,5},{1,2},i j->i+j)", "", listOf("line 1:17: Neutral element in reduce() should be a number expression: '{1,2}'.")),
             arrayOf("out reduce({1,5},1,i j->{i,j})", "", listOf("line 1:24: Lambda in reduce() is expected to return a number: '{i,j}'.")),
+            arrayOf("var i = 1 out reduce({1,5},0,i j->i+j)", "", listOf("line 1:29: Variable redeclaration: 'i'.")),
+            arrayOf("var j = 1 out reduce({1,5},0,i j->i+j)", "", listOf("line 1:31: Variable redeclaration: 'j'.")),
             arrayOf(
                 """
                     var r = reduce(
