@@ -1,6 +1,8 @@
 package com.ilyabogdanovich.jelly.ide.app.presentation.compose
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -151,23 +153,46 @@ private fun CodeEditTextField(
 
     LaunchedEffect(vScrollState.maxValue to value.selection) {
         layout?.let { l ->
-            // check if cursor
-            val line = l.getLineForOffset(value.selection.end)
-            val top = l.getLineTop(line)
-            val bottom = l.getLineBottom(line)
-            val lineHeight = bottom - top
-            val viewportBottom = vScrollState.value + viewportSize.height
-            if (bottom > viewportBottom - lineHeight) {
-                vScrollState.animateScrollBy(lineHeight)
-            } else if (top < vScrollState.value + lineHeight) {
-                vScrollState.animateScrollBy(-lineHeight)
-            }
+            l.scrollHorizontally(value, hScrollState, viewportSize, decorationOffset.value)
+            l.scrollVertically(value, vScrollState, viewportSize)
         }
     }
 
     LaunchedEffect(navigationEffect) {
         focusRequester.requestFocus()
         updateHighlight(value.selection.start)
+    }
+}
+
+private suspend fun TextLayoutResult.scrollHorizontally(
+    value: TextFieldValue,
+    hScrollState: ScrollState,
+    viewportSize: IntSize,
+    decorationOffset: Float
+) {
+    val start = getHorizontalPosition(value.selection.start, usePrimaryDirection = true)
+    val end = getHorizontalPosition(value.selection.end, usePrimaryDirection = true)
+    if (end > hScrollState.value + viewportSize.width - 2 * decorationOffset) {
+        hScrollState.scrollBy(end - hScrollState.value - viewportSize.width + 2 * decorationOffset)
+    } else if (start < hScrollState.value) {
+        hScrollState.scrollBy(start - hScrollState.value)
+    }
+}
+
+private suspend fun TextLayoutResult.scrollVertically(
+    value: TextFieldValue,
+    vScrollState: ScrollState,
+    viewportSize: IntSize,
+) {
+    val line = getLineForOffset(value.selection.end)
+    val top = getLineTop(line)
+    val bottom = getLineBottom(line)
+    val lineHeight = bottom - top
+    val viewportBottom = vScrollState.value + viewportSize.height
+    if (bottom > viewportBottom - lineHeight) {
+        vScrollState.animateScrollBy(lineHeight)
+    } else if (top < vScrollState.value + lineHeight) {
+        vScrollState.animateScrollBy(-lineHeight)
     }
 }
 
