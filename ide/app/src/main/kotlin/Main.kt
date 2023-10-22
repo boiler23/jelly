@@ -14,13 +14,16 @@ fun main() {
     val scope = CoroutineScope(Dispatchers.Default + Job())
 
     val diGraph = AppComponent.create()
-    val viewModel = diGraph.mainApi.viewModel
+    val mainWindowViewModel = diGraph.mainApi.mainWindowViewModel
+    val mainContentViewModel = diGraph.mainApi.mainContentViewModel
 
     // launch view model event processing
-    scope.launch { viewModel.processCompilationRequests() }
-    scope.launch { viewModel.processDocumentUpdates() }
-    scope.launch { viewModel.startApp() }
+    scope.launch { mainContentViewModel.processCompilationRequests() }
+    scope.launch { mainContentViewModel.processDocumentUpdates() }
+    scope.launch { mainContentViewModel.processContentChanges() }
+    scope.launch { mainWindowViewModel.processWindowTitleChanges() }
+    scope.launch { mainWindowViewModel.startApp() }
 
     // launch application UI
-    application { MainWindow(viewModel) }
+    application { MainWindow(mainWindowViewModel, mainContentViewModel) }
 }

@@ -11,7 +11,7 @@ import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationResults
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationServiceClient
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.Document
-import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentRepository
+import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentContentTracker
 import com.ilyabogdanovich.jelly.ide.app.presentation.compiler.CompilationStatus
 import com.ilyabogdanovich.jelly.logging.LoggerFactory
 import com.ilyabogdanovich.jelly.logging.get
@@ -21,16 +21,16 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
 /**
- * Main view model for the IDE application.
+ * View model for the main content of the IDE application: code editor & its output panels.
  *
  * @author Ilya Bogdanovich on 11.10.2023
  */
-class MainViewModel(
+class MainContentViewModel(
     private val compilationServiceClient: CompilationServiceClient,
-    private val documentRepository: DocumentRepository,
+    private val documentContentTracker: DocumentContentTracker,
     loggerFactory: LoggerFactory
 ) {
-    private val logger = loggerFactory.get<MainViewModel>()
+    private val logger = loggerFactory.get<MainContentViewModel>()
     var splashScreenVisible by mutableStateOf(true)
     var sourceInput by mutableStateOf(TextFieldValue(""))
     var errorMarkup by mutableStateOf(ErrorMarkup.empty())
@@ -49,11 +49,17 @@ class MainViewModel(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
+    /**
+     * Processes the changes to the source code text input.
+     */
     fun notifySourceInputChanged(input: TextFieldValue) {
         notifySourceInputChangedInternal(newInput = input.text, oldInput = sourceInput.text)
         sourceInput = input
     }
 
+    /**
+     * Processed the deep link clicks.
+     */
     fun notifyDeepLinkClicked(deepLink: DeepLink) {
         when (deepLink) {
             is DeepLink.Cursor -> {
@@ -76,10 +82,13 @@ class MainViewModel(
         }
     }
 
-    @WorkerThread
-    fun startApp() {
-        logger.d { "preparing app" }
-        val text = documentRepository.read().text
+    /**
+     * Processes changes to the internal document contents,
+     * not caused by the edit field changes (e.g. a new file opened).
+     */
+    suspend fun processContentChanges() = documentContentTracker.internalContentChanges.collectLatest {
+        logger.d { "internal contents changed" }
+        val text = it.text
         sourceInput = TextFieldValue(text)
         compilationRequests.tryEmit(text)
         splashScreenVisible = false
@@ -88,7 +97,7 @@ class MainViewModel(
     @WorkerThread
     suspend fun processDocumentUpdates() = documentUpdates.collectLatest {
         logger.d { "saving document" }
-        documentRepository.write(it)
+        documentContentTracker.handleContentChanges(it)
     }
 
     @WorkerThread

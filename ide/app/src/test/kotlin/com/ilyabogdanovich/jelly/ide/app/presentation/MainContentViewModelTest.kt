@@ -9,7 +9,7 @@ import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationResults
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.CompilationServiceClient
 import com.ilyabogdanovich.jelly.ide.app.domain.compiler.ErrorMarkup
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.Document
-import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentRepository
+import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentContentTracker
 import com.ilyabogdanovich.jelly.ide.app.presentation.compiler.CompilationStatus
 import com.ilyabogdanovich.jelly.logging.EmptyLoggerFactory
 import io.kotest.matchers.shouldBe
@@ -19,6 +19,7 @@ import io.mockk.coVerifySequence
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -27,20 +28,20 @@ import org.junit.Test
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * Test for [MainViewModel]
+ * Test for [MainContentViewModel]
  *
  * @author Ilya Bogdanovich on 11.10.2023
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class MainViewModelTest {
+class MainContentViewModelTest {
     private val compilationServiceClient = mockk<CompilationServiceClient>()
-    private val documentRepository = mockk<DocumentRepository>()
+    private val documentContentTracker = mockk<DocumentContentTracker>()
     private val dispatcher = UnconfinedTestDispatcher()
     private val scope = TestScope(dispatcher)
 
-    private val viewModel = MainViewModel(
+    private val viewModel = MainContentViewModel(
         compilationServiceClient,
-        documentRepository,
+        documentContentTracker,
         EmptyLoggerFactory,
     )
 
@@ -96,7 +97,7 @@ class MainViewModelTest {
     @Test
     fun `save document on new source text`() {
         // Prepare
-        coEvery { documentRepository.write(Document("text")) } returns Unit
+        coEvery { documentContentTracker.handleContentChanges(Document("text")) } returns Unit
 
         // Do
         scope.launch { viewModel.processDocumentUpdates() }
@@ -104,7 +105,7 @@ class MainViewModelTest {
 
         // Check
         coVerifySequence {
-            documentRepository.write(Document("text"))
+            documentContentTracker.handleContentChanges(Document("text"))
         }
         viewModel.resultOutput shouldBe ""
         viewModel.errorMessages shouldBe listOf()
@@ -149,7 +150,7 @@ class MainViewModelTest {
             CompilationResults.ErrorMessage("error 1", DeepLink.Cursor(position = 1)),
             CompilationResults.ErrorMessage("error 2", DeepLink.Cursor(position = 2)),
         )
-        every { documentRepository.read() } returns Document(text = "text")
+        every { documentContentTracker.internalContentChanges } returns flowOf(Document(text = "text"))
         coEvery { compilationServiceClient.compile("text") } returns CompilationResults(
             out = "out",
             errors = errorMessages,
@@ -161,11 +162,10 @@ class MainViewModelTest {
         // Do
         scope.launch { viewModel.processCompilationRequests() }
         scope.launch { viewModel.processDocumentUpdates() }
-        scope.launch { viewModel.startApp() }
+        scope.launch { viewModel.processContentChanges() }
 
         // Check
         coVerifySequence {
-            documentRepository.read()
             compilationServiceClient.compile("text")
         }
         viewModel.errorMarkup shouldBe errorMarkup

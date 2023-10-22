@@ -3,7 +3,11 @@ package com.ilyabogdanovich.jelly.ide.app.presentation.compose
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
-import com.ilyabogdanovich.jelly.ide.app.presentation.MainViewModel
+import com.ilyabogdanovich.jelly.ide.app.presentation.MainContentViewModel
+import com.ilyabogdanovich.jelly.ide.app.presentation.MainWindowViewModel
+import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.AlertDialog
+import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.FileDialog
+import okio.Path.Companion.toOkioPath
 
 /**
  * Composable for the main application window.
@@ -11,9 +15,18 @@ import com.ilyabogdanovich.jelly.ide.app.presentation.MainViewModel
  * @author Ilya Bogdanovich on 21.10.2023
  */
 @Composable
-fun ApplicationScope.MainWindow(viewModel: MainViewModel) {
-    Window(onCloseRequest = ::exitApplication) {
+fun ApplicationScope.MainWindow(
+    mainWindowViewModel: MainWindowViewModel,
+    viewModel: MainContentViewModel,
+) {
+    Window(
+        title = mainWindowViewModel.windowTitle,
+        onCloseRequest = ::exitApplication
+    ) {
         MainMenuBar(
+            onNew = mainWindowViewModel::new,
+            onOpen = mainWindowViewModel::open,
+            onSave = mainWindowViewModel::save,
             onExit = ::exitApplication
         )
         MainView(
@@ -27,5 +40,26 @@ fun ApplicationScope.MainWindow(viewModel: MainViewModel) {
             onSourceInputChanged = viewModel::notifySourceInputChanged,
             onDeepLinkClicked = viewModel::notifyDeepLinkClicked,
         )
+        if (mainWindowViewModel.isOpenFileDialogVisible) {
+            FileDialog(
+                "Open file",
+                isLoad = true,
+                onResult = { mainWindowViewModel.openResult(it?.toOkioPath()) }
+            )
+        }
+        if (mainWindowViewModel.isSaveFileDialogVisible) {
+            FileDialog(
+                "Save file",
+                isLoad = false,
+                onResult = { mainWindowViewModel.saveResult(it?.toOkioPath()) }
+            )
+        }
+        if (mainWindowViewModel.isCloseFileDialogVisible) {
+            AlertDialog(
+                "Do you want to save current file?",
+                "If you choose no - all contents will be lost!",
+                onResult = { mainWindowViewModel.closeResult(it) }
+            )
+        }
     }
 }

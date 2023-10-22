@@ -6,7 +6,7 @@ import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentRepository
 import com.ilyabogdanovich.jelly.logging.LoggerFactory
 import com.ilyabogdanovich.jelly.logging.get
 import okio.FileSystem
-import okio.Path.Companion.toPath
+import okio.Path
 import java.io.FileNotFoundException
 import java.io.IOException
 
@@ -44,10 +44,33 @@ class DocumentRepositoryImpl(
         logger.e(e) { "IO exception occurred while storing the source state" }
     }
 
-    companion object {
-        @VisibleForTesting
-        internal val INTERNAL_DIR = ".jelly".toPath()
+    override fun import(from: Path): Document = try {
+        fileSystem.createDirectories(INTERNAL_DIR)
+        fileSystem.copy(from, INTERNAL_SOURCE)
+        read()
+    } catch (e: IOException) {
+        logger.d(e) { "I/O exception occured while trying to import from $from" }
+        Document.empty()
+    }
 
+    override fun export(to: Path) = try {
+        to.parent?.let { fileSystem.createDirectories(it) }
+        fileSystem.copy(INTERNAL_SOURCE, to)
+        read()
+    } catch (e: IOException) {
+        logger.d(e) { "Failed to export internal content to $to" }
+        null
+    }
+
+    override fun readExternal(from: Path) = try {
+        val text = fileSystem.read(from) { readUtf8() }
+        Document(text = text)
+    } catch (e: IOException) {
+        logger.e(e) { "IO exception occurred while reading file $from" }
+        Document.empty()
+    }
+
+    companion object {
         @VisibleForTesting
         internal val INTERNAL_SOURCE = INTERNAL_DIR / "source.jy"
     }
