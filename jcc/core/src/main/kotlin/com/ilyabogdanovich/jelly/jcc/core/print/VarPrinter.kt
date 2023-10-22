@@ -5,6 +5,7 @@ import com.ilyabogdanovich.jelly.jcc.core.eval.Seq
 import com.ilyabogdanovich.jelly.jcc.core.eval.Var
 import java.math.BigDecimal
 import java.math.RoundingMode
+import kotlin.math.abs
 
 /**
  * Printer for variables. This printer is used in "out" command of our language.
@@ -30,8 +31,12 @@ internal class VarPrinter {
                 r == Double.NEGATIVE_INFINITY -> "-Infinity"
                 r.isNaN() -> "NaN"
                 else -> {
-                    val bd = BigDecimal(r)
-                    bd.setScale(12, RoundingMode.HALF_UP).stripTrailingZeros().toString()
+                    val bd = BigDecimal(r).setScale(12, RoundingMode.HALF_UP).stripTrailingZeros()
+                    if (abs(r) <= 1e-4 || abs(r) >= 1e+8) {
+                        bd.toString()
+                    } else {
+                        bd.toPlainString()
+                    }
                 }
             }
         }

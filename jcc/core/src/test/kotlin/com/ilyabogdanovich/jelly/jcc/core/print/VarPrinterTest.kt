@@ -100,13 +100,13 @@ class VarPrinterTest {
     @Test
     fun `print double scientific`() {
         // Prepare
-        val variable = 1e+6.toVar()
+        val variable = 1e+8.toVar()
 
         // Do
         val result = printer.print(variable)
 
         // Check
-        result shouldBe "1E+6"
+        result shouldBe "1E+8"
     }
 
     @Test
