@@ -19,7 +19,7 @@ class RecentsRepositoryImplTest {
     @Test
     fun `read existing recents`() {
         // Prepare
-        fileSystem.createDirectory(INTERNAL_DIR)
+        fileSystem.createDirectories(INTERNAL_DIR)
         fileSystem.write(RECENTS) { writeUtf8("path/to/recents") }
 
         // Do
@@ -55,7 +55,7 @@ class RecentsRepositoryImplTest {
     @Test
     fun `write path - existing recents`() {
         // Prepare
-        fileSystem.createDirectory(INTERNAL_DIR)
+        fileSystem.createDirectories(INTERNAL_DIR)
         fileSystem.write(RECENTS) { writeUtf8("path/to/recents") }
 
         // Do
@@ -82,7 +82,7 @@ class RecentsRepositoryImplTest {
     @Test
     fun `delete path - existing recents`() {
         // Prepare
-        fileSystem.createDirectory(INTERNAL_DIR)
+        fileSystem.createDirectories(INTERNAL_DIR)
         fileSystem.write(RECENTS) { writeUtf8("path/to/recents") }
 
         // Do

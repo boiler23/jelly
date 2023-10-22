@@ -9,4 +9,4 @@ import okio.Path.Companion.toPath
  * @author Ilya Bogdanovich on 22.10.2023
  */
 @VisibleForTesting
-internal val INTERNAL_DIR = ".jelly".toPath()
+internal val INTERNAL_DIR = System.getProperty("user.home").toPath() / ".jelly"
