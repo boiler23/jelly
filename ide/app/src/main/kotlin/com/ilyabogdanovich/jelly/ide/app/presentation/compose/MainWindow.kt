@@ -6,6 +6,7 @@ import androidx.compose.ui.window.Window
 import com.ilyabogdanovich.jelly.ide.app.presentation.MainContentViewModel
 import com.ilyabogdanovich.jelly.ide.app.presentation.MainWindowViewModel
 import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.AlertDialog
+import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.ConfirmDialog
 import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.FileDialog
 import okio.Path.Companion.toOkioPath
 
@@ -55,10 +56,17 @@ fun ApplicationScope.MainWindow(
             )
         }
         if (mainWindowViewModel.isCloseFileDialogVisible) {
-            AlertDialog(
+            ConfirmDialog(
                 "Do you want to save current file?",
                 "If you choose no - all contents will be lost!",
                 onResult = { mainWindowViewModel.closeResult(it) }
+            )
+        }
+        if (mainWindowViewModel.isFailedOpenDialogVisible) {
+            AlertDialog(
+                "File not supported",
+                "This file is not supported. You can only open files with extension 'jy'.",
+                onResult = { mainWindowViewModel.failedOpenResult() }
             )
         }
     }

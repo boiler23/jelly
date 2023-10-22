@@ -4,7 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentContentTracker
-import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.AlertDialogResult
+import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.ConfirmDialogResult
 import com.ilyabogdanovich.jelly.logging.LoggerFactory
 import com.ilyabogdanovich.jelly.logging.get
 import kotlinx.coroutines.CompletableDeferred
@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.withContext
 import okio.Path
+import okio.Path.Companion.toPath
 
 /**
  * View model for the main window contents: menus, window title, etc.
@@ -25,7 +26,8 @@ class MainWindowViewModel(
     loggerFactory: LoggerFactory,
     private val openDialogState: DialogState<Path?> = DialogState(),
     private val saveDialogState: DialogState<Path?> = DialogState(),
-    private val closeDialogState: DialogState<AlertDialogResult> = DialogState(),
+    private val closeDialogState: DialogState<ConfirmDialogResult> = DialogState(),
+    private val failedOpenDialogState: DialogState<Unit> = DialogState(),
 ) {
     private val logger = loggerFactory.get<MainWindowViewModel>()
     var windowTitle by mutableStateOf("")
@@ -39,18 +41,21 @@ class MainWindowViewModel(
     val isCloseFileDialogVisible: Boolean
         get() = closeDialogState.isAwaiting
 
+    val isFailedOpenDialogVisible: Boolean
+        get() = failedOpenDialogState.isAwaiting
+
     private suspend fun askToSave(): Boolean {
         if (documentContentTracker.dirtyState.value) {
             when (closeDialogState.awaitResult()) {
-                AlertDialogResult.Yes -> {
+                ConfirmDialogResult.Yes -> {
                     if (save()) {
                         return true
                     }
                 }
-                AlertDialogResult.No -> {
+                ConfirmDialogResult.No -> {
                     return true
                 }
-                AlertDialogResult.Cancel -> return false
+                ConfirmDialogResult.Cancel -> return false
                 null -> return false
             }
         } else {
@@ -76,8 +81,13 @@ class MainWindowViewModel(
         if (askToSave()) {
             val path = openDialogState.awaitResult()
             if (path != null) {
-                logger.d { "Picked file: $path" }
-                documentContentTracker.open(path)
+                if (path.toString().endsWith(".jy")) {
+                    logger.d { "Picked file: $path" }
+                    documentContentTracker.open(path)
+                } else {
+                    logger.d { "Picked unsupported file: $path" }
+                    failedOpenDialogState.awaitResult()
+                }
             }
         }
     }
@@ -90,13 +100,13 @@ class MainWindowViewModel(
         if (knownPath == null) {
             val pickedPath = saveDialogState.awaitResult()
             if (pickedPath != null) {
-                if (pickedPath.toString().endsWith(".jy")) {
-                    logger.d { "save path picked: $pickedPath" }
-                    documentContentTracker.save(pickedPath).also { logger.d { "save result: $it" } }
+                val finalPickedPath = if (!pickedPath.toString().endsWith(".jy")) {
+                    "$pickedPath.jy".toPath()
                 } else {
-                    logger.d { "path not picked - extension is not 'jy'" }
-                    false
+                    pickedPath
                 }
+                logger.d { "save path picked: $pickedPath" }
+                documentContentTracker.save(finalPickedPath).also { logger.d { "save result: $it" } }
             } else {
                 logger.d { "save path not picked" }
                 false
@@ -143,8 +153,14 @@ class MainWindowViewModel(
     /**
      * Handles the result of the close file dialog (yes/no/cancel alert).
      */
-    fun closeResult(result: AlertDialogResult) =
+    fun closeResult(result: ConfirmDialogResult) =
         closeDialogState.onResult(result)
+
+    /**
+     * Handles the result of the warning dialog about unsupported file type.
+     */
+    fun failedOpenResult() =
+        failedOpenDialogState.onResult(Unit)
 
     class DialogState<T> {
         private var onResult: CompletableDeferred<T>? by mutableStateOf(null)

@@ -1,7 +1,7 @@
 package com.ilyabogdanovich.jelly.ide.app.presentation
 
 import com.ilyabogdanovich.jelly.ide.app.domain.documents.DocumentContentTracker
-import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.AlertDialogResult
+import com.ilyabogdanovich.jelly.ide.app.presentation.compose.ds.ConfirmDialogResult
 import com.ilyabogdanovich.jelly.logging.EmptyLoggerFactory
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -31,7 +31,8 @@ class MainWindowViewModelTest {
     private val documentContentTracker = mockk<DocumentContentTracker>()
     private val openDialogState = mockk<MainWindowViewModel.DialogState<Path?>>()
     private val saveDialogState = mockk<MainWindowViewModel.DialogState<Path?>>()
-    private val closeDialogState = mockk<MainWindowViewModel.DialogState<AlertDialogResult>>()
+    private val closeDialogState = mockk<MainWindowViewModel.DialogState<ConfirmDialogResult>>()
+    private val failedOpenDialogState = mockk<MainWindowViewModel.DialogState<Unit>>()
     private val dispatcher = UnconfinedTestDispatcher()
     private val scope = TestScope(dispatcher)
 
@@ -42,6 +43,7 @@ class MainWindowViewModelTest {
         openDialogState,
         saveDialogState,
         closeDialogState,
+        failedOpenDialogState,
     )
 
     @Test
@@ -64,7 +66,7 @@ class MainWindowViewModelTest {
     fun `create new - current dirty - cancel`() = runTest(dispatcher) {
         // Prepare
         every { documentContentTracker.dirtyState } returns MutableStateFlow(true)
-        coEvery { closeDialogState.awaitResult() } returns AlertDialogResult.Cancel
+        coEvery { closeDialogState.awaitResult() } returns ConfirmDialogResult.Cancel
 
         // Do
         viewModel.new()
@@ -80,7 +82,7 @@ class MainWindowViewModelTest {
     fun `create new - current dirty - overwrite`() = runTest(dispatcher) {
         // Prepare
         every { documentContentTracker.dirtyState } returns MutableStateFlow(true)
-        coEvery { closeDialogState.awaitResult() } returns AlertDialogResult.No
+        coEvery { closeDialogState.awaitResult() } returns ConfirmDialogResult.No
         every { documentContentTracker.new() } returns Unit
 
         // Do
@@ -98,7 +100,7 @@ class MainWindowViewModelTest {
     fun `create new - current dirty - save - has path`() = runTest(dispatcher) {
         // Prepare
         every { documentContentTracker.dirtyState } returns MutableStateFlow(true)
-        coEvery { closeDialogState.awaitResult() } returns AlertDialogResult.Yes
+        coEvery { closeDialogState.awaitResult() } returns ConfirmDialogResult.Yes
         val path = mockk<Path>()
         coEvery { documentContentTracker.externalPath } returns MutableStateFlow(path)
         every { documentContentTracker.save(path) } returns true
@@ -121,7 +123,7 @@ class MainWindowViewModelTest {
     fun `create new - current dirty - save - has no path - pick new correct`() = runTest(dispatcher) {
         // Prepare
         every { documentContentTracker.dirtyState } returns MutableStateFlow(true)
-        coEvery { closeDialogState.awaitResult() } returns AlertDialogResult.Yes
+        coEvery { closeDialogState.awaitResult() } returns ConfirmDialogResult.Yes
         coEvery { documentContentTracker.externalPath } returns MutableStateFlow(null)
         val path = "external/folder/file.jy".toPath()
         coEvery { saveDialogState.awaitResult() } returns path
@@ -146,10 +148,13 @@ class MainWindowViewModelTest {
     fun `create new - current dirty - save - has no path - pick new incorrect`() = runTest(dispatcher) {
         // Prepare
         every { documentContentTracker.dirtyState } returns MutableStateFlow(true)
-        coEvery { closeDialogState.awaitResult() } returns AlertDialogResult.Yes
+        coEvery { closeDialogState.awaitResult() } returns ConfirmDialogResult.Yes
         coEvery { documentContentTracker.externalPath } returns MutableStateFlow(null)
         val path = "external/folder/file.txt".toPath()
         coEvery { saveDialogState.awaitResult() } returns path
+        val fixedSavePath = "external/folder/file.txt.jy".toPath()
+        every { documentContentTracker.save(fixedSavePath) } returns true
+        every { documentContentTracker.new() } returns Unit
 
         // Do
         viewModel.new()
@@ -160,6 +165,8 @@ class MainWindowViewModelTest {
             closeDialogState.awaitResult()
             documentContentTracker.externalPath
             saveDialogState.awaitResult()
+            documentContentTracker.save(fixedSavePath)
+            documentContentTracker.new()
         }
     }
 
@@ -167,7 +174,7 @@ class MainWindowViewModelTest {
     fun `create new - current dirty - save - has no path - do not pick new`() = runTest(dispatcher) {
         // Prepare
         every { documentContentTracker.dirtyState } returns MutableStateFlow(true)
-        coEvery { closeDialogState.awaitResult() } returns AlertDialogResult.Yes
+        coEvery { closeDialogState.awaitResult() } returns ConfirmDialogResult.Yes
         coEvery { documentContentTracker.externalPath } returns MutableStateFlow(null)
         coEvery { saveDialogState.awaitResult() } returns null
 
@@ -186,7 +193,7 @@ class MainWindowViewModelTest {
     @Test
     fun `open - current saved`() = runTest(dispatcher) {
         // Prepare
-        val path = mockk<Path>()
+        val path = "path/to/open.jy".toPath()
         every { documentContentTracker.dirtyState } returns MutableStateFlow(false)
         coEvery { openDialogState.awaitResult() } returns path
         every { documentContentTracker.open(path) } returns Unit
@@ -206,7 +213,7 @@ class MainWindowViewModelTest {
     fun `open - current dirty - cancel`() = runTest(dispatcher) {
         // Prepare
         every { documentContentTracker.dirtyState } returns MutableStateFlow(true)
-        coEvery { closeDialogState.awaitResult() } returns AlertDialogResult.Cancel
+        coEvery { closeDialogState.awaitResult() } returns ConfirmDialogResult.Cancel
 
         // Do
         viewModel.open()
@@ -222,8 +229,8 @@ class MainWindowViewModelTest {
     fun `open - current dirty - overwrite`() = runTest(dispatcher) {
         // Prepare
         every { documentContentTracker.dirtyState } returns MutableStateFlow(true)
-        coEvery { closeDialogState.awaitResult() } returns AlertDialogResult.No
-        val path = mockk<Path>()
+        coEvery { closeDialogState.awaitResult() } returns ConfirmDialogResult.No
+        val path = "path/to/open.jy".toPath()
         coEvery { openDialogState.awaitResult() } returns path
         every { documentContentTracker.open(path) } returns Unit
 
@@ -240,14 +247,35 @@ class MainWindowViewModelTest {
     }
 
     @Test
+    fun `open - current dirty - overwrite - not supported`() = runTest(dispatcher) {
+        // Prepare
+        every { documentContentTracker.dirtyState } returns MutableStateFlow(true)
+        coEvery { closeDialogState.awaitResult() } returns ConfirmDialogResult.No
+        val path = "path/to/open.txt".toPath()
+        coEvery { openDialogState.awaitResult() } returns path
+        coEvery { failedOpenDialogState.awaitResult() } returns Unit
+
+        // Do
+        viewModel.open()
+
+        // Check
+        coVerifySequence {
+            documentContentTracker.dirtyState
+            closeDialogState.awaitResult()
+            openDialogState.awaitResult()
+            failedOpenDialogState.awaitResult()
+        }
+    }
+
+    @Test
     fun `open - current dirty - save - has path`() = runTest(dispatcher) {
         // Prepare
         every { documentContentTracker.dirtyState } returns MutableStateFlow(true)
-        coEvery { closeDialogState.awaitResult() } returns AlertDialogResult.Yes
+        coEvery { closeDialogState.awaitResult() } returns ConfirmDialogResult.Yes
         val savePath = mockk<Path>()
         coEvery { documentContentTracker.externalPath } returns MutableStateFlow(savePath)
         every { documentContentTracker.save(savePath) } returns true
-        val openPath = mockk<Path>()
+        val openPath = "path/to/open.jy".toPath()
         coEvery { openDialogState.awaitResult() } returns openPath
         every { documentContentTracker.open(openPath) } returns Unit
 
@@ -269,12 +297,12 @@ class MainWindowViewModelTest {
     fun `open - current dirty - save - has no path - pick new correct`() = runTest(dispatcher) {
         // Prepare
         every { documentContentTracker.dirtyState } returns MutableStateFlow(true)
-        coEvery { closeDialogState.awaitResult() } returns AlertDialogResult.Yes
+        coEvery { closeDialogState.awaitResult() } returns ConfirmDialogResult.Yes
         coEvery { documentContentTracker.externalPath } returns MutableStateFlow(null)
         val savePath = "external/folder/file.jy".toPath()
         coEvery { saveDialogState.awaitResult() } returns savePath
         every { documentContentTracker.save(savePath) } returns true
-        val openPath = mockk<Path>()
+        val openPath = "path/to/open.jy".toPath()
         coEvery { openDialogState.awaitResult() } returns openPath
         every { documentContentTracker.open(openPath) } returns Unit
 
@@ -297,10 +325,15 @@ class MainWindowViewModelTest {
     fun `open - current dirty - save - has no path - pick new incorrect`() = runTest(dispatcher) {
         // Prepare
         every { documentContentTracker.dirtyState } returns MutableStateFlow(true)
-        coEvery { closeDialogState.awaitResult() } returns AlertDialogResult.Yes
+        coEvery { closeDialogState.awaitResult() } returns ConfirmDialogResult.Yes
         coEvery { documentContentTracker.externalPath } returns MutableStateFlow(null)
         val savePath = "external/folder/file.txt".toPath()
         coEvery { saveDialogState.awaitResult() } returns savePath
+        val fixedSavePath = "external/folder/file.txt.jy".toPath()
+        every { documentContentTracker.save(fixedSavePath) } returns true
+        val openPath = "path/to/open.jy".toPath()
+        coEvery { openDialogState.awaitResult() } returns openPath
+        every { documentContentTracker.open(openPath) } returns Unit
 
         // Do
         viewModel.open()
@@ -311,6 +344,9 @@ class MainWindowViewModelTest {
             closeDialogState.awaitResult()
             documentContentTracker.externalPath
             saveDialogState.awaitResult()
+            documentContentTracker.save(fixedSavePath)
+            openDialogState.awaitResult()
+            documentContentTracker.open(openPath)
         }
     }
 
@@ -318,7 +354,7 @@ class MainWindowViewModelTest {
     fun `open - current dirty - save - has no path - do not pick new`() = runTest(dispatcher) {
         // Prepare
         every { documentContentTracker.dirtyState } returns MutableStateFlow(true)
-        coEvery { closeDialogState.awaitResult() } returns AlertDialogResult.Yes
+        coEvery { closeDialogState.awaitResult() } returns ConfirmDialogResult.Yes
         coEvery { documentContentTracker.externalPath } returns MutableStateFlow(null)
         coEvery { saveDialogState.awaitResult() } returns null
 
@@ -376,6 +412,8 @@ class MainWindowViewModelTest {
         coEvery { documentContentTracker.externalPath } returns MutableStateFlow(null)
         val savePath = "external/folder/file.txt".toPath()
         coEvery { saveDialogState.awaitResult() } returns savePath
+        val fixedSavePath = "external/folder/file.txt.jy".toPath()
+        every { documentContentTracker.save(fixedSavePath) } returns true
 
         // Do
         viewModel.save()
@@ -384,6 +422,7 @@ class MainWindowViewModelTest {
         coVerifySequence {
             documentContentTracker.externalPath
             saveDialogState.awaitResult()
+            documentContentTracker.save(fixedSavePath)
         }
     }
 

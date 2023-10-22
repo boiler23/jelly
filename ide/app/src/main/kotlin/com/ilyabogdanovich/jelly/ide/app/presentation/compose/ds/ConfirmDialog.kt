@@ -11,21 +11,28 @@ import kotlinx.coroutines.swing.Swing
 import javax.swing.JOptionPane
 
 /**
- * This composable provides support for platform dialog with only one button to close it.
+ * This composable provides support for platform dialog with three options: Yes, No, or Cancel.
  *
  * @author Ilya Bogdanovich on 22.10.2023
  */
 @OptIn(DelicateCoroutinesApi::class)
 @Composable
-fun WindowScope.AlertDialog(
+fun WindowScope.ConfirmDialog(
     title: String,
     message: String,
-    onResult: () -> Unit
+    onResult: (result: ConfirmDialogResult) -> Unit
 ) {
     DisposableEffect(Unit) {
         val job = GlobalScope.launch(Dispatchers.Swing) {
-            JOptionPane.showConfirmDialog(window, message, title, JOptionPane.CLOSED_OPTION)
-            onResult()
+            val resultInt = JOptionPane.showConfirmDialog(
+                window, message, title, JOptionPane.YES_NO_CANCEL_OPTION
+            )
+            val result = when (resultInt) {
+                JOptionPane.YES_OPTION -> ConfirmDialogResult.Yes
+                JOptionPane.NO_OPTION -> ConfirmDialogResult.No
+                else -> ConfirmDialogResult.Cancel
+            }
+            onResult(result)
         }
 
         onDispose {
