@@ -250,6 +250,10 @@ class CompilationServiceIntegrationTest(
             arrayOf("out (-1.0)^1.0", "-1", empty()),
             arrayOf("out (-1.0)^2.0", "1", empty()),
             arrayOf("out (-1.0)^3.0", "-1", empty()),
+            arrayOf("out ((0 + 1) - 23 * 1 / 2 ) * -10 -5", "1E+2", empty()),
+            arrayOf("out ((0 + 1) - 23 * 1 / 2 ) * (-10) - 5", "1E+2", empty()),
+            arrayOf("out ((0 + 1) - 23 * 1 / 2 ) * (-10) - 55", "5E+1", empty()),
+            arrayOf("out ((0 + 1) - 23 * 1 / 2 ) * (-10) - 50", "55", empty()),
             arrayOf(
                 """
                     var num1 = 12

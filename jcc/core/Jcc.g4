@@ -18,11 +18,11 @@ printing: PRINT STRING;
 expression
           : identifier                       # id
           | number                           # value
+          | PLUSMINUS expression             # unary
           | LPAREN expression RPAREN         # parenthesis
           | expression POWER expression      # power
           | expression MULDIV expression     # muldiv
           | expression PLUSMINUS expression  # plusminus
-          | PLUSMINUS expression             # unary
           | sequence                         # array
           | map                              # mapping
           | reduce                           # reducing
