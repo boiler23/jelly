@@ -219,7 +219,7 @@ private fun DrawScope.drawErrorMarkup(
             val right = decorationOffset + layout.getHorizontalPosition(markup.stop, true)
             val bottom = layout.getLineBottom(markup.line) + ERROR_MARKUP_OFFSET_Y.dp.toPx()
             path.moveTo(left, bottom)
-            path.lineTo(right, bottom)
+            path.lineTo(if (left == right) left + ERROR_MARKUP_MIN_WIDTH.dp.toPx() else right, bottom)
         }
     }
 
@@ -286,3 +286,5 @@ private const val ERROR_MARKUP_THICKNESS = 2f
 private const val ERROR_MARKUP_DASH_INTERVAL = 3f
 // Error markup vertical offset, in dp
 private const val ERROR_MARKUP_OFFSET_Y = 1f
+// Error highlight minimal length, in dp
+private const val ERROR_MARKUP_MIN_WIDTH = 10f
