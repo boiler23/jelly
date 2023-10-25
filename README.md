@@ -35,7 +35,7 @@ And open the "Jelly" app on the device afterward.
 
 ## Frameworks/Libraries used
 - ANTLR for generating the lexer/parser/parse tree
-- Compose Desktop for the editor UI
+- Compose Multiplatform for the editor UI
 - Kotlin Coroutines to organize concurrency
 - Apache's FastMath for exponentiation
 - Okio for file operations
